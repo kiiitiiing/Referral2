@@ -1,0 +1,388 @@
+﻿@model PaginatedList<IncomingViewModel>
+
+@{
+    ViewData["Title"] = "Incoming Patients";
+}
+
+<div class="content">
+    <div class="container">
+        <div class="row">
+            <!-- CARD DANGER -->
+            <div class="col-md-3">
+                <!-- SELECT DATE -->
+                <div class="card card-danger card-green">
+                    <!-- CARD DANGER HEADER -->
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            Filter Result
+                        </h3>
+                        <span class="badge fa-pull-right">
+                            Result: @ViewBag.Total
+                        </span>
+                    </div>
+                    <!-- CARD DANGER BODY -->
+                    <form method="post" action="">
+                        <input type="hidden" name="_token" value="" autocomplete="off" />
+                        <div class="card-body">
+                            <!-- SEARCH -->
+                            <div class="form-group">
+                                <input type="text" placeholder="Seach Keyword..." class="form-control" name="SearchString" value="@ViewBag.CurrentFilter" required autocomplete="off" />
+                            </div>
+                            <!-- MUNICIPALITY -->
+                            <div class="form-group">
+                                <select class="form-control" name="municity">
+                                </select>
+                            </div>
+                            <!-- BARANGAY -->
+                            <div class="form-group">
+                                <select class="form-control" name="brngy">
+                                </select>
+                            </div>
+                            <div class="form-group hide"></div>
+                            <!-- BUTTONS -->
+                            <div class="form-group">
+                                <!-- FILTER -->
+                                <button type="submit" value="Filter" class="btn btn-block btn-success">
+                                    <i class="fa fa-filter"></i>
+                                    &nbsp;Filter Result
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <partial name="~/Views/Shared/PartialViews/_MainMenuPartial.cshtml" />
+            </div>
+            <div class="col-md-9">
+                <!-- PATIENT LIST -->
+                <div class="card card-outline">
+                    <!-- DAILY USERS HEADER -->
+                    <div class="card-header with-border">
+                        <h2>
+                            Incoming Patients
+                        </h2>
+                    </div>
+                    <!-- DAILY USERS BODY -->
+                    <div class="card-body">
+                        <div class="timeline">
+                            @foreach (var item in Model)
+                            {
+                                var code = item.Code;
+                                var patientName = item.Patient.FirstName + " " + item.Patient.MiddleName + " " + item.Patient.LastName;
+                                var sex = item.Patient.Sex;
+                                var age = DateTime.Now.Year - item.Patient.DateOfBirth.Year;
+                                var actionMd = item.ActionMd == null ? "" : "Dr. " + item.ActionMd.Firstname + " " + item.ActionMd.Middlename + " " + item.ActionMd.Lastname;
+                                var referringMd = item.ReferringMd == null ? "" : "Dr. " + item.ReferringMd.Firstname + " " + item.ReferringMd.Middlename + " " + item.ReferringMd.Lastname;
+                                //var actionMd = item.ActionMdNavigation == null? "" : "Dr. " + item.ActionMdNavigation.Firstname + " " + item.ActionMdNavigation.Middlename + " " + item.ActionMdNavigation.Lastname;
+                                //var referringMd = item.ReferringMdNavigation == null? "" : "Dr. " + item.ReferringMdNavigation.Firstname + " " + item.ReferringMdNavigation.Middlename + " " + item.ReferringMdNavigation.Lastname;
+
+                                var referredFrom = item.ReferredFrom.Name;
+                                var referredTo = item.ReferredTo.Name;
+                                var status = item.Status;
+                                var dateAction = item.DateAction;
+                                var currentUserFacility = int.Parse(User.FindFirstValue("Facility"));
+                                var currentUserDepartment = int.Parse(User.FindFirstValue("Department"));
+
+                                // ACCEPTED
+                                if (status.Equals("accepted"))
+                                {
+                                    <div>
+                                        <i class="fa fa-user-plus bg-olive"></i>
+                                        <div class="timeline-item">
+                                            <span class="time">
+                                                <i class="fa fa-calendar">
+                                                    &nbsp;@dateAction
+                                                </i>
+                                            </span>
+                                            <h3 class="timeline-header no-border">
+                                                <small class="text-bold">@code</small>
+                                                <a href="#">@patientName</a>
+                                                was accepted by
+                                                <span class="text-success">@actionMd</span>
+                                            </h3>
+                                            <div class="timeline-footer">
+                                                <div class="form-inline">
+                                                    <div class="form-group">
+                                                        <a href="#seenModal" data-toggle="modal" data-code="@code" class="btn btn-success btn-xs">
+                                                            <i class="fa fa-user-md"></i>
+                                                            &nbsp;Seen
+                                                            <small class="badge bg-green">1</small>
+                                                        </a>
+                                                        <button class="btn btn-info btn-xs" data-toggle="modal" data-target="#feedbackModal" data-code="@code">
+                                                            <i class="fa fa-comments"></i>
+                                                            &nbsp;ReCo
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                //TRANSFERRED
+                                else if (status.Equals("transferred"))
+                                {
+                                    <div>
+                                        <i class="fa fa-user-plus bg-olive"></i>
+                                        <div class="timeline-item">
+                                            <span class="time">
+                                                <i class="fa fa-calendar">
+                                                    &nbsp;@dateAction
+                                                </i>
+                                            </span>
+                                            <h3 class="timeline-header no-border">
+                                                <small class="text-bold">@code</small>
+                                                <a href="#">@patientName</a>
+                                                was transferred by
+                                                <span class="text-success">@actionMd</span>'s
+                                            </h3>
+                                        </div>
+                                    </div>
+                                }
+
+                                //ARRIVED
+                                else if (status.Equals("arrived"))
+                                {
+                                    <div>
+                                        <i class="fa fa-user-plus bg-olive"></i>
+                                        <div class="timeline-item">
+                                            <span class="time">
+                                                <i class="fa fa-calendar">
+                                                    &nbsp;@dateAction
+                                                </i>
+                                            </span>
+                                            <h3 class="timeline-header no-border">
+                                                <small class="text-bold">@code</small>
+                                                <a href="#">@patientName</a>
+                                                has arrived by
+                                                <span class="text-success">@actionMd</span>'s
+                                                department
+                                            </h3>
+                                            <div class="timeline-footer">
+                                                <div class="form-inline">
+                                                    <div class="form-group">
+                                                        <a href="#seenModal" data-toggle="modal" data-code="@code" class="btn btn-success btn-xs">
+                                                            <i class="fa fa-user-md"></i>
+                                                            &nbsp;Seen
+                                                            <small class="badge bg-green">1</small>
+                                                        </a>
+                                                        <button class="btn btn-info btn-xs" data-toggle="modal" data-target="#feedbackModal" data-code="@code">
+                                                            <i class="fa fa-comments"></i>
+                                                            &nbsp;ReCo
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                //CANCELLED
+                                else if (status.Equals("cancelled"))
+                                {
+                                    <div>
+                                        <i class="fa fa-user-plus bg-olive"></i>
+                                        <div class="timeline-item">
+                                            <span class="time">
+                                                <i class="fa fa-calendar">
+                                                    &nbsp;@dateAction
+                                                </i>
+                                            </span>
+                                            <h3 class="timeline-header no-border">
+                                                <small class="text-bold">@code</small>
+                                                <a href="#">@patientName</a>
+                                                was cancelled by
+                                                <span class="text-success">@actionMd</span>
+                                            </h3>
+                                            <div class="timeline-footer">
+                                                <div class="form-inline">
+                                                    <div class="form-group">
+                                                        <a href="#seenModal" data-toggle="modal" data-code="@code" class="btn btn-success btn-xs">
+                                                            <i class="fa fa-user-md"></i>
+                                                            &nbsp;Seen
+                                                            <small class="badge bg-green">1</small>
+                                                        </a>
+                                                        <button class="btn btn-info btn-xs" data-toggle="modal" data-target="#feedbackModal" data-code="@code">
+                                                            <i class="fa fa-comments"></i>
+                                                            &nbsp;ReCo
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                // ADMITTED
+                                else if (status.Equals("admitted"))
+                                {
+                                    <div>
+                                        <i class="fa fa-user-plus bg-olive"></i>
+                                        <div class="timeline-item">
+                                            <span class="time">
+                                                <i class="fa fa-calendar">
+                                                    &nbsp;@dateAction
+                                                </i>
+                                            </span>
+                                            <h3 class="timeline-header no-border">
+                                                <small class="text-bold">@code</small>
+                                                <a href="#">@patientName</a>
+                                                was admitted by
+                                                <span class="text-success">@actionMd</span>
+                                            </h3>
+                                            <div class="timeline-footer">
+                                                <div class="form-inline">
+                                                    <div class="form-group">
+                                                        <a href="#seenModal" data-toggle="modal" data-code="@code" class="btn btn-success btn-xs">
+                                                            <i class="fa fa-user-md"></i>
+                                                            &nbsp;Seen
+                                                            <small class="badge bg-green">1</small>
+                                                        </a>
+                                                        <button class="btn btn-info btn-xs" data-toggle="modal" data-target="#feedbackModal" data-code="@code">
+                                                            <i class="fa fa-comments"></i>
+                                                            &nbsp;ReCo
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                // REJECTED
+                                else if (status.Equals("rejected"))
+                                {
+                                    <div>
+                                        <i class="fa fa-user-plus bg-olive"></i>
+                                        <div class="timeline-item">
+                                            <span class="time">
+                                                <i class="fa fa-calendar">
+                                                    &nbsp;@dateAction
+                                                </i>
+                                            </span>
+                                            <h3 class="timeline-header no-border">
+                                                <small class="text-bold">@code</small>
+                                                <a href="#">@patientName</a>
+                                                was admitted by
+                                                <span class="text-success">@actionMd</span>
+                                            </h3>
+                                            <div class="timeline-footer">
+                                                <div class="form-inline">
+                                                    <div class="form-group">
+                                                        <a href="#seenModal" data-toggle="modal" data-code="@code" class="btn btn-success btn-xs">
+                                                            <i class="fa fa-user-md"></i>
+                                                            &nbsp;Seen
+                                                            <small class="badge bg-green">1</small>
+                                                        </a>
+                                                        <button class="btn btn-info btn-xs" data-toggle="modal" data-target="#feedbackModal" data-code="@code">
+                                                            <i class="fa fa-comments"></i>
+                                                            &nbsp;ReCo
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                // REFERRED
+                                else if (status.Equals("referred"))
+                                {
+                                    <div>
+                                        <i class="fa fa-ambulance bg-gradient-blue"></i>
+                                        <div class="timeline-item">
+                                            <span class="time">
+                                                <i class="fa fa-calendar">
+                                                    &nbsp;@dateAction
+                                                </i>
+                                            </span>
+                                            <h3 class="timeline-header no-border">
+                                                <small class="text-bold">@code</small>
+                                                <a href="#">@patientName</a>
+                                                <small class="text-muted">[@sex, @age]</small>
+                                                was referred to
+                                                <span class="text-danger">@referredTo</span>
+                                                by
+                                                <span class="text-success">@referringMd</span>
+                                                of
+                                                <span class="text-warning">@referredFrom</span>
+                                            </h3>
+                                            <div class="timeline-footer">
+                                                <div class="form-inline">
+                                                    <div class="form-group">
+                                                        @if (currentUserFacility == item.ReferredTo.Id && currentUserDepartment == item.DepartmentId.Id)
+                                                        {
+                                                            //<button class="btn btn-primary btn-xs refer_modal" asp-controller="AddPatients" asp-action="Refer" asp-route-id="@item.Id" value="@item.Id" type="button" data-toggle="modal" data-target="#refer_modal">
+                                                            <button class="btn btn-warning btn-xs patientform_modal" asp-controller="ViewForms" asp-action="PatientForm" asp-route-code="@code" value="@code" type="button" data-toggle="modal" data-target="#patientform_modal">
+                                                                <i class="fa fa-user-md"></i>
+                                                                &nbsp;View Form
+                                                            </button>
+                                                        }
+                                                        <a href="#seenModal" data-toggle="modal" data-code="@code" class="btn btn-success btn-xs">
+                                                            <i class="fa fa-user-md"></i>
+                                                            &nbsp;Seen
+                                                            <small class="badge bg-green">1</small>
+                                                        </a>
+                                                        <button class="btn btn-info btn-xs" data-toggle="modal" data-target="#feedbackModal" data-code="@code">
+                                                            <i class="fa fa-comments"></i>
+                                                            &nbsp;ReCo
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        @{
+                            var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+                            var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+                        }
+
+                        <a asp-action="Incoming"
+                           asp-route-sortOrder="@ViewData["CurrentSort"]"
+                           asp-route-pageNumber="@(Model._pageIndex - 1)"
+                           asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                           class="btn btn-primary @prevDisabled">
+                            Previous
+                        </a>
+                        <a asp-action="Incoming"
+                           asp-route-sortOrder="@ViewData["CurrentSort"]"
+                           asp-route-pageNumber="@(Model._pageIndex + 1)"
+                           asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                           class="btn btn-primary @nextDisabled">
+                            Next
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" role="dialog" id="patientform_modal">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>Patient</h4>
+            </div>
+            <div id="patientform_content" class="modal-body">
+                <hr />
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('body').on('click', '.patientform_modal', function () {
+        var patientCode = this.value;
+        var url = "/ViewForms/PatientForm?code=" + patientCode;
+        console.log(url);
+        $("#patientform_content").html("Loading..............");
+        $.get(url, function (result) {
+            $("#patientform_content").html(result);
+        })
+    });
+</script>

@@ -1,0 +1,224 @@
+﻿@model Patient
+
+@{
+    ViewData["Title"] = "Add new Patient";
+}
+
+<div class="content">
+    <div class="container">
+        <div class="row">
+            <!-- ADD NEW PATIENT CARD START -->
+            <div class="col-md-9">
+                <form method="post" class="" id="form-sumbit" asp-action="Add">
+                    <div class="card card-outline">
+                        <!-- CARD HEADER -->
+                        <div class="card-header with-border">
+                            <h3>
+                                Add New Patient
+                            </h3>
+                        </div>
+                        <!-- CARD BODY -->
+                        <div class="card-body">
+                            <!-- PATIENT INFO TABLE -->
+                            <!-- TABLE START -->
+                            <input type="hidden" name="_token" value="" autocomplete="off" />
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" border="1">
+                                    <tbody>
+                                        <!-- PHILHEALTH STATUS -->
+                                        <tr>
+                                            <td>PhilHealth Status:</td>
+                                            <td>
+                                                <div class="form-group">
+                                                    <select id="phicStatus" asp-for="PhicStatus" class="form-control" asp-items="ViewBag.PhicStatus" name="PhicStatus" required>
+                                                    </select>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <!-- PHILHEALTH ID -->
+                                        <tr>
+                                            <td>
+                                                PhilHealth ID:<br />
+                                                <small class="text-info">
+                                                    <em>(If applicable)</em>
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <input id="phicId" asp-for="PhicId" type="text" class="form-control" disabled autocomplete="off" />
+                                            </td>
+                                        </tr>
+                                        <!-- FIRST NAME -->
+                                        <tr>
+                                            <td>First Name:</td>
+                                            <td>
+                                                <input asp-for="FirstName" type="text" class="form-control" required autocomplete="off" />
+                                                <span asp-validation-for="FirstName" class="text-danger"></span>
+                                            </td>
+                                        </tr>
+                                        <!-- MIDDLE NAME -->
+                                        <tr>
+                                            <td>Middle Name:</td>
+                                            <td>
+                                                <input asp-for="MiddleName" type="text" class="form-control" required autocomplete="off" />
+                                                <span asp-validation-for="MiddleName" class="text-danger"></span>
+                                            </td>
+                                        </tr>
+                                        <!-- LAST NAME -->
+                                        <tr>
+                                            <td>Last Name:</td>
+                                            <td>
+                                                <input asp-for="LastName" type="text" class="form-control" required autocomplete="off" />
+                                                <span asp-validation-for="LastName" class="text-danger"></span>
+                                            </td>
+                                        </tr>
+                                        <!-- BIRTHDATE NAME -->
+                                        <tr>
+                                            <td>Birthdate:</td>
+                                            <td>
+                                                <input asp-for="DateOfBirth" type="date" class="form-control" required autocomplete="off" />
+                                                <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                                            </td>
+                                        </tr>
+                                        <!-- GENDER -->
+                                        <tr>
+                                            <td>Sex:</td>
+                                            <td>
+                                                <div>
+                                                    @foreach (var item in ViewBag.Sex)
+                                                    {
+                                                    <span>
+                                                        <input asp-for="Sex" type="radio" value="@item" required autocomplete="off" />&nbsp;@item<br />
+                                                    </span>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <!-- CIVIL STATUS -->
+                                        <tr>
+                                            <td>Civil Status:</td>
+                                            <td>
+                                                <div class="form-group">
+                                                    <select asp-for="CivilStatus" class="form-control" asp-items="ViewBag.CivilStatus" required></select>
+                                                    <span asp-validation-for="CivilStatus" class="text-danger"></span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <!--MUNICIPALITY/CITY -->
+                                        <tr>
+                                            <td>Municipality/City:</td>
+                                            <td>
+                                                <div class="form-group">
+                                                    <select id="muncityFilter" asp-for="MuncityId" class="form-control" asp-items="ViewBag.MuncityId" required>
+                                                        <option value="none">Select City/Municipality...</option>
+                                                    </select>
+                                                    <span asp-validation-for="MuncityId" class="text-danger"></span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <!--  BARANGAY -->
+                                        <tr>
+                                            <td id="barangay-label">Barangay:</td>
+                                            <td>
+                                                <select asp-for="BarangayId" class="form-control barangay" required>
+                                                    <option value="">Select Barangay...</option>
+                                                </select>
+                                                <span asp-validation-for="BarangayId" class="text-danger"></span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- TABLE END -->
+                        </div>
+                        <!-- CARD BODY END -->
+                        <div class="card-footer with-border">
+                            <!-- CARD FOOTER -->
+                            <div class="fa-pull-right">
+                                <!-- BACK BUTTON -->
+                                <a href="#" class="btn btn-sm btn-default">
+                                    <i class="fa fa-arrow-left"></i>
+                                    &nbsp;Back
+                                </a>
+                                <!-- SUMBIT BUTTON-->
+                                <button id="submitBtn" type="submit" class="btn btn-sm btn-success">
+                                    <i class="fa fa-send"></i>
+                                    &nbsp;Submit
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-3">
+                <partial name="~/Views/Shared/PartialViews/_MainMenuPartial.cshtml" />
+            </div>
+            <div class="clearfix"></div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#submitBtn").submit(function () {
+            $('form').preventDoubleSubmission();
+        });
+    });
+
+    $("#phicStatus").change(function () {
+        if ($("#phicStatus").val() != "None") {
+            $("#phicId").removeAttr("disabled");
+        }
+        else {
+            $("#phicId").attr("disabled", "disabled");
+            $("#phicId").val("");
+        }
+    });
+
+    jQuery.fn.preventDoubleSubmission = function () {
+        $(this).on('submit'), function (e) {
+            var $form = $(this);
+
+            if ($form.data('submitted') == true) {
+                e.preventDefault();
+            } else {
+                $form.data('submitted', true);
+            }
+        };
+
+        return this;
+    };
+
+    var muncityId = 0;
+    $('#muncityFilter').change(function () {
+        muncityId = $('#muncityFilter').val();
+
+        if (muncityId != 'none') {
+            $.when(getBarangayFiltered()).done(function (output) {
+            $('#barangay').empty()
+                .append($('<option>', {
+                    value: '',
+                    text: 'Select Barangay...'
+                }))
+            jQuery.each(output, function (i, item) {
+                $('#barangay').append($('<option>', {
+                    value: item.id,
+                    text: item.description
+                }))
+            }
+            );
+        });
+        }
+    });
+
+    function getBarangayFiltered() {
+        var urls = "/NoReload/FilteredBarangay?muncityId=" + muncityId;
+        return $.ajax({
+            url: urls,
+            type: 'get',
+            async: true
+        });
+    }
+</script>
+

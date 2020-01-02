@@ -1,0 +1,285 @@
+﻿@model IEnumerable<ReferredViewModel>
+
+
+@{
+    ViewData["Title"] = "Referred Patient";
+    var startDate = new DateTime(DateTime.Now.Year, 1, 1).ToString("yyyy/MM/dd");
+    var endDate = new DateTime(DateTime.Now.Year, 12, 31).ToString("yyyy/MM/dd");
+}
+<div class="row">
+    <div class="col-md-3">
+        <div class="card card-danger card-green">
+            <!-- CARD DANGER HEADER -->
+            <div class="card-header">
+                <h3 class="card-title">
+                    Filter Result
+                </h3>
+                <span class="badge fa-pull-right">
+                    Result: @ViewBag.Total
+                </span>
+            </div>
+            <!-- CARD DANGER BODY -->
+            <form method="post" action="">
+                <input type="hidden" value="" autocomplete="off" />
+                <div class="card-body">
+                    <!-- SEARCH -->
+                    <div class="form-group">
+                        <input type="text" placeholder="Seach Keyword..." class="form-control" name="SearchString" value="@ViewBag.CurrentFilter" autocomplete="off" required />
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control form-control-sm active" type="text" value="@startDate - @endDate" id="daterange" name="daterange" autocomplete="off">
+                    </div>
+                    <!-- MUNICIPALITY -->
+                    <div class="form-group">
+                        <select class="form-control" asp-items="ViewBag.Muncities" id="muncityFilter" required>
+                            <option>Select City/Municipality...</option>
+                        </select>
+                    </div>
+                    <!-- BARANGAY -->
+                    <div class="form-group">
+                        <select class="form-control" id="barangay" required>
+                            <option value="none">Select Barangay...</option>
+                        </select>
+                    </div>
+                    <div class="form-group hide"></div>
+                    <!-- BUTTONS -->
+                    <div class="form-group">
+                        <!-- FILTER -->
+                        <button type="submit" value="Filter" class="btn btn-block btn-success">
+                            <i class="fa fa-search"></i>
+                            &nbsp;Filter
+                        </button>
+                        <!-- ADD PATIENT -->
+                        <a asp-area="" asp-controller="AddPatients" asp-action="Add" class="btn btn-block btn-warning">
+                            <i class="fa fa-user-plus">
+                                &nbsp;Add Patient
+                            </i>
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <partial name="~/Views/Shared/PartialViews/_MainMenuPartial.cshtml" />"
+    </div>
+
+
+    <div class="col-md-9">
+        @foreach (var item in Model)
+        {
+            var patientName = item.Patient.FirstName + " " + item.Patient.MiddleName + " " + item.Patient.LastName;
+            var sex = item.Patient.Sex;
+            var age = DateTime.Now.Year - item.Patient.DateOfBirth.Year;
+            var address = item.Patient.Address;
+            var referringMd = "Dr. " + item.ReferringMd.Firstname + " " + item.ReferringMd.Middlename + " " + item.ReferringMd.Lastname;
+            var code = item.Code;
+            <div class="card card-outline">
+                <!-- DAILY USERS HEADER -->
+                <div class="card-header with-border">
+                    <h3 class="text-danger">
+                        <i class="fa fa-wheelchair"></i>
+                        &nbsp;@patientName
+                    </h3>
+                    <span class="text-sm text-muted">[@sex, @age]from @address</span><br />
+                    <span class="text-success">Referred by:</span>
+                    <a>@referringMd</a><br />
+                    <span class="text-success">Patient Code:</span>
+                    <span class="text-warning">@code</span>
+                </div>
+                <!-- DAILY USERS BODY -->
+                <div class="card-body">
+                    <!-- BS-WIZARD START -->
+                    <div class="row bs-wizard" style="border-bottom:0;">
+
+                        <div class="col-xs-2 bs-wizard-step  complete ">
+                            <!-- complete -->
+                            <div class="text-center bs-wizard-stepnum">
+                                Referred
+                            </div>
+                            <div class="progress"><div class="progress-bar"></div></div>
+                            <a href="javascript:void(0)" class="bs-wizard-dot" title="Referred"></a>
+                        </div>
+
+                        <div class="col-xs-2 bs-wizard-step  complete ">
+                            <!-- complete -->
+                            <div class="text-center bs-wizard-stepnum">Seen</div>
+                            <div class="progress"><div class="progress-bar"></div></div>
+                            <a href="javascript:void(0)" class="bs-wizard-dot"></a>
+                        </div>
+
+                        <div class="col-xs-2 bs-wizard-step  complete ">
+                            <!-- complete -->
+                            <div class="text-center bs-wizard-stepnum">Accepted</div>
+                            <div class="progress"><div class="progress-bar"></div></div>
+                            <a href="javascript:void(0)" class="bs-wizard-dot"></a>
+                        </div>
+
+                        <div class="col-xs-2 bs-wizard-step  complete ">
+                            <!-- complete -->
+                            <div class="text-center bs-wizard-stepnum">
+                                Arrived
+                            </div>
+                            <div class="progress"><div class="progress-bar"></div></div>
+                            <a href="javascript:void(0)" class="bs-wizard-dot"></a>
+                        </div>
+                        <div class="col-xs-2 bs-wizard-step  complete ">
+                            <!-- complete -->
+                            <div class="text-center bs-wizard-stepnum">Admitted</div>
+                            <div class="progress"><div class="progress-bar"></div></div>
+                            <a href="javascript:void(0)" class="bs-wizard-dot"></a>
+                        </div>
+                        <div class="col-xs-2 bs-wizard-step  active ">
+                            <!-- complete -->
+                            <div class="text-center bs-wizard-stepnum">Discharged</div>
+                            <div class="progress"><div class="progress-bar"></div></div>
+                            <a href="javascript:void(0)" class="bs-wizard-dot"></a>
+                        </div>
+                    </div>
+                    <!-- TABLE START-->
+                    <table>
+                        <tbody>
+                            @foreach (var item2 in item.Activities)
+                            {
+                                var dateReferred = item2.DateReferred;
+                                var patient = item2.Patient.FirstName + " " + item2.Patient.MiddleName + " " + item2.Patient.LastName;
+                                var referredFrom = item2.ReferredFromNavigation.Name;
+                                var referredTo = item2.ReferredToNavigation == null ? "" : item2.ReferredToNavigation.Name;
+                                var department = item2.Department == null ? "" : item2.Department.Description;
+                                var actionMd = "Dr. " + item2.ActionMdNavigation.Firstname + " " + item2.ActionMdNavigation.Middlename + " " + item2.ActionMdNavigation.Lastname;
+                                var actionMdFacility = item2.ActionMdNavigation.Facility.Name;
+                                var referringMd2 = item2.ReferringMdNavigation == null ? "" : "Dr. " + item2.ReferringMdNavigation.Firstname + " " + item2.ReferringMdNavigation.Middlename + " " + item2.ReferringMdNavigation.Lastname;
+                                var referringMdFacililty = item2.ReferredFromNavigation.Name;
+                                var remarks = item2.Remarks;
+
+                                if (item2.Status.Equals("referred"))
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="text-muted">@dateReferred</span>
+                                        </td>
+                                        <td>
+                                            <span class="text-success">@patient</span>
+                                            was referred by
+                                            <span class="text-info">@Html.DisplayFor(modelItem => item2.ReferringMdNavigation.Firstname) @Html.DisplayFor(modelItem => item2.ReferringMdNavigation.Middlename) @Html.DisplayFor(modelItem => item2.ReferringMdNavigation.Lastname)</span>
+                                            of
+                                            <span class="text-primary">@referredFrom</span>
+                                            to
+                                            <span class="text-primary">@Html.DisplayFor(modelItem => item2.ReferredToNavigation.Name)</span>
+                                        </td>
+                                    </tr>
+                                }
+                                else if (item2.Status.Equals("accepted"))
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="text-muted">@dateReferred</span>
+                                        </td>
+                                        <td>
+                                            <span class="text-success">@patient</span>
+                                            was accepted by
+                                            <span class="text-info">@actionMd</span>
+                                            of
+                                            <span class="text-primary">@actionMdFacility</span>
+                                            <br />
+                                            <span class="text-warning">Remarks: @remarks</span>
+                                        </td>
+                                    </tr>
+                                }
+                                else if (item2.Status.Equals("arrived"))
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="text-muted">@dateReferred</span>
+                                        </td>
+                                        <td>
+                                            <span class="text-success">@patient</span>
+                                            has arrived at
+                                            <span class="text-info">@actionMdFacility</span>
+                                            <br />
+                                            <span class="text-warning">Remarks: @remarks</span>
+                                        </td>
+                                    </tr>
+                                }
+                                else if (item2.Status.Equals("admitted"))
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="text-muted">@dateReferred</span>
+                                        </td>
+                                        <td>
+                                            <span class="text-success">@patient</span>
+                                            was admitted at
+                                            <span class="text-info">@actionMdFacility</span>
+                                            <br />
+                                            <span class="text-warning">Remarks: @remarks</span>
+                                        </td>
+                                    </tr>
+                                }
+                                else if (item2.Status.Equals("discharged"))
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="text-muted">@dateReferred</span>
+                                        </td>
+                                        <td>
+                                            <span class="text-success">@patient</span>
+                                            was discharged from
+                                            <span class="text-info">@actionMdFacility</span>
+                                            <br />
+                                            <span class="text-warning">Remarks: @remarks</span>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<script type="text/javascript" src="~/assets/daterangepicker/moment.js"></script>
+<script type="text/javascript" src="~/assets/daterangepicker/daterangepicker.js"></script>
+<link rel="stylesheet" type="text/css" href="~/assets/daterangepicker/daterangepicker-bs3.css" />
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('input[name="daterange"]').daterangepicker({
+            format: 'YYYY/MM/DD',
+            startDate: '@startDate',
+            endDate: '@endDate'
+        });
+    });
+</script>
+
+<script>
+    var muncityId = 0;
+    $('#muncityFilter').change(function () {
+        muncityId = $('#muncityFilter').val();
+
+        if (muncityId != 'none') {
+            $.when(getBarangayFiltered()).done(function (output) {
+            $('#barangay').empty()
+                .append($('<option>', {
+                    value: '',
+                    text: 'Select Barangay...'
+                }))
+            jQuery.each(output, function (i, item) {
+                $('#barangay').append($('<option>', {
+                    value: item.id,
+                    text: item.description
+                }))
+            }
+            );
+        });
+        }
+    });
+
+    function getBarangayFiltered() {
+        var urls = "/NoReload/FilteredBarangay?muncityId=" + muncityId;
+        return $.ajax({
+            url: urls,
+            type: 'get',
+            async: true
+        });
+    }
+</script>

@@ -1,0 +1,42 @@
+﻿@model DashboardViewModel
+
+@{
+    ViewData["Title"] = "Home Page";
+    var accepted = Model.Accepted;
+    var redirected = Model.Redirected;
+    var max = Model.Max * 1.3;
+}
+
+<div class="row">
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-header">
+                Monthly Activity
+            </div>
+            <div class="card-body">
+                <div class="chart">
+                    <canvas id="barChart" height="326" width="653" style="width: 523px; height: 261px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <partial name="~/Views/Shared/PartialViews/_MainMenuPartial.cshtml" />
+    </div>
+</div>
+
+
+<div class="modal fade" id="notificationModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body">
+                HELLO
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/assets/plugins/chart.js/Chart.js"></script>
+<script>
+    $('#notificationModal').modal('show');
+</script>

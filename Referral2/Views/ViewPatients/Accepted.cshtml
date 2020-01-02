@@ -1,0 +1,269 @@
+﻿@model PaginatedList<AcceptedViewModel>
+
+@{
+    ViewData["Title"] = "Accepted Patients";
+    var dateToday = DateTime.Now;
+    var firstDayOfMonth = new DateTime(dateToday.Year, 1, 1);
+    var lastDayOfMonth = new DateTime(dateToday.Year, 12, 31);
+}
+
+
+<div id="modal-placeholder"></div>
+
+<div class="col-md-12">
+
+    <!-- CARD START-->
+    <div class="card">
+        <!-- CARD DANGER HEADER -->
+        <div class="card-header">
+            <div class="fa-pull-right">
+                <form class="form-inline" asp-action="Accepted" method="get">
+                    <div class="form-actions no-color">
+                        <div class="form-group">
+                            <input class="form-control" type="text" placeholder="Code,Firstname,Lastname" name="SearchString" value="@ViewBag.CurrentFilter" />
+                        </div>
+                        <div class="form-group">
+                            <input class="form-control form-control-sm active" type="text" value="@firstDayOfMonth.ToString("yyyy/MM/dd") - @lastDayOfMonth.ToString("yyyy/MM/dd")" id="daterange" name="daterange" autocomplete="off">
+                        </div>
+                        <button type="submit" value="Search" class="btn btn-primary">
+                            Search
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div>
+                <h3 class="card-title">
+                    Accepted Patients
+                </h3><br />
+                <span class="text-sm text-muted">TOTAL: @ViewBag.Total</span>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <!-- CARD DANGER BODY -->
+        <form method="post" action="">
+            <input type="hidden" name="_token" value="" autocomplete="off" />
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>
+                                <p>Referring Facility</p>
+                            </th>
+                            <th>
+                                <p>Patient Name/Code</p>
+                            </th>
+                            <th>
+                                <p>Date Accepted</p>
+                            </th>
+                            <th>
+                                <p>Current Status</p>
+                            </th>
+                            <th>
+                                <p>Action</p>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            var facility = item.ReferredFrom.Name;
+                            var patientName = item.Patient.FirstName + " " + item.Patient.MiddleName + " " + item.Patient.LastName;
+                            var code = item.Code;
+                            var status = item.Status;
+                            var dateAction = item.DateAction.ToString("MMMM dd, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+                            <tr>
+                                <!-- REFERRING FACILITY -->
+                                <td>
+                                    @facility<br />
+                                    @if (item.Type.Equals("pregnant"))
+                                    {
+                                        <p class="small text-muted">Pregnant</p>
+                                    }
+                                    else
+                                    {
+                                        <p class="small text-muted">Non-Pregnant</p>
+                                    }
+                                </td>
+                                <!-- PATIENT NAME -->
+                                <td>
+                                    @patientName
+                                    <p class="small text-muted">
+                                        @code
+                                    </p>
+                                </td>
+                                <!-- DATE ACTIVITY -->
+                                <td>
+                                    @dateAction
+                                </td>
+                                <!-- STATUS -->
+                                <td>
+                                    @status.ToUpper()
+                                </td>
+                                <!-- ACTION -->
+                                <td>
+                                    @if (status.Equals("referred"))
+                                    {
+                                        //reco
+                                        <button class="btn btn-sm btn-info" value="O">
+                                            <i class="fa fa-comments"></i>
+                                        </button>
+                                    }
+                                    else if (status.Equals("accepted"))
+                                    {
+                                        //arrived
+                                        <button type="button" class="btn btn-sm btn-primary" data-toggle="ajax-modal" data-target="#arrived-modal" data-url="@Url.Action("ArrivedRemark","Remarks",new { code = item.Code})">
+                                            <i class="fa fa-wheelchair"></i>
+                                        </button>
+                                        //reco
+                                        <button class="btn btn-sm btn-info" value="O">
+                                            <i class="fa fa-comments"></i>
+                                        </button>
+                                    }
+                                    else if (status.Equals("arrived"))
+                                    {
+                                        //admitted
+                                        <button type="button" class="btn btn-sm btn-info" data-toggle="ajax-modal" data-target="#admitted-modal" data-url="@Url.Action("AdmittedRemark","Remarks",new { code = item.Code})">
+
+                                            <i class="fa fa-stethoscope"></i>
+                                        </button>
+                                        //discharged
+                                        <button type="button" class="btn btn-sm btn-warning" data-toggle="ajax-modal" data-target="#discharged-modal" data-url="@Url.Action("DischargedRemark","Remarks",new { code = item.Code})">
+                                            <i class="fa fa-wheelchair"></i>
+                                        </button>
+                                        //refer
+                                        <button type="button" class="btn btn-sm btn-success" data-toggle="ajax-modal" data-target="#refer-modal" data-url="@Url.Action("ReferRemark","Remarks",new { code = item.Code})">
+                                            <i class="fa fa-ambulance"></i>
+                                        </button>
+                                        //reco
+                                        <button class="btn btn-sm btn-info" value="O">
+                                            <i class="fa fa-comments"></i>
+                                        </button>
+                                    }
+                                    else if (status.Equals("admitted"))
+                                    {
+                                        //discharged
+                                <button type="button" class="btn btn-sm btn-warning" data-toggle="ajax-modal" data-target="#discharged-modal" data-url="@Url.Action("DischargedRemark","Remarks",new { code = item.Code})">
+                                    <i class="fa fa-wheelchair"></i>
+                                </button>
+                                        //refer
+                                <button type="button" class="btn btn-sm btn-success" data-toggle="ajax-modal" data-target="#refer-modal" data-url="@Url.Action("ReferRemark","Remarks",new { code = item.Code})">
+                                    <i class="fa fa-ambulance"></i>
+                                </button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+            <!-- CARD FOOTER -->
+            <div class="card-footer">
+                @{
+                    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+                    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+                }
+
+                <a asp-action="GetAcceptedPatients"
+                   asp-route-sortOrder="@ViewData["CurrentSort"]"
+                   asp-route-pageNumber="@(Model._pageIndex - 1)"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   class="btn btn-primary @prevDisabled">
+                    Previous
+                </a>
+                <a asp-action="GetAcceptedPatients"
+                   asp-route-sortOrder="@ViewData["CurrentSort"]"
+                   asp-route-pageNumber="@(Model._pageIndex + 1)"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   class="btn btn-primary @nextDisabled">
+                    Next
+                </a>
+
+                <table class="table table-striped">
+                    <caption>LEGEND: </caption>
+                    <tbody>
+                        <!-- ARRIVED -->
+                        <tr>
+                            <td class="text-left">
+                                <button class="btn btn-sm btn-primary" disabled>
+                                    <i class="fa fa-wheelchair"></i>
+                                </button>
+                                &nbsp;&nbsp;Arrived
+                            </td>
+                        </tr>
+                        <!-- DIDNT ARRIVED -->
+                        <tr>
+                            <td class="text-left">
+                                <button class="btn btn-sm btn-danger" disabled>
+                                    <i class="fa fa-wheelchair"></i>
+                                </button>
+                                &nbsp;&nbsp;Patient Didn't Arrive
+                            </td>
+                        </tr>
+                        <!-- ADMITTED -->
+                        <tr>
+                            <td class="text-left">
+                                <button class="btn btn-sm btn-info" disabled>
+                                    <i class="fa fa-stethoscope"></i>
+                                </button>
+                                &nbsp;&nbsp;Admitted
+                            </td>
+                        </tr>
+                        <!-- DISCHARGED -->
+                        <tr>
+                            <td class="text-left">
+                                <button class="btn btn-sm btn-warning" disabled>
+                                    <i class="fa fa-wheelchair"></i>
+                                </button>
+                                &nbsp;&nbsp;Patient Discharged
+                            </td>
+                        </tr>
+                        <!-- REFER -->
+                        <tr>
+                            <td class="text-left">
+                                <button class="btn btn-sm btn-success" disabled>
+                                    <i class="fa fa-ambulance"></i>
+                                </button>
+                                &nbsp;&nbsp;Refer Patient
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
+
+
+<!-- RECO -->
+<div class="modal card fade" role="dialog" id="reco_modal">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div id="admitted_content">
+                <hr />
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<script type="text/javascript" src="~/assets/daterangepicker/moment.js"></script>
+<script type="text/javascript" src="~/assets/daterangepicker/daterangepicker.js"></script>
+<link rel="stylesheet" type="text/css" href="~/assets/daterangepicker/daterangepicker-bs3.css" />
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('input[name="daterange"]').daterangepicker({
+            format: 'YYYY/MM/DD',
+            startDate: '@firstDayOfMonth.ToString("yyyy/MM/dd")',
+            endDate: '@lastDayOfMonth.ToString("yyyy/MM/dd")'
+        });
+    });
+</script>

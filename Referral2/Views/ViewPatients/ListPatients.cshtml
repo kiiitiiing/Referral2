@@ -1,0 +1,263 @@
+﻿@model PaginatedList<Patient>
+
+@{
+    ViewData["Title"] = "Patient List";
+    var patientPregnant = "refer-patient";
+    bool refer = true;
+}
+
+
+<div class="content">
+    <div class="container">
+        <div class="row">
+            <!-- CARD DANGER -->
+            <div class="col-md-3">
+                <!-- SELECT DATE -->
+                <div class="card card-danger card-green">
+                    <!-- CARD DANGER HEADER -->
+                    <div class="card-header">
+                        <h3 class="card-title">Filter Patients</h3>
+                    </div>
+                    <!-- CARD DANGER BODY -->
+                    <form method="post" action="">
+                        <input type="hidden" value="" autocomplete="off" />
+                        <div class="card-body">
+                            <!-- SEARCH -->
+                            <div class="form-group">
+                                <input type="text" placeholder="Seach Keyword..." class="form-control" name="SearchString" value="@ViewBag.CurrentFilter" autocomplete="off" required />
+                            </div>
+                            <!-- MUNICIPALITY -->
+                            <div class="form-group">
+                                <select class="form-control" asp-items="ViewBag.Muncities" id="muncityFilter" required>
+                                    <option value="none">Select City/Municipality...</option>
+                                </select>
+                            </div>
+                            <!-- BARANGAY -->
+                            <div class="form-group">
+                                <select class="form-control" id="barangay" required>
+                                    <option>Select Barangay...</option>
+                                </select>
+                            </div>
+                            <div class="form-group hide"></div>
+                            <!-- BUTTONS -->
+                            <div class="form-group">
+                                <!-- FILTER -->
+                                <button type="submit" value="Filter" class="btn btn-block btn-success">
+                                    <i class="fa fa-search"></i>
+                                    &nbsp;Filter
+                                </button>
+                                <!-- ADD PATIENT -->
+                                <a asp-area="" asp-controller="AddPatients" asp-action="Add" class="btn btn-block btn-warning">
+                                    <i class="fa fa-user-plus">
+                                        &nbsp;Add Patient
+                                    </i>
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <!-- PATIENT LIST -->
+                <div class="card card-outline">
+                    <!-- DAILY USERS HEADER -->
+                    <div class="card-header with-border">
+                        <h3>
+                            Patient List
+                        </h3>
+                        <small class="text-success">@DateTime.Now.ToString("MMMM dd, yyyy")</small>
+                    </div>
+                    <!-- DAILY USERS BODY -->
+                    <div class="card-body">
+                        <!-- TABLE START -->
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover table-bordered">
+                                <!-- TABLE HEADER -->
+                                <thead>
+                                    <tr class="bg-gradient-gray">
+                                        <th>Name</th>
+                                        <th>Gender</th>
+                                        <th>Age/DOB</th>
+                                        <th>Barangay</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <!-- TABLE BODY -->
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        var patientName = item.FirstName + " " + item.MiddleName + " " + item.LastName;
+                                        var dateOfBirth = item.DateOfBirth.ToString("MMMM dd, yyyy");
+                                        var sex = item.Sex;
+                                        var civilStatus = item.CivilStatus;
+                                        var philHealthId = item.PhicId;
+                                        var philHealthStatus = item.PhicStatus;
+                                        var address = item.Address;
+                                        var age = DateTime.Now.Year - item.DateOfBirth.Year;
+                                        var barangay = item.Barangay.Description;
+                                        var muncity = item.Muncity.Description;
+                                        <tr>
+                                            <td>@patientName</td><!-- NAME -->
+                                            <td>@sex</td><!-- GENDER -->
+                                            <td>
+                                                <!-- AGE/DOB -->
+                                                @age<br />
+                                                <small class="text-muted">@dateOfBirth</small>
+                                            </td>
+                                            <td>
+                                                <!-- BARANGAY -->
+                                                @barangay<br />
+                                                <small class="text-muted">@muncity</small>
+                                            </td>
+                                            <td>
+                                                <!-- REFER -->
+                                                @if (sex.Equals("Female") && (age > 14 && age < 50))
+                                                {
+                                                    <button type="button" id="refer-pregnant-btn" class="btn btn-primary btn-xs pregId" data-toggle="modal" data-target="#pregnant-choose-modal" data-patient_id="@item.Id">
+                                                        <i class="fa fa-stethoscope"></i>
+                                                        &nbsp;Refer
+                                                    </button>
+                                                    <!-- WALK IN -->
+                                                    <button data-toggle="modal" data-target="#pregnant-choose-modal" class="btn btn-warning btn-xs">
+                                                        <i class="fa fa-ambulance"></i>
+                                                        &nbsp;Walk-In
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button type="button" class="btn btn-primary btn-xs refer_modal" data-toggle="ajax-modal" data-target="#@patientPregnant" data-url="@Url.Action("Refer","AddPatients",new { id = item.Id})">
+                                                        <i class="fa fa-stethoscope"></i>
+                                                        &nbsp;Refer
+                                                    </button>
+                                                    <!-- WALK IN -->
+                                                    <button data-toggle="modal" data-target="#walkInModal" class="btn btn-warning btn-xs">
+                                                        <i class="fa fa-ambulance"></i>
+                                                        &nbsp;Walk-In
+                                                    </button>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div id="modal-placeholders"></div>
+
+<div class="modal fade" role="dialog" id="pregnant-choose-modal">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header justify-content-center">
+                <h4>
+                    SELECT OPTION
+                </h4>
+            </div>
+            <div class="modal-body clearfix">
+                <button type="button" id="non-preg-modal" class="btn btn-warning col-xs-7" data-backdrop="static" data-target="#refer_modal" data-toggle="modal">
+                    <img src="~/assets/dist/img/female.png" width="100" />
+                    <br />
+                    Non-Pregnant
+                </button>
+
+                <button type="button" id="non-preg-modal" class="btn btn-warning col-xs-7" data-backdrop="static" data-target="#pregnant_refer_modal" data-toggle="modal">
+                    <img src="~/assets/dist/img/pregnant.png" width="100" />
+                    <br />
+                    Pregnant
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- NORMAL REFER MODAL -->
+<div class="modal fade" id="refer_modal" tabindex="-1" role="dialog" aria-labelledby="addContactLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content" id="normal_content">
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+<!-- NORMAL WALKIN MODAL -->
+<div class="modal fade" id="walkin_modal" tabindex="-1" role="dialog" aria-labelledby="addContactLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content" id="normal_content">
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+<!-- PREGNANT REFER MODAL -->
+<div class="modal fade" id="pregnant_refer_modal" tabindex="-1" role="dialog" aria-labelledby="addContactLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content" id="pregnant_content">
+            <div class="clearfix"></div>
+            ha? ha? hakdog
+        </div>
+    </div>
+</div>
+<!-- PREGNANT WALKIN MODAL -->
+<div class="modal fade" id="pregnant_walkin_modal" tabindex="-1" role="dialog" aria-labelledby="addContactLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content" id="pregnant_content">
+            <div class="clearfix"></div>
+            ha? ha? hakdog
+        </div>
+    </div>
+</div>
+
+<script>
+
+    var patientId;
+    var url;
+
+    $('.pregId').on('click', function () {
+        patientId = $(this).data('patient_id');
+    });
+
+    $('#refer_modal').on('show.bs.modal', function () {
+        url = '/AddPatients/Refer?id=' + patientId;
+        console.log(url);
+        $.get(url).done(function (data) {
+            $('#normal_content').empty();
+            $('#normal_content').html(data);
+        });
+    });
+
+    var muncityId = 0;
+    $('#muncityFilter').change(function () {
+        muncityId = $('#muncityFilter').val();
+
+        if (muncityId != 'none') {
+            $.when(getBarangayFiltered()).done(function (output) {
+                console.log(output);
+                $('#barangay').empty()
+                    .append($('<option>', {
+                        value: '',
+                        text: 'Select Barangay...'
+                    }))
+                jQuery.each(output, function (i, item) {
+                    $('#barangay').append($('<option>', {
+                        value: item.id,
+                        text: item.description
+                    }))
+                }
+                );
+            });
+        }
+    });
+
+    function getBarangayFiltered() {
+        var urls = "/NoReload/FilteredBarangay?muncityId=" + muncityId;
+        return $.ajax({
+            url: urls,
+            type: 'get',
+            async: true
+        });
+    }
+</script>

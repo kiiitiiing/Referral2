@@ -1,0 +1,27 @@
+﻿@using System.Security.Claims
+
+
+<ul class="nav navbar-nav">
+    @if (User.Identity.IsAuthenticated)
+    {
+        var currentUser = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.GivenName).Value + " " + User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Surname).Value;
+
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Profile" title="Manage">Hello @currentUser!</a>
+        </li>
+        <li class="nav-item">
+            <form class="form-inline" asp-controller="Account" asp-action="Logout">
+                <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
+            </form>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Log in</a>
+        </li>
+    }
+</ul>

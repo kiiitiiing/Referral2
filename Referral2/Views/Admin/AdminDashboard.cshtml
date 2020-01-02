@@ -1,0 +1,115 @@
+﻿@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    var totalDoctor = Model.TotalDoctors;
+    var onlineDoctors = Model.OnlineDoctors;
+    var activeFacility = Model.ActviteFacilities;
+    var referredPatients = Model.ReferredPatients;
+    var accepted = Model.Accepted;
+    var redirected = Model.Redirected;
+    var max = Model.Max * 1.3;
+}
+
+    <div class="row">
+        <!-- ADMIN DASHBOARD -->
+        <div class="col-md-9">
+            <div class="card card-success card-outline">
+                <div class="card-header with-border">
+                    <h3>Admin: Dashboard</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- TOTAL DOCTORS -->
+                        <div class="col-sm-6">
+                            <div class="info-box bg-gradient-yellow">
+                                <span class="info-box-icon">
+                                    <i class="fa fa-user-md"></i>
+                                </span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">TOTAL DOCTORS</span>
+                                    <span class="info-box-number">@totalDoctor</span>
+                                    <div class="progress">
+                                        <div class="progress-bar"></div>
+                                    </div>
+                                    <span class="progress-description"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- ONLINE DOCTORS -->
+                        <div class="col-sm-6">
+                            <div class="info-box bg-gradient-cyan">
+                                <span class="info-box-icon">
+                                    <i class="fa fa-users"></i>
+                                </span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">ONLINE DOCTORS</span>
+                                    <span class="info-box-number">@onlineDoctors</span>
+                                    <div class="progress">
+                                        <div class="progress-bar"></div>
+                                    </div>
+                                    <span class="progress-description"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <!-- ACTIVE FACILITIES -->
+                        <div class="col-sm-6">
+                            <div class="info-box bg-gradient-red">
+                                <span class="info-box-icon">
+                                    <i class="fa fa-hospital"></i>
+                                </span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Active Facilities</span>
+                                    <span class="info-box-number">@activeFacility</span>
+                                    <div class="progress">
+                                        <div class="progress-bar"></div>
+                                    </div>
+                                    <span class="progress-description"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- REFERRED PATIENTS -->
+                        <div class="col-sm-6">
+                            <div class="info-box bg-green">
+                                <span class="info-box-icon">
+                                    <i class="fa fa-file-o"></i>
+                                </span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Referred Patients</span>
+                                    <span class="info-box-number">@referredPatients</span>
+                                    <div class="progress">
+                                        <div class="progress-bar"></div>
+                                    </div>
+                                    <span class="progress-description"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- LINKS -->
+        <div class="col-md-3">
+            <partial name="~/Views/Shared/PartialViews/_LinksPartial.cshtml" />
+        </div>
+        <!-- MONTHLY ACTIVITY -->
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Monthly Activity</h3>
+                </div>
+                <div class="card-body" id="dashboard_div">
+                    <div class="chart">
+                        <canvas id="barChart" height="326" width="653" style="width: 523px; height: 261px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<script src="~/assets/plugins/chart.js/Chart.js"></script>
+<script>
+    $('#notificationModal').modal('show');
+</script>

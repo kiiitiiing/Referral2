@@ -1,0 +1,19 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace Referral2.Models.ViewModels
+{
+    public class IncomingReportViewModel
+    {
+        public string Code { get; set; }
+        public string Facility { get; set; }
+        public DateTime DateArrived { get; set; }
+        public DateTime DateAdmitted { get; set; }
+        public DateTime DateDischarged { get; set; }
+        public DateTime DateTransferred { get; set; }
+        public DateTime DateCancelled { get; set; }
+    }
+
+}

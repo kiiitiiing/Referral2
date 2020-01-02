@@ -1,0 +1,34 @@
+﻿@model Referral2.Models.ViewModels.LoginViewModel
+
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="row">
+    <div class="col-md-5">
+        <h2>Login with your credentials</h2>
+        @if(!ViewContext.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                <div asp-validation-summary="All"></div>
+            </div>
+        }
+        <form asp-action="Login" method="post">
+            <div class="form-group">
+                <label asp-for="Username">Username</label>
+                <input type="text" class="form-control" autofocus placeholder="Username" id="username" name="username" asp-for="Username" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Password">Password</label>
+                <input type="password" class="form-control" autofocus placeholder="Password" id="password" name="password" asp-for="Password" />
+            </div>
+            <div>
+                <label asp-for="RememberMe">Remember me&nbsp;</label>
+                <input type="checkbox" autofocus  id="rememberMe" name="rememberme" asp-for="RememberMe" />
+            </div>
+            <input type="hidden" name="returnUrl" asp-for="ReturnUrl" />
+            <button class="btn btn-primary" type="submit">Login</button>
+        </form>
+    </div>
+</div>

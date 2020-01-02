@@ -1,0 +1,31 @@
+﻿@model AdmittedViewModel
+
+<div class="modal fade" role="dialog" id="admitted-modal">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <form asp-action="AdmittedRemark">
+                <div class="modal-header">
+                    <h4>
+                        Admit Patient
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <div class="">
+                        <input type="hidden" asp-for="Code" />
+                    </div>
+                    <div class="">
+                        <span>Select Date/Time:</span>
+                        <input asp-for="DateAdmitted" value="@DateTime.Now.ToString("yyyy-MM-ddThh:mm",System.Globalization.CultureInfo.InvariantCulture)" class="form-control" />
+                        <span asp-validation-for="DateAdmitted" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-end">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+

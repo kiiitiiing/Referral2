@@ -1,0 +1,122 @@
+﻿<ul class="navbar-nav flex-grow-1">
+    <!-- DASHBOARD -->
+    <li class="nav-item d-none d-sm-inline-block">
+        <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="AdminDashboard">
+            <i class="fa fa-home"></i>
+            &nbsp;Dashboard
+        </a>
+    </li>
+    <!-- MANAGE -->
+    <li class="nav-item dropdown d-none d-sm-inline-block">
+        <a class="dropdown-toggle nav-link" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            <i class="fa fa-wrench"></i>
+            &nbsp;Manage
+        </a>
+        <ul class="dropdown-menu">
+            <!-- IT SUPPORT -->
+            <li class="dropdown-item">
+                <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="SupportUsers">
+                    <i class="fa fa-users"></i>
+                    &nbsp;IT Support
+                </a>
+            </li>
+            <!-- FACILITIES -->
+            <li class="dropdown-item">
+                <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="Facilities">
+                    <i class="fa fa-hospital"></i>
+                    &nbsp;Facilities
+                </a>
+            </li>
+            <!-- REFERRAL -->
+            <li class="dropdown-item">
+                <a class="nav-link" asp-area="" asp-controller="ViewPatients" asp-action="Discharged">
+                    <i class="fa fa-file-o"></i>
+                    &nbsp;Referral
+                </a>
+            </li>
+        </ul>
+    </li>
+    <!-- REPORT -->
+    <li class="nav-item dropdown">
+        <a class="dropdown-toggle nav-link" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fa fa-print"></i>
+            &nbsp;Report
+        </a>
+        <ul class="dropdown-menu">
+            <!-- ONLINE USERS -->
+            <li class="dropdown-item">
+                <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="OnlineUsers">
+                    <i class="fa fa-ambulance"></i>
+                    &nbsp;Online Users
+                </a>
+            </li>
+            <!-- REFERRAL STATUS -->
+            <li class="dropdown-item">
+                <a class="nav-link" asp-area="" asp-controller="ViewPatients" asp-action="Referred">
+                    <i class="fas fa-user"></i>
+                    &nbsp;Referral Status
+                </a>
+            </li>
+            <!-- DIVIDER -->
+            <li class="dropdown-divider"></li>
+            <!-- DAILY USERS -->
+            <li class="dropdown-item">
+                <a class="nav-link" asp-area="" asp-controller="Report" asp-action="IncomingReport">
+                    <i class="fas fa-users"></i>
+                    &nbsp;Daily Users
+                </a>
+            </li>
+            <!-- DAILY REFERRAL -->
+            <li class="dropdown-item">
+                <a class="nav-link" asp-area="" asp-controller="Report" asp-action="OutgoingReport">
+                    <i class="fa fa-arrows-h"></i>
+                    &nbsp;Daily Referral
+                </a>
+            </li>
+            <!-- CONSOLIDATED -->
+            <li class="dropdown-item">
+                <a class="nav-link" asp-area="" asp-controller="Report" asp-action="IncomingReport">
+                    <i class="fas fa-file-archive-o"></i>
+                    &nbsp;Consolidated
+                </a>
+            </li>
+            <!-- GRAPH -->
+            <li class="dropdown-item">
+                <a class="nav-link" asp-area="" asp-controller="Report" asp-action="OutgoingReport">
+                    <i class="fa fa-bar-chart-o"></i>
+                    &nbsp;Graph
+                </a>
+            </li>
+        </ul>
+    </li>
+    <!-- LOGIN AS-->
+    <li class="nav-item">
+        <a class="nav-link" asp-area="" asp-controller="Provinces" asp-action="Create">
+            <i class="nav-icon fa fa-sign-in"></i>
+            &nbsp;Login As
+        </a>
+    </li>
+    <!-- SETTINGS -->
+    <li class="nav-item dropdown">
+        <a class="dropdown-toggle nav-link" href="#resetPasswordModal" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            <i class="fa fa-gear"></i>
+            &nbsp;Settings
+        </a>
+        <ul class="dropdown-menu">
+            <!-- CHANGE PASSWORD -->
+            <li class="dropdown-item">
+                <a class=" nav-link" data-target="modal" asp-area="" asp-controller="Home" asp-action="index">
+                    <i class="fa fa-key"></i>
+                    &nbsp;Change Password
+                </a>
+            </li>
+            <!-- LOGOUT -->
+            <li class="dropdown-item">
+                <a class=" nav-link" data-target="modal" asp-area="" asp-controller="Home" asp-action="loginas">
+                    <i class="fa fa-sign-out"></i>
+                    &nbsp;Logout
+                </a>
+            </li>
+        </ul>
+    </li>
+</ul>

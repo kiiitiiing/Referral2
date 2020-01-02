@@ -1,0 +1,124 @@
+﻿@model PaginatedList<DischargedViewModel>
+
+@{
+    ViewData["Title"] = "Discharged/Transferred Patients";
+}
+
+
+<div class="col-md-12">
+
+    <!-- CARD START-->
+    <div class="card">
+        <!-- CARD DANGER HEADER -->
+        <div class="card-header">
+            <div class="fa-pull-right">
+                <form asp-action="Discharged" method="get">
+                    <div class="form-actions no-color">
+                        <p>
+                            <input type="text" placeholder="Code,Firstname,Lastname" name="SearchString" value="@ViewData["CurrentFilter"]" />
+                            <input type="submit" value="Search" class="btn btn-primary" />
+                        </p>
+                    </div>
+                </form>
+            </div>
+            <div>
+                <h3 class="card-title">Discharged/Transferred Patients</h3><br />
+                <span class="text-sm text-muted">TOTAL: @ViewBag.Total</span> 
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <!-- CARD DANGER BODY -->
+        <form method="post" action="">
+            <input type="hidden" name="_token" value="" autocomplete="off" />
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>
+                                <p>Referring Facility</p>
+                            </th>
+                            <th>
+                                <p>Patient Name/Code</p>
+                            </th>
+                            <th>
+                                <p>Date Discharged</p>
+                            </th>
+                            <th>
+                                <p>Status</p>
+                            </th>
+                            <th>
+                                <p>Record</p>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            var facility = item.ReferredFrom.Name;
+                            var patientName = item.Patient.FirstName + " " + item.Patient.MiddleName + " " + item.Patient.LastName;
+                            var code = item.Code;
+                            var status = item.Status;
+                            var dateDischarged = item.DateAction.ToString("MMMM dd, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+                            <tr>
+                                <td>
+                                    @facility)<br />
+                                    @*if (item.Type.Equals("pregnant"))
+                                    {
+                                        <p class="small text-muted">Pregnant</p>
+                                    }
+                                    else
+                                    {
+                                        <p class="small text-muted">Non-Pregnant</p>
+                                    }*@
+                                </td>
+                                <td>
+                                    @patientName
+                                    <p class="small text-muted">
+                                        @code
+                                    </p>
+                                </td>
+                                <td>
+                                    <span>@dateDischarged</span>
+                                </td>
+                                <td>
+                                    @status.ToUpper()
+                                </td>
+                                <td>
+                                    <button class="btn btn-primary">
+                                        <i class="fa fa-stethoscope"></i>
+                                        &nbsp;Track
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+            <!-- CARD FOOTER -->
+            <div class="card-footer">
+                @{
+                    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+                    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+                }
+
+                <a asp-action="GetAcceptedPatients"
+                   asp-route-sortOrder="@ViewData["CurrentSort"]"
+                   asp-route-pageNumber="@(Model._pageIndex - 1)"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   class="btn btn-primary @prevDisabled">
+                    Previous
+                </a>
+                <a asp-action="GetAcceptedPatients"
+                   asp-route-sortOrder="@ViewData["CurrentSort"]"
+                   asp-route-pageNumber="@(Model._pageIndex + 1)"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   class="btn btn-primary @nextDisabled">
+                    Next
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+

@@ -1,0 +1,41 @@
+﻿<!-- LINKS CARD DANGER -->
+    <!-- MAIN MENU -->
+    <div class="card card-danger card-green">
+        <div class="card-header">
+            <h3 class="card-title">Main Menu</h3>
+        </div>
+        <div class="card-body">
+            <div class="list-group">
+                <!-- INCOMING -->
+                <a class="list-group-item clearfix link-black" asp-area="" asp-controller="ViewPatients" asp-action="Incoming">
+                    Incoming
+                    <span class="fa-pull-right badge badge-success">
+                        <i class="fa fa-wheelchair-alt"></i>
+                        <span class="">743</span>
+                        &nbsp;New
+                    </span>
+                </a>
+                <!-- REFERRED -->
+                <a class="list-group-item clearfix link-black" asp-area="" asp-controller="ViewPatients" asp-action="Referred">
+                    Referred
+                    <span class="fa-pull-right">
+                        <i class="fa fa-ambulance"></i>
+                    </span>
+                </a>
+                <!-- ACCEPTED -->
+                <a class="list-group-item clearfix link-black" asp-area="" asp-controller="ViewPatients" asp-action="Accepted">
+                    Accepted
+                    <span class="fa-pull-right">
+                        <i class="fa fa-users"></i>
+                    </span>
+                </a>
+                <!-- ONLINE DOCTORS -->
+                <a class="list-group-item clearfix link-black" asp-area="" asp-controller="Home" asp-action="loginas">
+                    Online Doctors
+                    <span class="fa-pull-right">
+                        <i class="fa fa-user-md"></i>
+                    </span>
+                </a>
+            </div>
+        </div>
+    </div>

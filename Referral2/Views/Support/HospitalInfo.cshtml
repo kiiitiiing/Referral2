@@ -1,0 +1,201 @@
+﻿@model HospitalInfoViewModel
+
+
+@{
+    ViewData["Title"] = "Hospital Information";
+}
+
+<div class="content">
+    <div class="container">
+        <div class="row">
+            <!-- HOSPITAL INFORMATION CARD START -->
+            <div class="col-md-9">
+                <form method="post" class="" id="form-sumbit" asp-action="HospitalInfo">
+                    <div class="card card-success card-outline">
+                        <!-- CARD HEADER -->
+                        <div class="card-header with-border">
+                            <h3>
+                                Hospital Information
+                            </h3>
+                        </div>
+                        <!-- CARD BODY -->
+                        <div class="card-body">
+                            <!-- HOSPITAL INFO TABLE -->
+                            <!-- TABLE START -->
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" border="1">
+                                    <tbody>
+                                        <!-- FACILITY NAME -->
+                                        <tr>
+                                            <td class="hover">Facility Name:</td>
+                                            <td>
+                                                <div class="">
+                                                    <input asp-for="FacilityName" class="form-control" />
+                                                    <span asp-validation-for="FacilityName" class="text-danger"></span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <!-- SHORT NAME -->
+                                        <tr>
+                                            <td>
+                                                Short Name:
+                                            </td>
+                                            <td>
+                                                <div class="">
+                                                    <input asp-for="Abbreviation" class="form-control" />
+                                                    <span asp-validation-for="Abbreviation" class="text-danger"></span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <!-- MUNCITY -->
+                                        <tr>
+                                            <td>
+                                                City/Municipality:
+                                            </td>
+                                            <td>
+                                                <div class="">
+                                                    <select id="muncityFilter" asp-for="MuncityId" class="form-control" asp-items="ViewBag.Muncities"></select>
+                                                    <span asp-validation-for="MuncityId" class="text-danger"></span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <!-- BARANGAY -->
+                                        <tr>
+                                            <td>
+                                                Barangay:
+                                            </td>
+                                            <td>
+                                                <div class="">
+                                                    <select id="barangay" asp-for="BarangayId" class="form-control" asp-items="ViewBag.Barangays"></select>
+                                                    <span asp-validation-for="BarangayId" class="text-danger"></span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <!-- ADDRESS -->
+                                        <tr>
+                                            <td>
+                                                Street No./Sitio/Purok:
+                                            </td>
+                                            <td>
+                                                <div class="">
+                                                    <input asp-for="Address" class="form-control" />
+                                                    <span asp-validation-for="Address" class="text-danger"></span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <!-- CONTACT -->
+                                        <tr>
+                                            <td>
+                                                Contact:
+                                            </td>
+                                            <td>
+                                                <div class="">
+                                                    <input asp-for="Contact" class="form-control" />
+                                                    <span asp-validation-for="Contact" class="text-danger"></span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <!-- EMAIL -->
+                                        <tr>
+                                            <td>
+                                                Email:
+                                            </td>
+                                            <td>
+                                                <div class="">
+                                                    <input type="email" asp-for="Email" class="form-control" />
+                                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <!-- STATUS -->
+                                        <tr>
+                                            <td>
+                                                Status:
+                                            </td>
+                                            <td>
+                                                <div class="">
+                                                    <select asp-for="Status" class="form-control" asp-items="ViewBag.Statuses"></select>
+                                                    <span asp-validation-for="Status" class="text-danger"></span>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- TABLE END -->
+                        </div>
+                        <!-- CARD BODY END -->
+                        <div class="card-footer with-border">
+                            <!-- CARD FOOTER -->
+                            <div class="fa-pull-right">
+                                <!-- UPDATE BUTTON-->
+                                <button id="submitBtn" type="submit" class="btn btn-sm btn-info">
+                                    <i class="fa fa-pencil"></i>
+                                    &nbsp;Update
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-3">
+                <partial name="~/Views/Shared/PartialViews/_SupportLinksPartial.cshtml" />
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#submitBtn").submit(function () {
+            $('form').preventDoubleSubmission();
+        });
+    });
+
+    jQuery.fn.preventDoubleSubmission = function () {
+        $(this).on('submit'), function (e) {
+            var $form = $(this);
+
+            if ($form.data('submitted') == true) {
+                e.preventDefault();
+            } else {
+                $form.data('submitted', true);
+            }
+        };
+
+        return this;
+    };
+
+    var muncityId = 0;
+    $('#muncityFilter').change(function () {
+        muncityId = $('#muncityFilter').val();
+
+        if (muncityId != 'none') {
+            $.when(getBarangayFiltered()).done(function (output) {
+            $('#barangay').empty()
+                .append($('<option>', {
+                    value: '',
+                    text: 'Select Barangay...'
+                }))
+            jQuery.each(output, function (i, item) {
+                $('#barangay').append($('<option>', {
+                    value: item.id,
+                    text: item.description
+                }))
+            }
+            );
+        });
+        }
+    });
+
+    function getBarangayFiltered() {
+        var urls = "/NoReload/FilteredBarangay?muncityId=" + muncityId;
+        return $.ajax({
+            url: urls,
+            type: 'get',
+            async: true
+        });
+    }
+</script>

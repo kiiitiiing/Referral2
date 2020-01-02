@@ -1,0 +1,114 @@
+﻿@model PaginatedList<IncomingReportViewModel>
+
+@{
+    ViewData["Title"] = "Patient List";
+}
+
+<div class="content">
+    <div class="container">
+        <div class="row">
+            <!-- CARD DANGER -->
+            <div class="col-md-3">
+                <!-- SELECT DATE -->
+                <div class="card card-danger card-green">
+                    <!-- CARD DANGER HEADER -->
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            Filter Result
+                            <span class="badge fa-pull-right">
+                                Result: @ViewBag.Total
+                            </span>
+                        </h3>
+                    </div>
+                    <!-- CARD DANGER BODY -->
+                    <form method="post" action="">
+                        <input type="hidden" name="_token" value="" autocomplete="off" />
+                        <div class="card-body">
+                            <!-- SEARCH -->
+                            <div class="form-group">
+                                <input type="text" placeholder="Seach Keyword..." class="form-control" name="SearchString" value="@ViewBag.CurrentFilter" required autocomplete="off" />
+                            </div>
+                            <!-- MUNICIPALITY -->
+                            <div class="form-group">
+                                <select class="form-control" name="municity">
+                                </select>
+                            </div>
+                            <!-- BARANGAY -->
+                            <div class="form-group">
+                                <select class="form-control" name="brngy">
+                                </select>
+                            </div>
+                            <div class="form-group hide"></div>
+                            <!-- BUTTONS -->
+                            <div class="form-group">
+                                <!-- FILTER -->
+                                <button type="submit" value="Filter" class="btn btn-block btn-success">
+                                    <i class="fa fa-filter"></i>
+                                    &nbsp;Filter Result
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <partial name="~/Views/Shared/PartialViews/_MainMenuPartial.cshtml" />
+            </div>
+            <div class="col-md-9">
+                <!-- PATIENT LIST -->
+                <div class="card card-outline">
+                    <!-- DAILY USERS HEADER -->
+                    <div class="card-header with-border">
+                        <h2>
+                            Incoming Referral Report
+                        </h2>
+                        <small class="text-success">@DateTime.Now.ToString("MMMM dd, yyyy")</small>
+                    </div>
+                    <!-- DAILY USERS BODY -->
+                    <div class="card-body">
+                        <!-- TABLE START -->
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover table-bordered">
+                                <!-- TABLE HEADER -->
+                                <thead>
+                                    <tr class="bg-black">
+                                        <th class="text-center" rowspan="2">Patient Code</th>
+                                        <th class="text-center" rowspan="2">Referring Facility</th>
+                                        <th class="text-center" colspan="5">Status</th>
+                                    </tr>
+                                    <tr class="bg-black">
+                                        <th class="text-center">Arrived</th>
+                                        <th class="text-center">Admitted</th>
+                                        <th class="text-center">Discharged</th>
+                                        <th class="text-center">Transferred</th>
+                                        <th class="text-center">Cancelled</th>
+                                    </tr>
+                                </thead>
+                                <!-- TABLE BODY -->
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        var code = item.Code;
+                                        var referredFrom = item.Facility;
+                                        var arrived = item.DateArrived == null || item.DateArrived == default ? "" : item.DateArrived.ToString("MM/dd/yy hh:mm");
+                                        var admitted = item.DateAdmitted == null || item.DateAdmitted == default? "" : item.DateAdmitted.ToString("MM/dd/yy hh:mm");
+                                        var discharged = item.DateDischarged == null || item.DateDischarged == default? "" : item.DateDischarged.ToString("MM/dd/yy hh:mm");
+                                        var transferred = item.DateTransferred == null || item.DateTransferred == default? "" : item.DateTransferred.ToString("MM/dd/yy hh:mm");
+                                        var cancelled = item.DateCancelled == null || item.DateCancelled == default? "" : item.DateCancelled.ToString("MM/dd/yy hh:mm");
+                                    <tr>
+                                        <th><small class="">@code</small></th>
+                                        <th><small class="text-success">@referredFrom</small></th>
+                                        <th><small class="text-success">@arrived</small></th>
+                                        <th><small class="text-success">@admitted</small></th>
+                                        <th><small class="text-success">@discharged</small></th>
+                                        <th><small class="text-success">@transferred</small></th>
+                                        <th><small class="text-success">@cancelled</small></th>
+                                    </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,126 @@
+﻿@model IEnumerable<User>
+@{
+    ViewData["Title"] = "Online Doctors";
+}
+
+    <div class="content">
+        <div class="container">
+            <div class="row">
+                <!-- CARD DANGER -->
+                <div class="col-md-3">
+                    <!-- SELECT USER -->
+                    <div class="card card-danger card-green">
+                        <!-- CARD DANGER HEADER -->
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                Filter Result
+                            </h3>
+                        </div>
+                        <!-- CARD DANGER BODY -->
+                        <form method="post" asp-action="WhosOnline">
+                            <input type="hidden" name="_token" value="" autocomplete="off" />
+                            <div class="card-body">
+                                <!-- SEARCH -->
+                                <div class="form-group">
+                                    <input type="text" placeholder="Enter name.." class="form-control" value="@ViewBag.CurrentSearch" name="SearchString" required autocomplete="off" />
+                                </div>
+                                <!-- FACILITY -->
+                                <div class="form-group">
+                                    <select class="form-control" asp-items="ViewBag.Facilities">
+                                        <option value="0">Select All</option>
+                                    </select>
+                                </div>
+                                <div class="form-group hide"></div>
+                                <!-- BUTTONS -->
+                                <div class="form-group">
+                                    <!-- FILTER -->
+                                    <button type="submit" value="Filter" class="btn btn-block btn-success justify-content-center">
+                                        <i class="fa fa-filter"></i>
+                                        &nbsp;Filter Result
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <partial name="~/Views/Shared/PartialViews/_MainMenuPartial.cshtml" />
+                </div>
+                <div class="col-md-9">
+                    <!-- ONLINE DOCTORS -->
+                    <div class="card card-outline" style="background: rgba(255, 255, 255, 0.4)">
+                        <!-- DAILY USERS HEADER -->
+                        <div class="card-header with-border">
+                            <h2>
+                                Online Doctors
+                            </h2>
+                        </div>
+                        <!-- DAILY USERS BODY -->
+                        <div class="card-body">
+                            <div class="row">
+                                @foreach (var item in Model)
+                                {
+                                    var mdName = "Dr. " + item.Firstname + " " + item.Middlename + " " + item.Lastname;
+                                    var abbrv = item.Facility.Abbrevation ?? "";
+                                    var contact = string.IsNullOrEmpty(item.Contact) ? "N/A" : item.Contact;
+                                    var dutyTime = item.LastLogin.ToString("hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+                                    string status;
+                                    string widgetBg;
+                                    if(item.LoginStatus.Equals("login"))
+                                    {
+                                        status = "ON DUTY";
+                                        widgetBg = "bg-gradient-success";
+                                    }
+                                    else
+                                    {
+                                        status = "OFF DUTY";
+                                        widgetBg = "bg-gradient-warning";
+                                    }
+                                    <div class="col-md-4">
+                                        <!-- Widget: user widget style 2 -->
+                                        <div class="card card-widget widget-user-2">
+                                            <!-- Add the bg color to the header using any of the bg-* classes -->
+                                            <div class="widget-user-header @widgetBg ">
+                                                <div class="widget-user-image">
+                                                    <img class="img-circle elevation-2" src="~/assets/dist/img/MDMale.jpg" alt="User Avatar">
+                                                </div>
+                                                <!-- /.widget-user-image -->
+                                                <h3 class="widget-user-username">@mdName</h3>
+                                                <h5 class="widget-user-desc badge bg-maroon">@abbrv</h5>
+                                            </div>
+                                            <div class="card-footer p-0">
+                                                <ul class="nav flex-column">
+                                                    <li class="nav-item">
+                                                        <a href="#" class="nav-link">
+                                                            @contact
+                                                            <span class="float-right badge bg-primary">
+                                                                <i class="fa fa-phone"></i>
+                                                            </span>
+                                                        </a>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <a href="#" class="nav-link">
+                                                            @item.Department.Description
+                                                            <span class="float-right badge bg-info">
+                                                                <i class="fa fa-hospital"></i>
+                                                            </span>
+                                                        </a>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <a href="#" class="nav-link">
+                                                            @status
+                                                            <span class="float-right badge bg-success">
+                                                                @dutyTime
+                                                            </span>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

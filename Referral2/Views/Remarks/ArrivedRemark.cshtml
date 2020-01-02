@@ -1,0 +1,33 @@
+﻿@model RemarksViewModel
+
+<div class="modal fade" role="dialog" id="arrived-modal">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <form asp-action="ArrivedRemark">
+                <div class="modal-header">
+                    <h4>
+                        PATIENT ARRIVED
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <div class="">
+                        <input type="hidden" asp-for="Code" />
+                    </div>
+                    <div class="text-center">
+                        <small class="text-bold">Date/Time arrived</small><br />
+                        <span class="text-success">@DateTime.Now.ToString("MMM dd, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture)</span>
+                    </div>
+                    <div class="">
+                        <textarea asp-for="Remarks" class="form-control" rows="7"></textarea>
+                        <span asp-validation-for="Remarks" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-end">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+    
