@@ -3,8 +3,6 @@
     ViewData["Title"] = "List of Support User";
 }
 
-<div id="modal-placeholder"></div>
-
 <div class="col-md-12">
     <div class="card card-success card-outline">
         <div class="card-header">
@@ -44,8 +42,15 @@
                     <tbody>
                         @foreach(var item in Model)
                         {
+                            var lastLogin = item.LastLogin.ToString();
+                            if(lastLogin.Equals(default))
+                            {
+                                lastLogin = "Never login";
+                            }
                             <tr>
-                                <td>@item.Name</td>
+                                <td>
+                                    <a class="text-warning" data-toggle="ajax-modal" data-target="#update-doctor-modal" data-url="@Url.Action("UpdateSupport", new { id = item.Id })">@item.Name</a>
+                                </td>
                                 <td>@item.Facility</td>
                                 <td>
                                     @item.Contact<br />
@@ -62,7 +67,7 @@
                                         <strong class="text-danger">Logout</strong>
                                     }
                                 </td>
-                                <td>@item.LastLogin</td>
+                                <td>@lastLogin</td>
                             </tr>
                         }
                     </tbody>

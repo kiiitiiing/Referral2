@@ -84,12 +84,10 @@
                                             <td>Sex:</td>
                                             <td>
                                                 <div>
-                                                    @foreach (var item in ViewBag.Sex)
-                                                    {
-                                                    <span>
-                                                        <input asp-for="Sex" type="radio" value="@item" required autocomplete="off" />&nbsp;@item<br />
-                                                    </span>
-                                                    }
+                                                    <input asp-for="Sex" type="radio" value="Male" required autocomplete="off" />&nbsp;Male<br />
+                                                </div>
+                                                <div>
+                                                    <input asp-for="Sex" type="radio" value="Female" required autocomplete="off" />&nbsp;Female<br />
                                                 </div>
                                             </td>
                                         </tr>
@@ -119,8 +117,8 @@
                                         <tr>
                                             <td id="barangay-label">Barangay:</td>
                                             <td>
-                                                <select asp-for="BarangayId" class="form-control barangay" required>
-                                                    <option value="">Select Barangay...</option>
+                                                <select id="barangay" asp-for="BarangayId" class="form-control" required>
+                                                    <option value="none">Select Barangay...</option>
                                                 </select>
                                                 <span asp-validation-for="BarangayId" class="text-danger"></span>
                                             </td>
@@ -190,7 +188,7 @@
         return this;
     };
 
-    var muncityId = 0;
+    /*var muncityId = 0;
     $('#muncityFilter').change(function () {
         muncityId = $('#muncityFilter').val();
 
@@ -205,12 +203,11 @@
                 $('#barangay').append($('<option>', {
                     value: item.id,
                     text: item.description
-                }))
-            }
-            );
+                }));
+            });
         });
         }
-    });
+    });*/
 
     function getBarangayFiltered() {
         var urls = "/NoReload/FilteredBarangay?muncityId=" + muncityId;

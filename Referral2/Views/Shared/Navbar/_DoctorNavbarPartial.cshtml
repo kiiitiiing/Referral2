@@ -1,6 +1,6 @@
 ﻿<ul class="navbar-nav flex-grow-1">
     <!-- DASHBOARD -->
-    <li class="nav-item d-none d-sm-inline-block">
+    <li class="">
         <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
             <i class="fa fa-home"></i>
             &nbsp;Dashboard
@@ -8,7 +8,7 @@
     </li>
     <!-- PATIENTS-->
     <li class="nav-item dropdown">
-        <a class="dropdown-toggle nav-link" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+        <a class="dropdown-toggle nav-link" href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
             <i class="fa fa-users"></i>
             &nbsp;Patients
         </a>
@@ -63,8 +63,8 @@
         </ul>
     </li>
     <!-- REFERRAL -->
-    <li class="nav-item dropdown">
-        <a class="dropdown-toggle nav-link" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <li class="dropdown">
+        <a class="dropdown-toggle nav-link" href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
             <i class="fa fa-print"></i>
             &nbsp;Referral
         </a>
@@ -123,7 +123,7 @@
             </li>
             <!-- CHANGE LOGIN STATUS -->
             <li class="dropdown-item">
-                <a class=" nav-link" data-target="modal" asp-area="" asp-controller="Provinces" asp-action="Index">
+                <a class=" nav-link" data-toggle="modal" data-target="#login-status-modal">
                     <i class="fa fa-user-md"></i>
                     &nbsp;Change Login Status
                 </a>
@@ -142,6 +142,12 @@
                 <a class=" nav-link" data-target="modal" asp-area="" asp-controller="Home" asp-action="loginas">
                     <i class="fa fa-sign-out-alt"></i>
                     &nbsp;Logout
+                </a>
+            </li>
+            <li class="dropdown-item">
+                <a class=" nav-link" data-target="modal" asp-area="" asp-controller="Trackings" asp-action="Index">
+                    <i class="fa fa-sign-out-alt"></i>
+                    &nbsp;Tracking
                 </a>
             </li>
         </ul>

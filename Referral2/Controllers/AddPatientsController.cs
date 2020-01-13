@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Referral2.Helpers;
 using System.Security.Claims;
 using Referral2.Models.ViewModels.Doctor;
+using Microsoft.Extensions.Options;
 
 namespace Referral2.Controllers
 {
@@ -23,24 +24,24 @@ namespace Referral2.Controllers
     {
         const string SessionPatientId = "_patient_id";
         private readonly ReferralDbContext _context;
-        private readonly ResourceManager Roles = new ResourceManager("Referral2.Roles", Assembly.GetExecutingAssembly());
-        private readonly ResourceManager Status = new ResourceManager("Referral2.ReferralStatus", Assembly.GetExecutingAssembly());
+        private readonly IOptions<ReferralRoles> _roles;
+        private readonly IOptions<ReferralStatus> _status;
 
-        public AddPatientsController(ReferralDbContext context)
+        public AddPatientsController(ReferralDbContext context, IOptions<ReferralRoles> roles, IOptions<ReferralStatus> status)
         {
             _context = context;
+            _roles = roles;
+            _status = status;
         }
 
         //GET: Return View of Add Patient
         [HttpGet]
         public IActionResult Add()
         {
-            SetUser();
-            ViewBag.BarangayId = new SelectList(_context.Barangay.Where(x => x.ProvinceId.Equals(CurrentUser.user.ProvinceId)), "Id", "Description");
-            ViewBag.MuncityId = new SelectList(_context.Muncity.Where(x => x.ProvinceId.Equals(CurrentUser.user.ProvinceId)), "Id", "Description");
+            ViewBag.BarangayId = new SelectList(_context.Barangay.Where(x => x.ProvinceId.Equals(UserProvince())), "Id", "Description");
+            ViewBag.MuncityId = new SelectList(_context.Muncity.Where(x => x.ProvinceId.Equals(UserProvince())), "Id", "Description");
             ViewBag.CivilStatus = new SelectList(ListContainer.CivilStatus);
             ViewBag.PhicStatus = new SelectList(ListContainer.PhicStatus);
-            ViewBag.Sex = ListContainer.Sex;
             return View();
         }
 
@@ -48,7 +49,7 @@ namespace Referral2.Controllers
         [HttpPost]
         public async Task<IActionResult> Add([Bind] Patient patient)
         {
-            patient.ProvinceId = CurrentUser.user.ProvinceId;
+            patient.ProvinceId = UserProvince();
             if (ModelState.IsValid)
             {
                 setPatients(patient);
@@ -67,17 +68,14 @@ namespace Referral2.Controllers
         //GET: ReferPartial
         public IActionResult Refer(int id)
         {
-            int facilityId = int.Parse(User.FindFirstValue("Facility"));
             var facility = _context.Facility;
             var patient = _context.Patient.Find(id);
-            int currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            string currentUserName = User.FindFirstValue(ClaimTypes.GivenName) + " " + User.FindFirstValue(ClaimTypes.Surname);
             HttpContext.Session.SetInt32(SessionPatientId, id);
 
-            ViewBag.ReferringFacility = facility.Find(facilityId).Name;
-            ViewBag.ReferringFacilityAddress = facility.Find(facilityId).Address;
-            ViewBag.ReferringMd = "Dr. " + currentUserName;
-            ViewBag.ReferredTo = new SelectList(facility.Where(x => !x.Id.Equals(facilityId)), "Id", "Name");
+            ViewBag.ReferringFacility = facility.Find(UserFacility()).Name;
+            ViewBag.ReferringFacilityAddress = facility.Find(UserFacility()).Address;
+            ViewBag.ReferringMd = UserName();
+            ViewBag.ReferredTo = new SelectList(facility.Where(x => !x.Id.Equals(UserFacility())), "Id", "Name");
             ViewBag.PatientName = patient.FirstName + " " + patient.MiddleName + " " + patient.LastName;
             ViewBag.PatientAge = DateTime.Now.Year - patient.DateOfBirth.Year;
             ViewBag.PatientSex = patient.Sex;
@@ -94,7 +92,8 @@ namespace Referral2.Controllers
         public async Task<IActionResult> Refer([Bind] PatientFormViewModel model)
         {
             var id = (int)HttpContext.Session.GetInt32(SessionPatientId);
-            var facility = _context.Facility.Find(int.Parse(User.FindFirstValue("Facility")));
+            model.PatientId = id;
+            var facility = _context.Facility.Find(UserFacility());
             var currentPatient = _context.Patient.Find(id);
             if (ModelState.IsValid)
             {
@@ -108,7 +107,7 @@ namespace Referral2.Controllers
                 return RedirectToAction("ListPatients","ViewPatients");
             }
             ViewBag.ReferringFacility = facility.Name;
-            ViewBag.ReferringMd = "Dr." + User.FindFirstValue(ClaimTypes.GivenName)+ " " + User.FindFirstValue(ClaimTypes.Surname);
+            ViewBag.ReferringMd = UserName();
             ViewBag.DepartmentId = new SelectList(_context.Department, "Id", "Description", model.DepartmentId);
             ViewBag.ReferredMd = new SelectList(_context.User, "Id", "Lastname", model.ReferredMd);
             ViewBag.PatientName = currentPatient.FirstName + " " + currentPatient.MiddleName + " " + currentPatient.LastName;
@@ -127,13 +126,11 @@ namespace Referral2.Controllers
 
         public PatientForm setNormalPatientForm(PatientFormViewModel model)
         {
-            int userFacilityId = int.Parse(User.FindFirstValue("Facility"));
-            int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             PatientForm patient = new PatientForm
             {
-                UniqueId = model.PatientId + "-" + userFacilityId + "-" + DateTime.Now.ToString("yyMMddhh"),
-                Code = DateTime.Now.ToString("yyMMdd") + "-" + userFacilityId.ToString().PadLeft(3, '0') + "-" + DateTime.Now.ToString("hhmmss"),
-                ReferringFacilityId = userFacilityId,
+                UniqueId = model.PatientId + "-" + UserFacility() + "-" + DateTime.Now.ToString("yyMMddhh"),
+                Code = DateTime.Now.ToString("yyMMdd") + "-" + UserFacility().ToString().PadLeft(3, '0') + "-" + DateTime.Now.ToString("hhmmss"),
+                ReferringFacilityId = UserFacility(),
                 ReferredTo = model.FacilityId,
                 DepartmentId = model.DepartmentId,
                 TimeReferred = DateTime.Now,
@@ -143,7 +140,7 @@ namespace Referral2.Controllers
                 RecommendSummary = model.SummaryReCo,
                 Diagnosis = model.Diagnosis,
                 Reason = model.Reason,
-                ReferringMd = userId,
+                ReferringMd = UserId(),
                 ReferredMd = model.ReferredMd,
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now                
@@ -153,7 +150,7 @@ namespace Referral2.Controllers
 
         public Tracking setNormalTracking(PatientForm patientForm)
         {
-            Tracking tracking = new Tracking 
+            Tracking tracking = new Tracking
             {
                 Code = patientForm.Code,
                 PatientId = patientForm.PatientId,
@@ -169,8 +166,8 @@ namespace Referral2.Controllers
                 ActionMd = patientForm.ReferredMd,
                 Remarks = patientForm.Reason,
                 Type = "normal",
-                Status = Status.GetString("REFERRED"),
-                FormId = patientForm.Id,
+                Status = _status.Value.REFERRED,
+                //FormId = patientForm.Id,
                 WalkIn = "no",
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now
@@ -190,7 +187,7 @@ namespace Referral2.Controllers
                 ReferredTo = tracking.ReferredTo,
                 DepartmentId = tracking.DepartmentId,
                 ReferringMd = tracking.ReferringMd,
-                ActionMd = tracking.ActionMd,
+                ActionMd = null,
                 Remarks = tracking.Remarks,
                 Status = tracking.Status,
                 CreatedAt = DateTime.Now,
@@ -237,12 +234,34 @@ namespace Referral2.Controllers
         {
             return new string(input.Where(c => char.IsDigit(c)).ToArray());
         }
-
-        public void SetUser()
+        public int UserId()
         {
-            CurrentUser.user = _context.User.Find(int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)));
+            return int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
         }
-
+        public int UserFacility()
+        {
+            return int.Parse(User.FindFirstValue("Facility"));
+        }
+        public int UserDepartment()
+        {
+            return int.Parse(User.FindFirstValue("Department"));
+        }
+        public int UserProvince()
+        {
+            return int.Parse(User.FindFirstValue("Province"));
+        }
+        public int UserMuncity()
+        {
+            return int.Parse(User.FindFirstValue("Muncity"));
+        }
+        public int UserBarangay()
+        {
+            return int.Parse(User.FindFirstValue("Barangay"));
+        }
+        public string UserName()
+        {
+            return "Dr. " + User.FindFirstValue(ClaimTypes.GivenName) + " " + User.FindFirstValue(ClaimTypes.Surname);
+        }
         #endregion
 
 

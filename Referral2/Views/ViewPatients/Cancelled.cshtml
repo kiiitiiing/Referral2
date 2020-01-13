@@ -1,7 +1,10 @@
-﻿@model PaginatedList<Activity>
+﻿@model PaginatedList<CancelledViewModel>
 
 @{
     ViewData["Title"] = "Cancelled Patients";
+    var dateToday = DateTime.Now;
+    var firstDayOfMonth = new DateTime(dateToday.Year, 1, 1);
+    var lastDayOfMonth = new DateTime(dateToday.Year, 12, 31);
 }
 
 
@@ -11,16 +14,10 @@
     <div class="card">
         <!-- CARD DANGER HEADER -->
         <div class="card-header">
-            <div class="fa-pull-right">
-                <form asp-action="Cancelled" method="get">
-                    <div class="form-actions no-color">
-                        <p>
-                            <input type="text" placeholder="Code,Firstname,Lastname" name="SearchString" value="@ViewData["CurrentFilter"]" />
-                            <input type="submit" value="Search" class="btn btn-primary" />
-                        </p>
-                    </div>
-                </form>
-            </div>
+            @await Html.PartialAsync("~/Views/Shared/PartialViews/_PatientSearchFilter.cshtml", new SearchModel
+            {
+                Action = "Cancelled"
+            })
             <div>
                 <h3 class="card-title">Cancelled Patients</h3><br />
                 <span class="text-sm text-muted">TOTAL: @ViewBag.Total</span>
@@ -51,36 +48,36 @@
                     <tbody>
                         @foreach (var item in Model)
                         {
-                            var facility = item.ReferredFromNavigation.Name;
-                            var patientName = item.Patient.FirstName + " " + item.Patient.MiddleName + " " + item.Patient.LastName;
-                            var code = item.Code;
-                            var status = item.Status;
-                            var dateCancelled = item.DateReferred.ToString("MMMM dd, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
-                            var reason = item.Remarks;
-
+                            var dateCancelled = item.DateCancelled.ToString("MMMM dd, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+                            
                             <tr>
                                 <td>
-                                    @facility)<br />
-                                    @*if (item.Type.Equals("pregnant"))
+                                    <span class="facility-color">
+                                        @item.ReferringFacility
+                                    </span>
+                                    <br />
+                                    @if (item.PatientType.Equals("pregnant"))
                                         {
                                             <p class="small text-muted">Pregnant</p>
                                         }
                                         else
                                         {
                                             <p class="small text-muted">Non-Pregnant</p>
-                                        }*@
+                                        }
                                 </td>
                                 <td>
-                                    @patientName
+                                    <a href="#">
+                                        @item.PatientName
+                                    </a>
                                     <p class="small text-muted">
-                                        @code
+                                        @item.PatientCode
                                     </p>
                                 </td>
                                 <td>
                                     <span>@dateCancelled</span>
                                 </td>
                                 <td>
-                                    @reason
+                                    @item.ReasonCancelled
                                 </td>
                             </tr>
                         }

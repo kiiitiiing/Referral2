@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Referral2.Models.ViewModels.Support
 {
-    public class AddDoctorViewModel : AddUserViewModel
+    public partial class AddDoctorViewModel : AddUserViewModel
     {
         public int Department { get; set; }
         [Required]
         public string Level { get; set; }
-        }
+    }
 }

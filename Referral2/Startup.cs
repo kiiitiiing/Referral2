@@ -1,13 +1,8 @@
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
@@ -40,6 +35,9 @@ namespace Referral2
 
             services.AddCors();
 
+            services.Configure<ReferralRoles>(Configuration);
+            services.Configure<ReferralStatus>(Configuration);
+
             services.AddLocalization(options => options.ResourcesPath = "Resources");
 
             services.AddTransient<IUserService, UserService>();
@@ -71,7 +69,7 @@ namespace Referral2
                 options.MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.None;
             });
 
-            services.Configure<RequestLocalizationOptions>(options =>
+            /*services.Configure<RequestLocalizationOptions>(options =>
             {
                 var supportedCulture = new[]
                 {
@@ -85,15 +83,7 @@ namespace Referral2
 
                 options.SupportedUICultures = supportedCulture;
 
-            });
-
-            /*services.AddControllersWithViews()
-                        .SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_3_0)
-                        .AddNewtonsoftJson()
-                        .AddJsonOptions(options =>
-                        {
-                            options.JsonSerializerOptions.
-                        })*/
+            });*/
 
             services.AddMvc()
                         .SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_3_0)

@@ -11,8 +11,8 @@
                     </legend>
                 </fieldset>
             </div>
-            <form asp-action="AddUser">
-                <div class="modal-body">
+            <div class="modal-body">
+                <form asp-action="AddUser">
                     <!-- FIRST NAME -->
                     <div class="form-group">
                         <label>First Name:</label>
@@ -84,19 +84,19 @@
                         <input type="password" class="form-control" asp-for="ConfirmPassword" autofocus required autocomplete="off">
                         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                     </div>
-                </div>
-                <!-- REFER FOOTER -->
-                <div class="modal-footer justify-content-end">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">
-                        <i class="fa fa-times"></i>
-                        &nbsp;Close
-                    </button>
-                    <button type="submit" class="btn btn-success" data-save>
-                        <i class="fa fa-check"></i>
-                        &nbsp;Save
-                    </button>
-                </div>
-            </form>
+                </form>
+            </div>
+            <!-- REFER FOOTER -->
+            <div class="modal-footer justify-content-end">
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    <i class="fa fa-times"></i>
+                    &nbsp;Close
+                </button>
+                <button class="btn btn-success" data-save="modal" data-url="@Url.Action("AddUser","Support")">
+                    <i class="fa fa-check"></i>
+                    &nbsp;Save
+                </button>
+            </div>
         </div>
     </div>
 </div>

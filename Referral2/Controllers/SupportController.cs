@@ -15,44 +15,41 @@ using Referral2.Helpers;
 using Referral2.Models;
 using Referral2.Models.ViewModels.Support;
 using Referral2.Services;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Http;
 
 namespace Referral2.Controllers
 {
     [Authorize(Policy = "support")]
     public class SupportController : Controller
     {
+        const string SessionDoctorUsername = "_username";
         private readonly ReferralDbContext _context;
         private readonly IUserService _userService;
-        private readonly ResourceManager Status = new ResourceManager("Referral2.ReferralStatus", Assembly.GetExecutingAssembly());
-        private readonly ResourceManager Roles = new ResourceManager("Referral2.Roles", Assembly.GetExecutingAssembly());
+        private readonly IOptions<ReferralRoles> _roles;
+        private readonly IOptions<ReferralStatus> _status;
 
-        public SupportController(ReferralDbContext context, IUserService userService)
+        public SupportController(ReferralDbContext context, IUserService userService, IOptions<ReferralRoles> roles, IOptions<ReferralStatus> status)
         {
             _context = context;
             _userService = userService;
+            _roles = roles;
+            _status = status;
         }
 
         public IActionResult SupportDashboard()
         {
-            int userFacility = int.Parse(User.FindFirstValue("Facility"));
             List<int> accepted = new List<int>();
             List<int> redirected = new List<int>();
 
             var activities = _context.Activity;
-            var totalDoctors = _context.User.Where(x => x.Level.Equals("doctor") && x.FacilityId.Equals(userFacility)).Count();
-            var onlineDoctors = _context.User.Where(x => x.Login.Equals("login") && x.FacilityId.Equals(userFacility)).Count();
-            var referredPatients = _context.Tracking.Where(x => x.DateReferred != default || x.DateAccepted != default || x.DateArrived != default)
-                                                    .Where(x => x.ReferredTo.Equals(userFacility)).Count();
-
-            for (int x = 1; x <= 12; x++)
-            {
-                accepted.Add(activities.Where(i => i.DateReferred.Month.Equals(x) && (i.Status.Equals(Status.GetString("ACCEPTED")) || i.Status.Equals(Status.GetString("ARRIVED")) || i.Status.Equals(Status.GetString("ADMITTED")))).Where(x => x.ReferredTo.Equals(userFacility)).Count());
-                redirected.Add(activities.Where(i => i.DateReferred.Month.Equals(x) && (i.Status.Equals(Status.GetString("REJECTED")) || i.Status.Equals(Status.GetString("TRANSFERRED")))).Where(x => x.ReferredTo.Equals(userFacility)).Count());
-            }
-
+            var totalDoctors = _context.User
+                .Where(x => x.Level.Equals(_roles.Value.DOCTOR) && x.FacilityId.Equals(UserFacility())).Count();
+            var onlineDoctors = _context.User
+                .Where(x => x.Login.Equals("login") && x.FacilityId.Equals(UserFacility())).Count();
+            var referredPatients = _context.Tracking
+                .Where(x => x.ReferredTo.Equals(UserFacility())).Count();
             var dashboard = new SupportDashboadViewModel(
-                accepted.ToArray(),
-                redirected.ToArray(),
                 totalDoctors,
                 onlineDoctors,
                 referredPatients);
@@ -62,7 +59,7 @@ namespace Referral2.Controllers
 
         public async Task<IActionResult> ManageUsers(string searchName)
         {
-            var doctors = _context.User.Where(x => x.FacilityId.Equals(int.Parse(User.FindFirstValue("Facility"))) && x.Level.Equals(Roles.GetString("DOCTOR")))
+            var doctors = _context.User.Where(x => x.FacilityId.Equals(UserFacility()) && x.Level.Equals(_roles.Value.DOCTOR))
                                        .Select(y => new SupportManageViewModel
                                        {
                                            Id = y.Id,
@@ -95,15 +92,15 @@ namespace Referral2.Controllers
         {
             if(ModelState.IsValid)
             {
-                if(await _userService.RegisterSupportAsync(model, int.Parse(User.FindFirstValue("Facility"))))
+                if(await _userService.RegisterSupportAsync(model, UserFacility()))
                 {
-                    return RedirectToAction("ManageUsers", "Support");
+                    return RedirectToAction("ManageUsers");
                 }
             }
 
             return PartialView(model);
         }
-
+        [HttpGet]
         public async Task<IActionResult> UpdateUser(int? id)
         {
             var departments = _context.Department;
@@ -116,22 +113,43 @@ namespace Referral2.Controllers
                 currentMd.Password = "";
             }
 
-            var doctor = returnDoctorInfo(id);
-
+            var doctor = returnDoctorInfo(currentMd);
+            HttpContext.Session.SetString(SessionDoctorUsername, doctor.Username);
 
             return PartialView(doctor);
         }
         [HttpPost]
         public async Task<IActionResult> UpdateUser([Bind] UpdateDoctorViewModel model)
         {
-            if (User != null)
+            var doctorLastUsername = HttpContext.Session.GetString(SessionDoctorUsername);
+            var departments = _context.Department;
+            var doctor = SetDoctorViewModel(model);
+            if (ModelState.IsValid)
             {
-                var doctor = SetDoctorViewModel(model);
-                if(await _userService.ChangePasswordAsync(doctor,model.Password))
+                if(!string.IsNullOrEmpty(model.Password))
                 {
-                    return RedirectToAction("ManageUsers", "Support");
+                    if (_userService.ChangePasswordAsync(doctor, model.Password))
+                    {
+                        return RedirectToAction("ManageUsers", "Support");
+                    }
                 }
+                else
+                {
+                    if(!_context.User.Any(x => x.Username.Equals(model.Username)))
+                    {
+                        _context.Update(doctor);
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction("ManageUsers", "Support");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("Username", "Username already exist");
+                    }
+                }
+                
             }
+            ViewBag.Statuses = new SelectList(ListContainer.Status, doctor.Status);
+            ViewBag.Departments = new SelectList(departments, "Id", "Description", doctor.DepartmentId);
             return PartialView("~/Views/Support/UpdateUser.cshtml",model);
         }
 
@@ -139,7 +157,7 @@ namespace Referral2.Controllers
 
         public IActionResult HospitalInfo()
         {
-            var facility = _context.Facility.Find(int.Parse(User.FindFirstValue("Facility")));
+            var facility = _context.Facility.Find(UserFacility());
 
             var currentFacility = new HospitalInfoViewModel
             {
@@ -152,8 +170,8 @@ namespace Referral2.Controllers
                 Email = facility.Email,
                 Status = facility.Status
             };
-            int provinceFacility = int.Parse(User.FindFirstValue("Province"));
-            int muncityFacility = int.Parse(User.FindFirstValue("Muncity"));
+            int provinceFacility = UserProvince();
+            int muncityFacility = UserMuncity();
             var muncities = _context.Muncity.Where(x => x.ProvinceId.Equals(provinceFacility));
             var barangays = _context.Barangay.Where(x => x.ProvinceId.Equals(provinceFacility) && x.MuncityId.Equals(muncityFacility));
 
@@ -179,8 +197,7 @@ namespace Referral2.Controllers
 
         public async Task<IActionResult> DailyUsers(string date)
         {
-            int facilityId = int.Parse(User.FindFirstValue("Facility"));
-            var facilityUsers =await _context.User.Where(x => x.FacilityId.Equals(facilityId)).AsNoTracking().ToListAsync();
+            var facilityUsers =await _context.User.Where(x => x.FacilityId.Equals(UserFacility())).AsNoTracking().ToListAsync();
 
 
             return View(facilityUsers);
@@ -205,15 +222,13 @@ namespace Referral2.Controllers
             doctor.Status = model.Status;
             doctor.Level = model.Level;
             doctor.Username = model.Username;
-
+            doctor.UpdatedAt = DateTime.Now;
             return doctor;
         }
 
 
-        private UpdateDoctorViewModel returnDoctorInfo(int? id)
+        private UpdateDoctorViewModel returnDoctorInfo(User doctor)
         {
-            var doctor = _context.User.Find(id);
-
             var returnDoctor = new UpdateDoctorViewModel
             {
                 Firstname = doctor.Firstname,
@@ -225,15 +240,16 @@ namespace Referral2.Controllers
                 Department = (int)doctor.DepartmentId,
                 Level = doctor.Level,
                 Username = doctor.Username,
-                Status = doctor.Status
+                Status = doctor.Status,
+                ConfirmPassword = "",
+                Password = ""
             };
 
             return returnDoctor;
         }
         public Facility UpdateFacility(HospitalInfoViewModel model)
         {
-            int facilityId = int.Parse(User.FindFirstValue("Facility"));
-            var facility = _context.Facility.Find(facilityId);
+            var facility = _context.Facility.Find(UserFacility());
             facility.Name = model.FacilityName;
             facility.Abbrevation = model.Abbreviation;
             facility.MuncityId = model.MuncityId;
@@ -246,6 +262,34 @@ namespace Referral2.Controllers
             return facility;
         }
 
+        public int UserId()
+        {
+            return int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        }
+        public int UserFacility()
+        {
+            return int.Parse(User.FindFirstValue("Facility"));
+        }
+        public int UserDepartment()
+        {
+            return int.Parse(User.FindFirstValue("Department"));
+        }
+        public int UserProvince()
+        {
+            return int.Parse(User.FindFirstValue("Province"));
+        }
+        public int UserMuncity()
+        {
+            return int.Parse(User.FindFirstValue("Muncity"));
+        }
+        public int UserBarangay()
+        {
+            return int.Parse(User.FindFirstValue("Barangay"));
+        }
+        public string UserName()
+        {
+            return "Dr. " + User.FindFirstValue(ClaimTypes.GivenName) + " " + User.FindFirstValue(ClaimTypes.Surname);
+        }
         #endregion
     }
 }

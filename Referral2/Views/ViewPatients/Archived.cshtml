@@ -2,6 +2,9 @@
 
 @{
     ViewData["Title"] = "Archived Patients";
+    var dateToday = DateTime.Now;
+    var firstDayOfMonth = new DateTime(dateToday.Year, 1, 1);
+    var lastDayOfMonth = new DateTime(dateToday.Year, 12, 31);
 }
 
 
@@ -11,16 +14,10 @@
     <div class="card">
         <!-- CARD DANGER HEADER -->
         <div class="card-header">
-            <div class="fa-pull-right">
-                <form asp-action="Archived" method="get">
-                    <div class="form-actions no-color">
-                        <p>
-                            <input type="text" placeholder="Code,Firstname,Lastname" name="SearchString" value="@ViewData["CurrentFilter"]" />
-                            <input type="submit" value="Search" class="btn btn-primary" />
-                        </p>
-                    </div>
-                </form>
-            </div>
+            @await Html.PartialAsync("~/Views/Shared/PartialViews/_PatientSearchFilter.cshtml", new SearchModel
+            {
+                Action = "Archived"
+            })
             <div>
                 <h3 class="card-title">Archived Patients</h3><br />
                 <span class="text-sm text-muted">TOTAL: @ViewBag.Total</span>

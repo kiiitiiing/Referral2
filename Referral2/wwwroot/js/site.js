@@ -9,14 +9,71 @@
 
 $(function () {
 
-    var pregnantIdBtn = $('.pregId');
+    var numberOfNotif = $('span.numberNotif');
+    var bodey = $('body');
 
+    if (numberOfNotif.length > 0) {
+        $.when(GetNumberNotif()).done(function (output) {
+            numberOfNotif.text(output);
+        });
+    }
 
-    pregnantIdBtn.on('click', function () {
-        console.log('hellos');
-    })
+    //---------------------- ADDRESS CHANGE -------------------------
 
-    var placeholderElement = $('#modal-placeholder');
+    var muncitySelect = $('#muncityFilter');
+    var barangaySelect = $('#barangay');
+    var muncityId = 0;
+    muncitySelect.on('change', function () {
+        muncityId = muncitySelect.val();
+        console.log(muncityId);
+        if (muncityId != 'none') {
+            $.when(GetBarangayFiltered(muncityId)).done(function (output) {
+                barangaySelect.empty()
+                    .append($('<option>', {
+                        value: 'none',
+                        text: 'Select Barangay...'
+                    }));
+                jQuery.each(output, function (i, item) {
+                    barangaySelect.append($('<option>', {
+                        value: item.id,
+                        text: item.description
+                    }));
+                });
+            });
+        }
+        else {
+            barangaySelect.empty()
+                .append($('<option>', {
+                    value: 'none',
+                    text: 'Select Barangay...'
+                }));
+        }
+    });
+
+    //---------------------- ADDRESS CHANGE -------------------------
+
+    //---------------------- ACCEPT MODAL ---------------------------
+    
+
+    //---------------------- ACCEPT MODAL ---------------------------
+
+    var secondPlaceHolder = $('#modal-second-placeholder');
+
+    //---------------------- MODALS ---------------------------------
+
+    var placeholderElement = $('#modal-placeholders');
+
+    var smallModal = $('#small-modal');
+    var smallContent = $('#small-content');
+
+    $('button[data-toggle="small-modal"]').click(function (event) {
+        var url = $(this).data('url');
+        $.get(url).done(function (data) {
+            smallModal.modal('show');
+            smallContent.empty();
+            smallContent.html(data);
+        });
+    });
 
 
     $('button[data-toggle="ajax-modal"]').click(function (event) {
@@ -37,13 +94,45 @@ $(function () {
         });
     });
 
-    var testDiv = $('#test_div');
-
-    var testButton = $('#test_button')
-
-    testButton.click(function () {
-        testDiv.html('hello');
+    placeholderElement.on('click', 'button[data-save="modal"]', function (event) {
+        event.preventDefault();
+        var form = placeholderElement.find('.modal').find('form');
+        var actionUrl = form.attr('action');
+        var dataToSend = form.serialize();
+        $.post(actionUrl, dataToSend).done(function (data) {
+            var newBody = $('.modal-body', data);
+            placeholderElement.find('.modal-body').replaceWith(newBody);
+            var validation = $('span.text-danger').text();
+            if (validation == '') {
+                placeholderElement.find('.modal').modal('hide');
+                location.reload();
+            }
+        });
     });
+
+    //---------------------- MODALS ---------------------------------
+
+    //-------------------- CHANGE LOGIN STATUS ----------------------------
+
+    var onDuty = $('button#btn-on-duty');
+    var offDuty = $('button#btn-off-duty');
+    var container = $('div#login-status-modal');
+
+    onDuty.on('click', function () {
+        SetLoginStatus('onDuty');
+        container.modal('hide');
+        location.reload();
+    });
+
+    offDuty.on('click', function () {
+        SetLoginStatus('offDuty');
+        container.modal('hide');
+        location.reload();
+    });
+
+
+
+    //-------------------- CHANGE LOGIN STATUS ----------------------------
 
     //-------------------- DASHBOARD ----------------------------
 
@@ -51,7 +140,6 @@ $(function () {
 
     if ($('div.chart').length > 0) {
         $.when(GetDashboardValues()).done(function (output) {
-            console.log(output);
             var areaChartData = {
                 labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
                 datasets: [
@@ -135,10 +223,38 @@ $(function () {
 function GetDashboardValues() {
     var urlss = "/NoReload/DashboardValues?level=" + "doctor";
     return $.ajax({
-        url: urlss,
+        url: urlss, 
         type: 'get',
         async: true
     });
 }
+
+function SetLoginStatus(status) {
+    var urlss = "/NoReload/ChangeLoginStatus?status=" + status;
+    $.ajax({
+        url: urlss,
+        tpye: 'get',
+        async: true
+    });
+}
+
+function GetNumberNotif() {
+    var urlss = "/NoReload/NumberNotif";
+    return $.ajax({
+        url: urlss,
+        tpye: 'get',
+        async: true
+    })
+}
+
+function GetBarangayFiltered(id) {
+    var urls = "/NoReload/FilteredBarangay?muncityId=" + id;
+    return $.ajax({
+        url: urls,
+        type: 'get',
+        async: true
+    });
+}
+
 
 //----------------------- FUNCTIONS --------------------------

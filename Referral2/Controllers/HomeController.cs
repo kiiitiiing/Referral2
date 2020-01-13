@@ -15,6 +15,7 @@ using Referral2.Data;
 using Referral2.Helpers;
 using Referral2.Models;
 using Referral2.Models.ViewModels;
+using Microsoft.Extensions.Options;
 
 namespace Referral2.Controllers
 {
@@ -23,25 +24,27 @@ namespace Referral2.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly ReferralDbContext _context;
-        private readonly ResourceManager Status = new ResourceManager("Referral2.ReferralStatus", Assembly.GetExecutingAssembly());
+        private readonly IOptions<ReferralRoles> _roles;
+        private readonly IOptions<ReferralStatus> _status;
 
-        public HomeController(ILogger<HomeController> logger, ReferralDbContext context)
+        public HomeController(ILogger<HomeController> logger, ReferralDbContext context, IOptions<ReferralRoles> roles, IOptions<ReferralStatus> status)
         {
             _logger = logger;
             _context = context;
+            _roles = roles;
+            _status = status;
         }
 
         public IActionResult Index()
         {
-            SetCurrentUser();
             List<int> accepted = new List<int>();
             List<int> redirected = new List<int>();
             var activities = _context.Activity;
 
             for (int x = 1; x <= 12; x++)
             {
-                accepted.Add(activities.Where(i => i.DateReferred.Month.Equals(x) && (i.Status.Equals(Status.GetString("ACCEPTED")) || i.Status.Equals(Status.GetString("ARRIVED")) || i.Status.Equals(Status.GetString("ADMITTED")))).Count());
-                redirected.Add(activities.Where(i => i.DateReferred.Month.Equals(x) && (i.Status.Equals(Status.GetString("REJECTED")) || i.Status.Equals(Status.GetString("TRANSFERRED")))).Count());
+                accepted.Add(activities.Where(i => i.DateReferred.Month.Equals(x) && (i.Status.Equals(_status.Value.ACCEPTED) || i.Status.Equals(_status.Value.ARRIVED) || i.Status.Equals(_status.Value.ADMITTED))).Count());
+                redirected.Add(activities.Where(i => i.DateReferred.Month.Equals(x) && (i.Status.Equals(_status.Value.REJECTED) || i.Status.Equals(_status.Value.TRANSFERRED))).Count());
             }
 
             DashboardViewModel dashboard = new DashboardViewModel(accepted.ToArray(), redirected.ToArray());
@@ -65,11 +68,6 @@ namespace Referral2.Controllers
         }
 
         #region HELPERS
-
-        private void SetCurrentUser()
-        {
-            CurrentUser.user = _context.User.Find(int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)));
-        }
 
         #endregion
     }

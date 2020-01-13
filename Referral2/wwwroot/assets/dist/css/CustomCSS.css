@@ -1,0 +1,86 @@
+body {
+    background-image: url('../img/backdrop.png'),radial-gradient(#CCC,#DDD);
+}
+
+.alert-warning {
+    background-color: #F39C12 !important;
+    background-image: linear-gradient(to bottom,#fcf8e3 0,#f8efc0 100%);
+}
+
+.title-info {
+    color: #F39C2B !important;
+}
+
+.title-info, title-desc{
+    font-weight: bold;
+    font-size: 1.2em;
+    color: #FFF;
+}
+
+
+.referral-footer {
+    position: absolute;
+    border: 0;
+    width: 100%;
+    color: #FFF;
+    white-space: nowrap;
+    line-height: 40px !important;
+    background-color: #2F4054;
+    vertical-align: central;
+}
+
+.patientTitle{
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #AC2020;
+}
+
+.patient-color {
+    font-weight: bold;
+    color: #28A745;
+}
+
+.md-color {
+    font-weight: bold;
+    color: #17A2C2;
+}
+
+.facility-color {
+    color: #ff8456;
+}
+
+
+.card-custom-bg {
+    color: #3C763D;
+    background-color: #DFF0D8;
+    border-color: #D6E9C6;
+}
+
+.tracking-activities{
+    background: #EFEFEF;
+    padding: 5px;
+}
+
+.table-date{
+    white-space: nowrap;
+    vertical-align: top;
+    padding-right: 2em;
+}
+
+.code-color{
+    color: #F39C12;
+}
+
+.hospital-color{
+    font-weight: bold;
+    color: #9D7311;
+}
+
+.contact-color {
+    font-weight: bold;
+    color: #437EA9;
+}
+
+.badge-bg{
+    background-color: #F18B3C !important;
+}

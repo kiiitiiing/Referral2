@@ -142,7 +142,7 @@ namespace Referral2.Controlers
         [Route("profile")]
         public IActionResult Profile()
         {
-            var user = CurrentUser.user;
+            var user = _context.User.Find(UserId());
 
             if (user == null)
             {
@@ -154,11 +154,6 @@ namespace Referral2.Controlers
 
 
         #region Helpers
-        private void SetCurrentUser(int id)
-        {
-            if(CurrentUser.user == null)
-                CurrentUser.user = _context.User.Find(id);
-        }
         private bool isUrlValid(string returnUrl)
         {
             return !string.IsNullOrWhiteSpace(returnUrl) && Uri.IsWellFormedUriString(returnUrl, UriKind.Relative);
@@ -190,7 +185,6 @@ namespace Referral2.Controlers
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);
-            SetCurrentUser(user.Id);
             await HttpContext.SignInAsync(principal, properties);
         }
         public void CreateLogin(int userId)
@@ -229,6 +223,35 @@ namespace Referral2.Controlers
                 _context.Update(logout);
                 _context.SaveChanges();
             }
+        }
+
+        public int UserId()
+        {
+            return int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        }
+        public int UserFacility()
+        {
+            return int.Parse(User.FindFirstValue("Facility"));
+        }
+        public int UserDepartment()
+        {
+            return int.Parse(User.FindFirstValue("Department"));
+        }
+        public int UserProvince()
+        {
+            return int.Parse(User.FindFirstValue("Province"));
+        }
+        public int UserMuncity()
+        {
+            return int.Parse(User.FindFirstValue("Muncity"));
+        }
+        public int UserBarangay()
+        {
+            return int.Parse(User.FindFirstValue("Barangay"));
+        }
+        public string UserName()
+        {
+            return "Dr. " + User.FindFirstValue(ClaimTypes.GivenName) + " " + User.FindFirstValue(ClaimTypes.Surname);
         }
         #endregion
     }

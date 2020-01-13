@@ -11,34 +11,40 @@ using Referral2.Data;
 using Referral2.Helpers;
 using Referral2.Models;
 using Referral2.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Options;
 
 namespace Referral2.Controllers
 {
+    [Authorize(Policy = "Doctor")]
     public class ReportController : Controller
     {
         private readonly ReferralDbContext _context;
-        private readonly ResourceManager Status = new ResourceManager("Referral2.ReferralStatus", Assembly.GetExecutingAssembly());
+        private readonly IOptions<ReferralRoles> _roles;
+        private readonly IOptions<ReferralStatus> _status;
 
         private readonly ICompute _compute;
 
-        public ReportController(ReferralDbContext context, ICompute compute)
+        public ReportController(ReferralDbContext context, ICompute compute, IOptions<ReferralRoles> roles, IOptions<ReferralStatus> status)
         {
             _context = context;
             _compute = compute;
+            _roles = roles;
+            _status = status;
         }
         public async Task<IActionResult> IncomingReport(int? pageNumber)
         {
             var activities = _context.Activity;
             var tracking = _context.Tracking.Select(t => new IncomingReportViewModel
-                                            {
-                                                Code = t.Code,
-                                                Facility = t.ReferredToNavigation.Name,
-                                                DateAdmitted = activities.FirstOrDefault(x=>x.Code.Equals(t.Code) && x.Status.Equals(Status.GetString("ADMITTED"))).DateReferred,
-                                                DateArrived = activities.FirstOrDefault(x => x.Code.Equals(t.Code) && x.Status.Equals(Status.GetString("ARRIVED"))).DateReferred,
-                                                DateDischarged = activities.FirstOrDefault(x => x.Code.Equals(t.Code) && x.Status.Equals(Status.GetString("DISCHARGED"))).DateReferred,
-                                                DateCancelled = activities.FirstOrDefault(x => x.Code.Equals(t.Code) && x.Status.Equals(Status.GetString("CANCELLED"))).DateReferred,
-                                                DateTransferred = activities.FirstOrDefault(x => x.Code.Equals(t.Code) && x.Status.Equals(Status.GetString("TRANSFERRED"))).DateReferred
-                                            });
+                {
+                    Code = t.Code,
+                    Facility = t.ReferredToNavigation.Name,
+                    DateAdmitted = activities.FirstOrDefault(x=>x.Code.Equals(t.Code) && x.Status.Equals(_status.Value.ADMITTED)).DateReferred,
+                    DateArrived = activities.FirstOrDefault(x => x.Code.Equals(t.Code) && x.Status.Equals(_status.Value.ARRIVED)).DateReferred,
+                    DateDischarged = activities.FirstOrDefault(x => x.Code.Equals(t.Code) && x.Status.Equals(_status.Value.DISCHARGED)).DateReferred,
+                    DateCancelled = activities.FirstOrDefault(x => x.Code.Equals(t.Code) && x.Status.Equals(_status.Value.CANCELLED)).DateReferred,
+                    DateTransferred = activities.FirstOrDefault(x => x.Code.Equals(t.Code) && x.Status.Equals(_status.Value.TRANSFERRED)).DateReferred
+                });
 
             int pageSize = 5;
 

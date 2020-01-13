@@ -5,15 +5,21 @@ using System.Threading.Tasks;
 
 namespace Referral2.Models.ViewModels.ViewPatients
 {
-    public class ReferredViewModel
+    public partial class ReferredViewModel
     {
-        public Facility ReferredFrom { get; set; }
-        public Facility ReferredTo { get; set; }
-        public Department Department { get; set; }
+        public string PatientName { get; set; }
+        public string PatientSex { get; set; }
+        public int PatientAge { get; set; }
+        public int TrackingId { get; set; }
+        public int SeenCount { get; set; }
+        public int CallerCount { get; set; }
+        public int TravelCount { get; set; }
+        public int ReCoCount { get; set; }
+        public string PatientAddress { get; set; }
+        public string ReferredBy { get; set; }
+        public string ReferredTo { get; set; }
         public string Code { get; set; }
-        public Patient Patient { get; set; }
-        public User ReferringMd { get; set; }
-        public User ActionMd { get; set; }
+        public string Status { get; set; }
         public IEnumerable<Activity> Activities { get; set; }
 
         public DateTime UpdatedAt { get; set; }

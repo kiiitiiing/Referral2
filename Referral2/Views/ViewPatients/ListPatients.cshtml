@@ -35,7 +35,7 @@
                             <!-- BARANGAY -->
                             <div class="form-group">
                                 <select class="form-control" id="barangay" required>
-                                    <option>Select Barangay...</option>
+                                    <option value="none">Select Barangay...</option>
                                 </select>
                             </div>
                             <div class="form-group hide"></div>
@@ -110,22 +110,23 @@
                                                 <small class="text-muted">@muncity</small>
                                             </td>
                                             <td>
-                                                <!-- REFER -->
                                                 @if (sex.Equals("Female") && (age > 14 && age < 50))
                                                 {
-                                                    <button type="button" id="refer-pregnant-btn" class="btn btn-primary btn-xs pregId" data-toggle="modal" data-target="#pregnant-choose-modal" data-patient_id="@item.Id">
+                                                    <!-- REFER -->
+                                                    <button type="button" id="refer-pregnant-btn" class="btn btn-primary btn-xs patientId" data-toggle="modal" data-target="#pregnant-choose-modal" data-patient_id="@item.Id">
                                                         <i class="fa fa-stethoscope"></i>
                                                         &nbsp;Refer
                                                     </button>
                                                     <!-- WALK IN -->
-                                                    <button data-toggle="modal" data-target="#pregnant-choose-modal" class="btn btn-warning btn-xs">
+                                                    <button data-toggle="modal" data-target="#pregnant-choose-modal" class="btn btn-warning btn-xs patientId">
                                                         <i class="fa fa-ambulance"></i>
                                                         &nbsp;Walk-In
                                                     </button>
                                                 }
                                                 else
                                                 {
-                                                    <button type="button" class="btn btn-primary btn-xs refer_modal" data-toggle="ajax-modal" data-target="#@patientPregnant" data-url="@Url.Action("Refer","AddPatients",new { id = item.Id})">
+                                                    <!-- REFER -->
+                                                    <button type="button" class="btn btn-primary btn-xs refer_modal patientId" data-toggle="modal" data-target="#refer_modal" data-patient_id="@item.Id">
                                                         <i class="fa fa-stethoscope"></i>
                                                         &nbsp;Refer
                                                     </button>
@@ -150,7 +151,7 @@
 
 
 
-<div id="modal-placeholders"></div>
+
 
 <div class="modal fade" role="dialog" id="pregnant-choose-modal">
     <div class="modal-dialog modal-sm" role="document">
@@ -167,7 +168,7 @@
                     Non-Pregnant
                 </button>
 
-                <button type="button" id="non-preg-modal" class="btn btn-warning col-xs-7" data-backdrop="static" data-target="#pregnant_refer_modal" data-toggle="modal">
+                <button type="button" id="non-preg-modal" class="btn btn-info col-xs-7" data-backdrop="static" data-target="#pregnant_refer_modal" data-toggle="modal">
                     <img src="~/assets/dist/img/pregnant.png" width="100" />
                     <br />
                     Pregnant
@@ -212,52 +213,18 @@
 </div>
 
 <script>
-
     var patientId;
     var url;
 
-    $('.pregId').on('click', function () {
+    $('.patientId').on('click', function () {
         patientId = $(this).data('patient_id');
     });
 
     $('#refer_modal').on('show.bs.modal', function () {
         url = '/AddPatients/Refer?id=' + patientId;
-        console.log(url);
         $.get(url).done(function (data) {
             $('#normal_content').empty();
             $('#normal_content').html(data);
         });
     });
-
-    var muncityId = 0;
-    $('#muncityFilter').change(function () {
-        muncityId = $('#muncityFilter').val();
-
-        if (muncityId != 'none') {
-            $.when(getBarangayFiltered()).done(function (output) {
-                console.log(output);
-                $('#barangay').empty()
-                    .append($('<option>', {
-                        value: '',
-                        text: 'Select Barangay...'
-                    }))
-                jQuery.each(output, function (i, item) {
-                    $('#barangay').append($('<option>', {
-                        value: item.id,
-                        text: item.description
-                    }))
-                }
-                );
-            });
-        }
-    });
-
-    function getBarangayFiltered() {
-        var urls = "/NoReload/FilteredBarangay?muncityId=" + muncityId;
-        return $.ajax({
-            url: urls,
-            type: 'get',
-            async: true
-        });
-    }
 </script>

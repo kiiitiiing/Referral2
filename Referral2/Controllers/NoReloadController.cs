@@ -11,19 +11,24 @@ using Referral2.Data;
 using Referral2.Helpers;
 using Referral2.Models;
 using Referral2.Models.ViewModels;
+using System.Security.Claims;
+using Referral2.Models.ViewModels.ViewPatients;
+using Microsoft.Extensions.Options;
 
 namespace Referral2.Controllers
 {
     public class NoReloadController : Controller
     {
         private readonly ReferralDbContext _context;
-        private readonly ResourceManager Roles = new ResourceManager("Referral2.Roles", Assembly.GetExecutingAssembly());
-        private readonly ResourceManager Status = new ResourceManager("Referral2.ReferralStatus", Assembly.GetExecutingAssembly());
+        private readonly IOptions<ReferralRoles> _roles;
+        private readonly IOptions<ReferralStatus> _status;
 
 
-        public NoReloadController(ReferralDbContext context)
+        public NoReloadController(ReferralDbContext context, IOptions<ReferralRoles> roles, IOptions<ReferralStatus> status)
         {
             _context = context;
+            _roles = roles;
+            _status = status;
         }
 
         public class SelectMuncity
@@ -31,8 +36,6 @@ namespace Referral2.Controllers
             public int Id { get; set; }
             public string Description { get; set; }
         }
-
-
 
         public class SelectAddressDepartment
         {
@@ -58,6 +61,24 @@ namespace Referral2.Controllers
             public string DoctorName { get; set; }
         }
 
+        [HttpGet]
+        public int NumberNotif()
+        {
+            var incoming = from t in _context.Tracking.Where(f => f.ReferredTo.Equals(UserFacility()))
+                           join a in _context.Activity
+                           on t.Code equals a.Code
+                           into tact
+                           from c in tact.DefaultIfEmpty()
+                           select new IncomingViewModel()
+                           {
+                               ReferredToId = (int)t.ReferredTo,
+                               DateAction = c.DateReferred
+                           };
+            incoming = incoming.Where(x => x.ReferredToId.Equals(UserFacility()) && x.DateAction.Date.Equals(DateTime.Now.Date));
+
+            return incoming.Count();
+        }
+
 
         [HttpGet]
         public List<SelectMuncity> FilteredBarangay(int? muncityId)
@@ -71,13 +92,37 @@ namespace Referral2.Controllers
 
             return filteredBarangay;
         }
+        
+        [HttpGet]
+        public void ChangeLoginStatus(string status)
+        {
+            var currentUser = _context.User.Find(UserId());
+
+            if(status.Equals("onDuty"))
+            {
+                currentUser.LoginStatus = "login";
+            }
+            else if(status.Equals("offDuty"))
+            {
+                currentUser.LoginStatus = "login off";
+            }
+
+            currentUser.UpdatedAt = DateTime.Now;
+            _context.Update(currentUser);
+            _context.SaveChangesAsync();
+        }
 
 
         //  FilterDepartment?facilityId=
         [HttpGet]
         public SelectAddressDepartment FilterDepartment(int? facilityId)
         {
-            string address = _context.Facility.Find(facilityId).Address;
+            var facility = _context.Facility.Find(facilityId);
+            string facilityAddress = facility.Address.Equals("none") ? "" : facility.Address + ", ";
+            string barangay = facility.Barangay == null ? "" : facility.Barangay.Description + ", ";
+            string muncity = facility.Muncity == null ? "" : facility.Muncity.Description + ", ";
+            string province = facility.Province == null ? "" : facility.Province.Description;
+            string address = facilityAddress + barangay + muncity + province;
 
             var departments = _context.Department.Select(x => new SelectDepartment
             {
@@ -85,7 +130,7 @@ namespace Referral2.Controllers
                 DepartmentName = x.Description
             });
 
-            var faciliyDepartment = _context.User.Where(x => x.FacilityId.Equals(facilityId) && x.Level.Equals(Roles.GetString("DOCTOR")))
+            var faciliyDepartment = _context.User.Where(x => x.FacilityId.Equals(facilityId) && x.Level.Equals(_roles.Value.DOCTOR))
                                             .GroupBy(d => d.DepartmentId)
                                             .Select(y => new SelectDepartment
                                             {
@@ -100,7 +145,7 @@ namespace Referral2.Controllers
 
         public List<SelectUser> FilterUser(int facilityId, int departmentId)
         {
-            var getUser = _context.User.Where(x => x.FacilityId.Equals(facilityId) && x.DepartmentId.Equals(departmentId) && x.Level.Equals(Roles.GetString("DOCTOR")))
+            var getUser = _context.User.Where(x => x.FacilityId.Equals(facilityId) && x.DepartmentId.Equals(departmentId) && x.Level.Equals(_roles.Value.DOCTOR))
                                         .Select(y => new SelectUser
                                         {
                                             MdId = y.Id,
@@ -110,31 +155,51 @@ namespace Referral2.Controllers
             return getUser.ToList();
         }
 
-        public AdminDashboardViewModel DashboardValues(string level)
+        public DashboardViewModel DashboardValues(string level)
         {
             List<int> accepted = new List<int>();
             List<int> redirected = new List<int>();
-
-            var activities = _context.Activity.Where(x => x.DateReferred.Year.Equals(DateTime.Now.Year));
-            var totalDoctors = _context.User.Where(x => x.Level.Equals("doctor")).Count();
-            var onlineDoctors = _context.User.Where(x => x.Login.Equals("login")).Count();
-            var activeFacility = _context.Facility.Count();
-            var referredPatients = _context.Tracking.Where(x => x.DateReferred != default || x.DateAccepted != default || x.DateArrived != default).Count();
-
-
-
+            var activities = _context.Activity.Where(x => x.DateReferred.Year.Equals(DateTime.Now.Year) && x.ReferredTo.Equals(UserFacility()));
             for (int x = 1; x <= 12; x++)
             {
-                accepted.Add(activities.Where(i => i.DateReferred.Month.Equals(x) && (i.Status.Equals(Status.GetString("ACCEPTED")) || i.Status.Equals(Status.GetString("ARRIVED")) || i.Status.Equals(Status.GetString("ADMITTED")))).Count());
-                redirected.Add(activities.Where(i => i.DateReferred.Month.Equals(x) && (i.Status.Equals(Status.GetString("REJECTED")) || i.Status.Equals(Status.GetString("TRANSFERRED")))).Count());
+                accepted.Add(activities.Where(i => i.DateReferred.Month.Equals(x) && (i.Status.Equals(_status.Value.ACCEPTED) || i.Status.Equals(_status.Value.ARRIVED) || i.Status.Equals(_status.Value.ADMITTED))).Count());
+                redirected.Add(activities.Where(i => i.DateReferred.Month.Equals(x) && (i.Status.Equals(_status.Value.REJECTED) || i.Status.Equals(_status.Value.TRANSFERRED))).Count());
             }
-
-            var adminDashboard = new AdminDashboardViewModel(accepted.ToArray(), redirected.ToArray(), totalDoctors, onlineDoctors, activeFacility, referredPatients);
-
-            adminDashboard.Max = accepted.Max() > redirected.Max() ? accepted.Max() : redirected.Max();
-
-
+            var adminDashboard = new DashboardViewModel(accepted.ToArray(), redirected.ToArray());
             return adminDashboard;
         }
+
+        #region HELPERS
+
+        public int UserId()
+        {
+            return int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        }
+        public int UserFacility()
+        {
+            return int.Parse(User.FindFirstValue("Facility"));
+        }
+        public int UserDepartment()
+        {
+            return int.Parse(User.FindFirstValue("Department"));
+        }
+        public int UserProvince()
+        {
+            return int.Parse(User.FindFirstValue("Province"));
+        }
+        public int UserMuncity()
+        {
+            return int.Parse(User.FindFirstValue("Muncity"));
+        }
+        public int UserBarangay()
+        {
+            return int.Parse(User.FindFirstValue("Barangay"));
+        }
+        public string UserName()
+        {
+            return "Dr. " + User.FindFirstValue(ClaimTypes.GivenName) + " " + User.FindFirstValue(ClaimTypes.Surname);
+        }
+
+        #endregion
     }
 }

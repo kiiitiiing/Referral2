@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Referral2.Helpers
 {
-    public static class ListContainer
+    public partial class ListContainer
     {
         public static List<string> PhicStatus
         {
@@ -70,5 +70,6 @@ namespace Referral2.Helpers
             else
                 return false;
         }
+
     }
 }

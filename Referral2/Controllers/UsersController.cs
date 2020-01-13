@@ -15,7 +15,6 @@ using System.Security.Claims;
 
 namespace Referral2.Controllers
 {
-    [Authorize(Policy = "doctor")]
     public class UsersController : Controller
     {
         private readonly ReferralDbContext _context;
@@ -28,11 +27,12 @@ namespace Referral2.Controllers
             _userService = userService;
         }
 
+        [Authorize(Policy = "doctor")]
         public async Task<IActionResult> WhosOnline(string nameSearch, int? facilitySearch)
         {
             ViewBag.CurrentSearch = nameSearch;
-            ViewBag.Facilities = new SelectList(_context.Facility.Where(x => x.ProvinceId.Equals(int.Parse(User.FindFirstValue("Province")))),"Id","Name");
-            var onlineUsers = await _context.User.Where(x => x.LoginStatus.Equals("login") && x.LastLogin.Date.Equals(DateTime.Now.Date)).ToListAsync();
+            ViewBag.Facilities = new SelectList(_context.Facility.Where(x => x.ProvinceId.Equals(UserProvince())),"Id","Name");
+            var onlineUsers = await _context.User.Where(x => x.LoginStatus.Contains("login") && x.LastLogin.Date.Equals(DateTime.Now.Date) && x.FacilityId.Equals(UserFacility())).ToListAsync();
 
             if(!string.IsNullOrEmpty(nameSearch))
             {
@@ -53,25 +53,68 @@ namespace Referral2.Controllers
             return PartialView("~/Views/Users/ChangePassword.cshtml");
         }
 
+
         [HttpPost]
         public async Task<IActionResult> ChangePassword([Bind] ChangePasswordViewModel model)
         {
             if(ModelState.IsValid)
             {
-                var (isValid, user) = await _userService.ValidateUserCredentialsAsync(User.FindFirstValue(ClaimTypes.Name), model.CurrentPassword);
+                var (isValid, user) = await _userService.ValidateUserCredentialsAsync(UserUsername(), model.CurrentPassword);
 
 
                 if (isValid)
                 {
-                    if(await _userService.ChangePasswordAsync(user, model.NewPassword))
+                    if( _userService.ChangePasswordAsync(user, model.NewPassword))
                     {
                         ViewData["Status"] = "success";
                     }
+                }
+                else
+                {
+                    ModelState.AddModelError("CurrentPassword", "Wrong Password");
                 }
             }
             ViewData["Status"] = "failed";
 
             return PartialView("~/Views/Users/ChangePassword.cshtml",model);
         }
+
+        #region HELPERS
+        public int UserId()
+        {
+            return int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        }
+        public int UserFacility()
+        {
+            return int.Parse(User.FindFirstValue("Facility"));
+        }
+        public int UserDepartment()
+        {
+            return int.Parse(User.FindFirstValue("Department"));
+        }
+        public int UserProvince()
+        {
+            return int.Parse(User.FindFirstValue("Province"));
+        }
+        public int UserMuncity()
+        {
+            return int.Parse(User.FindFirstValue("Muncity"));
+        }
+        public int UserBarangay()
+        {
+            return int.Parse(User.FindFirstValue("Barangay"));
+        }
+        public string UserName()
+        {
+            return "Dr. " + User.FindFirstValue(ClaimTypes.GivenName) + " " + User.FindFirstValue(ClaimTypes.Surname);
+        }
+
+        public string UserUsername()
+        {
+            return User.FindFirstValue(ClaimTypes.Name);
+        }
+
+
+        #endregion
     }
 }

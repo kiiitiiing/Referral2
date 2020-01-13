@@ -1,0 +1,18 @@
+﻿@model IEnumerable<SeenCallViewModel>
+
+@foreach (var item in Model)
+{
+    <div class="list-group">
+        <a href="#" class="list-group-item clearfix">
+            <span class="title-info">@item.MdName</span>
+            <br>
+            <small class="text-primary">
+                Seen: @item.SeenDate.ToString("MMMM dd, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture)
+            </small>
+            <br>
+            <small class="text-success">
+                Contact: @item.MdContact
+            </small>
+        </a>
+    </div>
+}

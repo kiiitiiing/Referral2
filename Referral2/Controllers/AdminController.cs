@@ -17,54 +17,45 @@ using Referral2.Models.ViewModels;
 using Referral2.Models.ViewModels.Admin;
 using Referral2.Services;
 using Referral2.Resources;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Http;
 
 namespace Referral2.Controllers
 {
     [Authorize(Policy = "Administrator")]
     public class AdminController : Controller
     {
+        const string SessionSupportUsername = "_username";
         private readonly IUserService _userService;
         public readonly ReferralDbContext _context;
-        private readonly ResourceManager Roles = new ResourceManager("Referral2.Roles",Assembly.GetExecutingAssembly());
-        private readonly ResourceManager Status = new ResourceManager("Referral2.ReferralStatus", Assembly.GetExecutingAssembly());
+        private readonly IOptions<ReferralRoles> _roles;
+        private readonly IOptions<ReferralStatus> _status;
 
-        public AdminController(ReferralDbContext context, IUserService userService)
+        public AdminController(ReferralDbContext context, IUserService userService, IOptions<ReferralRoles> roles, IOptions<ReferralStatus> status)
         {
             _context = context;
             _userService = userService;
+            _roles = roles;
+            _status = status;
         }
 
 
         public IActionResult AdminDashboard()
         {
-            SetCurrentUser();
-            List<int> accepted = new List<int>();
-            List<int> redirected = new List<int>();
-
             var activities = _context.Activity.Where(x=>x.DateReferred.Year.Equals(DateTime.Now.Year));
             var totalDoctors = _context.User.Where(x => x.Level.Equals("doctor")).Count();
             var onlineDoctors = _context.User.Where(x => x.Login.Equals("login")).Count();
             var activeFacility = _context.Facility.Count();
             var referredPatients = _context.Tracking.Where(x => x.DateReferred != default || x.DateAccepted != default || x.DateArrived != default).Count();
 
-
-
-            for (int x = 1; x <= 12; x++)
-            {
-                accepted.Add(activities.Where(i => i.DateReferred.Month.Equals(x) && (i.Status.Equals(Status.GetString("ACCEPTED")) || i.Status.Equals(Status.GetString("ARRIVED")) || i.Status.Equals(Status.GetString("ADMITTED")))).Count());
-                redirected.Add(activities.Where(i => i.DateReferred.Month.Equals(x) && (i.Status.Equals(Status.GetString("REJECTED")) || i.Status.Equals(Status.GetString("TRANSFERRED")))).Count());
-            }
-
-            var adminDashboard = new AdminDashboardViewModel(accepted.ToArray(), redirected.ToArray(), totalDoctors, onlineDoctors, activeFacility, referredPatients);
-
-            adminDashboard.Max = accepted.Max() > redirected.Max() ? accepted.Max() : redirected.Max();
+            var adminDashboard = new AdminDashboardViewModel(totalDoctors, onlineDoctors, activeFacility, referredPatients);
 
             return View(adminDashboard);
         }
 
         public async Task<IActionResult> SupportUsers()
         {
-            var support = _context.User.Where(x => x.Level.Equals(Roles.GetString("SUPPORT")))
+            var support = _context.User.Where(x => x.Level.Equals(_roles.Value.SUPPORT))
                             .Select(x => new SupportUsersViewModel
                             {
                                 Id = x.Id,
@@ -73,7 +64,7 @@ namespace Referral2.Controllers
                                 Contact = x.Contact ?? "N/A",
                                 Email = x.Email ?? "N/A",
                                 Username = x.Username,
-                                Status = x.Status,
+                                Status = x.LoginStatus,
                                 LastLogin = x.LastLogin == null ? default : x.LastLogin
                             });
 
@@ -129,6 +120,64 @@ namespace Referral2.Controllers
             return View(await onlinePerFacility.ToListAsync());
         }
 
+        [HttpGet]
+        public async Task<IActionResult> UpdateSupport(int? id)
+        {
+            var facility = _context.Facility;
+            var currentSupport = await _context.User.FindAsync(id);
+            if (currentSupport != null)
+            {
+                ViewBag.Status = new SelectList(ListContainer.Status, currentSupport.Status);
+                ViewBag.Facility = new SelectList(facility, "Id", "Name", currentSupport.FacilityId);
+                currentSupport.Password = "";
+            }
+
+            var support = ReturnSupportInfo(currentSupport);
+            HttpContext.Session.SetString(SessionSupportUsername, currentSupport.Username);
+            return PartialView(support);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateSupport([Bind] UpdateSupportViewModel model)
+        {
+            var doctorLastUsername = HttpContext.Session.GetString(SessionSupportUsername);
+            var facilities = _context.Facility;
+            var support = SetSupportViewModel(model);
+            if (ModelState.IsValid)
+            {
+                if (!string.IsNullOrEmpty(model.Password))
+                {
+                    if (_userService.ChangePasswordAsync(support, model.Password))
+                    {
+                        return RedirectToAction("ManageUsers", "Support");
+                    }
+                }
+                else
+                {
+                    if (!model.Username.Equals(doctorLastUsername))
+                    {
+                        if (!_context.User.Any(x => x.Username.Equals(model.Username)))
+                        {
+                            _context.Update(support);
+                            await _context.SaveChangesAsync();
+                            return RedirectToAction("ManageUsers", "Support");
+                        }
+                        else
+                        {
+                            ModelState.AddModelError("Username", "Username already exist");
+                        }
+
+                    }
+                }
+
+            }
+            ViewBag.Statuses = new SelectList(ListContainer.Status, support.Status);
+            ViewBag.Facilities = new SelectList(facilities, "Id", "Description", support.FacilityId);
+            return PartialView("~/Views/Admin/UpdateSupport.cshtml", model);
+        }
+
+        
+
         public IActionResult AddSupport()
         {
             ViewBag.Facilities = new SelectList(_context.Facility.Where(x=>x.Name.Contains("")), "Id", "Name");
@@ -139,25 +188,54 @@ namespace Referral2.Controllers
         {
             if(ModelState.IsValid)
             {
-                if(await _userService.RegisterDoctorAsync(model))
+                model.Firstname = GlobalFunctions.FixName(model.Firstname);
+                model.Middlename = GlobalFunctions.FixName(model.Middlename);
+                model.Lastname = GlobalFunctions.FixName(model.Lastname);
+                if (await _userService.RegisterDoctorAsync(model))
                 {
                     return RedirectToAction("SupportUsers");
                 }
 
             }
             ViewBag.Facilities = new SelectList(_context.Facility, "Id", "Name");
-            return PartialView("",model);
+            return PartialView(model);
         }
 
 
 
         #region HELPERS
-        private void SetCurrentUser()
+        private UpdateSupportViewModel ReturnSupportInfo(User currentSupport)
         {
-            if (CurrentUser.user == null)
-                CurrentUser.user = _context.User.Find(int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)));
+            var support = new UpdateSupportViewModel
+            {
+                Firstname = currentSupport.Firstname,
+                Middlename = currentSupport.Middlename,
+                Lastname = currentSupport.Lastname,
+                ContactNumber = currentSupport.Contact,
+                Email = currentSupport.Email,
+                Facility = currentSupport.FacilityId,
+                Designation = currentSupport.Designation,
+                Status = currentSupport.Status,
+                Username = currentSupport.Username
+            };
+            return support;
         }
+        private User SetSupportViewModel(UpdateSupportViewModel model)
+        {
+            var support = _context.User.First(x => x.Username.Equals(model.Username));
 
+            support.Firstname = model.Firstname;
+            support.Middlename = model.Middlename;
+            support.Lastname = model.Lastname;
+            support.Contact = model.ContactNumber;
+            support.Email = model.Email;
+            support.Designation = model.Designation;
+            support.FacilityId = model.Facility;
+            support.Status = model.Status;
+            support.Username = model.Username;
+            support.UpdatedAt = DateTime.Now;
+            return support;
+        }
 
         #endregion
     }

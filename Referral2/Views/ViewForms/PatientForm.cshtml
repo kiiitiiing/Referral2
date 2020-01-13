@@ -2,226 +2,242 @@
 
 
 @{
-    var patient = Model.Patient.FirstName + " " + Model.Patient.MiddleName + " " + Model.Patient.LastName;
-    var referringMd = "Dr. " + Model.ReferringMdNavigation.Firstname + " " + Model.ReferringMdNavigation.Middlename + " " + Model.ReferringMdNavigation.Lastname;
-    var referredMd = "Dr. " + Model.ReferredMdNavigation.Firstname + " " + Model.ReferredMdNavigation.Middlename + " " + Model.ReferredMdNavigation.Lastname;
     var code = Model.Code;
-    var accept = "accept_modal";
+    var referringFacility = Model.ReferringFacility.Name;
+    var referringFacilityContact = Model.ReferringFacility.Contact;
+    var referringFacilityAddress = GlobalFunctions.GetAddress(Model.ReferringFacility);
+    var referredFacility = Model.ReferredToNavigation.Name;
+    var referredFacilityDepartment = Model.Department.Description;
+    var referredFacilityAddress = GlobalFunctions.GetAddress(Model.ReferredToNavigation);
+    var dateReferred = Model.TimeReferred;
+    var dateTransferred = Model.TimeTransferred;
+    var patientName = GlobalFunctions.GetFullName(Model.Patient);
+    var patientAge = GlobalFunctions.ComputeAge(Model.Patient.DateOfBirth);
+    var patientSex = Model.Patient.Sex;
+    var patientCivilStatus = Model.Patient.CivilStatus;
+    var patientAddress = GlobalFunctions.GetAddress(Model.Patient);
+    var patientPhicStatus = Model.Patient.PhicStatus;
+    var patientPhicId = Model.Patient.PhicId;
+    var caseSummary = Model.CaseSummary;
+    var recoSummary = Model.RecommendSummary;
+    var diagnosis = Model.Diagnosis;
+    var reason = Model.Reason;
+    var ReferringMd = GlobalFunctions.GetMDFullName(Model.ReferringMdNavigation);
+    var ReferringMdContact = Model.ReferringMdNavigation.Contact;
+    var ReferredMd = GlobalFunctions.GetMDFullName(Model.ReferredMdNavigation);
+    var accept = "accept-modal";
+
 }
+    <div class="modal fade" role="dialog" id="patient-form-modal">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header justify-content-center">
+                    CENTRAL VISAYAS HEALTH REFERRAL SYSTEM
+                    <br>
+                    <small>
+                        Clinical Referral Form
+                    </small>
+                </div>
+                <div class="modal-body">
+                    <!-- REFER BODY -->
+                    <form asp-action="Refer">
+                        <table class="table table-striped">
+                            <tbody>
+                                <!-- FACILITY NAME-->
+                                <tr>
+                                    <td colspan="6" class="warning">
+                                        ReferringFacility: @referringFacility
+                                    </td>
+                                </tr>
+                                <!-- FACILITY ADDRESS -->
+                                <tr>
+                                    <td colspan="6">
+                                        Address: @referringFacilityAddress
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <!-- REFERRED TO -->
+                                    <td colspan="3">
+                                        Referred to: @referredFacility
+                                    </td>
+                                    <!-- DEPARTMENT -->
+                                    <td colspan="3">
+                                        Department: @referredFacilityDepartment
+                                    </td>
+                                </tr>
+                                <!-- ADDRESS OF REFERRED HOSPITAL -->
+                                <tr>
+                                    <td colspan="6">
+                                        Address: @referredFacilityAddress
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <!-- DATE/TIME REFERRED -->
+                                    <td colspan="3">
+                                        Date/Time Referred (ReCo):
+                                        <span class="text-warning">@dateReferred</span>
+                                    </td>
+                                    <!-- DATE/TIME TRANSFERRED -->
+                                    <td colspan="3">
+                                        Date/Time Transferred:
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <!-- NAME OF PATIENT -->
+                                    <td colspan="3">
+                                        Name of Patient:
+                                        <span class="text-warning">
+                                            @patientName
+                                        </span>
+                                    </td>
+                                    <!-- AGE -->
+                                    <td>
+                                        Age:
+                                        <span class="text-warning">
+                                            @patientAge
+                                        </span>
+                                    </td>
 
+                                    <!-- SEX -->
+                                    <td>
+                                        Sex:
+                                        <span class="text-warning">
+                                            @patientSex
+                                        </span>
 
-<!-- REFER BODY -->
-<form asp-action="Refer">
-    <table class="table table-striped">
-        <tbody>
-            <!-- FACILITY NAME-->
-            <tr>
-                <td colspan="6">
-                    ReferringFacility:<br />
-                    @Html.DisplayFor(model => model.ReferringFacility.Name)
-                </td>
-            </tr>
-            <!-- FACILITY ADDRESS -->
-            <tr>
-                <td colspan="6">
-                    Address:<br />
-                    <span class="text-success" asp-validation-for="ReferringFacility.Address">
-                        @Html.DisplayFor(model => model.ReferringFacility.Address)
-                    </span>
-                </td>
-            </tr>
-            <tr>
-                <!-- REFERRED TO -->
-                <td colspan="3">
-                    Referred to:
-                    <label class="control-label">Referred To:</label>
-                    <span class="text-success" asp-validation-for="ReferringFacility.Address">
-                        @Html.DisplayFor(model => model.ReferredToNavigation.Name)
-                    </span>
-                </td>
-                <!-- DEPARTMENT -->
-                <td colspan="3">
-                    <label class="control-label">Department:</label>
-                    <span class="text-success" asp-validation-for="ReferringFacility.Address">
-                        @Html.DisplayFor(model => model.Department.Description)
-                    </span>
-                </td>
-            </tr>
-            <!-- ADDRESS OF REFERRED HOSPITAL -->
-            <tr>
-                <td colspan="6">
-                    Address:
-                    <span class="text-success">
-                        @Html.DisplayFor(model => model.ReferredToNavigation.Address)
-                    </span>
-                </td>
-            </tr>
-            <tr>
-                <!-- DATE/TIME REFERRED -->
-                <td colspan="3">
-                    Date/Time Referred (ReCo):
-                    <span class="text-success">@Html.DisplayFor(model => model.TimeReferred)</span>
-                </td>
-                <!-- DATE/TIME TRANSFERRED -->
-                <td colspan="3">
-                    Date/Time Transferred:
-                </td>
-            </tr>
-            <tr>
-                <!-- NAME OF PATIENT -->
-                <td colspan="3">
-                    Name of Patient:<br />
-                    <span class="text-danger">
-                        @patient
-                    </span>
-                </td>
-                <!-- AGE -->
-                <td>
-                    Age:<br />
-                    <span class="text-danger">
-                        @Html.DisplayFor(model => model.Patient.DateOfBirth)
-                    </span>
-                </td>
+                                    </td>
 
-                <!-- SEX -->
-                <td>
-                    Sex:<br />
-                    <span class="text-danger">
-                        @Html.DisplayFor(model => model.Patient.Sex)
-                    </span>
+                                    <!-- STATUS -->
+                                    <td>
+                                        Status:
+                                        <span class="text-warning">
+                                            @patientCivilStatus
+                                        </span>
+                                    </td>
+                                </tr>
+                                <!-- ADDRESS OF PATIENT -->
+                                <tr>
+                                    <td colspan="6">
+                                        Address:
+                                        <span class="text-warning">
+                                            @patientAddress
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <!-- PHILHEALTH STATUS -->
+                                    <td colspan="3">
+                                        PhilHealth:
+                                        <span class="text-warning">
+                                            @patientPhicStatus
+                                        </span>
+                                    </td>
+                                    <!-- PHILHEALTH NUMBER -->
+                                    <td colspan="3">
+                                        PhilHealth#:
+                                        <span class="text-warning">
+                                            @patientPhicId
+                                        </span>
+                                    </td>
+                                </tr>
+                                <!-- CASE SUMMARY -->
+                                <tr>
+                                    <td colspan="6">
+                                        Case Summary (pertinent Hx/PE, including meds, labs, course etc.):
+                                        <span class="text-warning ">
+                                            @caseSummary
+                                        </span>
+                                    </td>
+                                </tr>
+                                <!-- SUMMARY OF RECO -->
+                                <tr>
+                                    <td colspan="6">
+                                        Summary of ReCo (Please refer to ReCo Guide in Referring Patients Checklist):
+                                        <span class="text-warning">
+                                            @recoSummary
+                                        </span>
+                                    </td>
+                                </tr>
+                                <!-- DIAGNOSYS/IMPRESSION -->
+                                <tr>
+                                    <td colspan="6">
+                                        Diagnosis/Impression:
+                                        <span class="text-warning">
+                                            @diagnosis
+                                        </span>
+                                    </td>
+                                </tr>
+                                <!-- REASON -->
+                                <tr>
+                                    <td colspan="6">
+                                        Reason for referral:
+                                        <span class="text-warning">
+                                            @reason
+                                        </span>
+                                    </td>
+                                </tr>
+                                <!-- NAME OF REFERRING -->
+                                <tr>
+                                    <td colspan="6">
+                                        Name of Referring MD/HCW:
+                                        <span class="text-warning">
+                                            @ReferringMd
+                                        </span>
+                                    </td>
+                                </tr>
+                                <!-- CONTACT OF REFERRING -->
+                                <tr>
+                                    <td colspan="6">
+                                        Contact # of referring MD/HCW:
+                                        <span class="text-warning">
+                                            @ReferringMdContact
+                                        </span>
+                                    </td>
+                                </tr>
+                                <!-- NAME OF REFERRED -->
+                                <tr>
+                                    <td colspan="6">
+                                        Name of referred MD/HCW- Mobile Contact # (ReCo):
+                                        <span class="text-warning">
+                                            @ReferredMd
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
 
-                </td>
-
-                <!-- STATUS -->
-                <td>
-                    Status:<br />
-                    <span class="text-danger">
-                        @Html.DisplayFor(model => model.Patient.CivilStatus)
-                    </span>
-                </td>
-            </tr>
-            <!-- ADDRESS OF PATIENT -->
-            <tr>
-                <td colspan="6">
-                    Address:<br />
-                    <span class="text-danger">
-                        @Html.DisplayFor(model => model.Patient.Address)
-                    </span>
-                </td>
-            </tr>
-            <tr>
-                <!-- PHILHEALTH STATUS -->
-                <td colspan="3">
-                    PhilHealth:<br />
-                    <span class="text-danger">
-                        @Html.DisplayFor(model => model.Patient.PhicStatus)
-                    </span>
-                </td>
-                <!-- PHILHEALTH NUMBER -->
-                <td colspan="3">
-                    PhilHealth#:<br />
-                    <span class="text-danger">
-                        @Html.DisplayFor(model => model.Patient.PhicId)
-                    </span>
-                </td>
-            </tr>
-            <!-- CASE SUMMARY -->
-            <tr>
-                <td colspan="6">
-                    Case Summary (pertinent Hx/PE, including meds, labs, course etc.):<br />
-                    <span class="text-success">
-                        @Html.DisplayFor(model => model.CaseSummary)
-                    </span>
-                </td>
-            </tr>
-            <!-- SUMMARY OF RECO -->
-            <tr>
-                <td colspan="6">
-                    Summary of ReCo (Please refer to ReCo Guide in Referring Patients Checklist):
-                    <span class="text-success">
-                        @Html.DisplayFor(model => model.RecommendSummary)
-                    </span>
-                </td>
-            </tr>
-            <!-- DIAGNOSYS/IMPRESSION -->
-            <tr>
-                <td colspan="6">
-                    Diagnosis/Impression:
-                    <span class="text-success">
-                        @Html.DisplayFor(model => model.Diagnosis)
-                    </span>
-                </td>
-            </tr>
-            <!-- REASON -->
-            <tr>
-                <td colspan="6">
-                    Reason for referral:
-                    <span class="text-success">
-                        @Html.DisplayFor(model => model.Reason)
-                    </span>
-                </td>
-            </tr>
-            <!-- NAME OF REFERRING -->
-            <tr>
-                <td colspan="6">
-                    Name of Referring MD/HCW:
-                    <span class="text-success">
-                        @referringMd
-                    </span>
-                </td>
-            </tr>
-            <!-- NAME OF REFERRED -->
-            <tr>
-                <td colspan="6">
-                    <div class="col-md-5">
-                        Name of Referred MD/HCW - Mobile Contact Number (ReCo):
-
-                        <span class="text-success">
-                            @referredMd
-                        </span>
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <!-- REFER FOOTER -->
-    <div class="modal-footer justify-content-end">
-        <!-- CLOSE -->
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <!-- CALL REQUEST -->
-        <button class="btn btn-info @accept" asp-controller="Remarks" asp-action="ActionRemark" asp-route-code="@code" value="@code" type="button" data-toggle="modal" data-target="#@accept">
-            <i class="fa fa-phone"></i>
-            Call Request
-        </button>
-        <!-- RECOMMEND TO REDIRECT -->
-        <button class="btn btn-danger @accept" asp-controller="Remarks" asp-action="ActionRemark" asp-route-code="@code" value="@code" type="button" data-toggle="modal" data-target="#@accept">
-            <i class="fa fa-line-chart"></i>
-            Recommend to Redirect
-        </button>
-        <!-- ACCEPT -->
-        <button class="btn btn-success @accept" asp-controller="Remarks" asp-action="ActionRemark" asp-route-code="@code" value="@code" type="button" data-toggle="modal" data-target="#@accept">
-            <i class="fa fa-check"></i>
-            Accept
-        </button>
-    </div>
-</form>
-
-<div class="modal fade" role="dialog" id="@accept">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4>Accept</h4>
+                    </form>
+                </div>
+                <!-- REFER FOOTER -->
+                <div class="modal-footer justify-content-end">
+                    <!-- CLOSE -->
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <!-- CALL REQUEST -->
+                    <button class="btn btn-info" asp-controller="Remarks" asp-action="ActionRemark" asp-route-code="@code" value="@code" type="button" data-toggle="modal" data-target="#@accept">
+                        <i class="fa fa-phone"></i>
+                        Call Request
+                    </button>
+                    <!-- RECOMMEND TO REDIRECT -->
+                    <button class="btn btn-danger" asp-controller="Remarks" asp-action="ActionRemark" asp-route-code="@code" value="@code" type="button" data-toggle="modal" data-target="#@accept">
+                        <i class="fa fa-line-chart"></i>
+                        Recommend to Redirect
+                    </button>
+                    <!-- ACCEPT -->
+                    <button class="btn btn-success" id="accept-btn" value="@code" type="button" data-toggle="modal" data-target="#@accept">
+                        <i class="fa fa-check"></i>
+                        Accept
+                    </button>
+                </div>
             </div>
-            <div id="accept_content">
-                <hr />
-            </div>
-            <div class="clearfix"></div>
         </div>
     </div>
-</div>
 
 <script>
-    $('body').on('click', '.@accept', function () {
+
+    var acceptBtn = $('#accept-btn');
+
+    acceptBtn.on('click', function () {
+        console.log('yow');
         var patientCode = this.value;
         var url = "/Remarks/AcceptedRemark?code=" + patientCode;
         console.log(url);
@@ -230,4 +246,7 @@
             $("#accept_content").html(result);
         })
     });
+
 </script>
+
+

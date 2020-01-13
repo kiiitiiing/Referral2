@@ -12,6 +12,7 @@ using Referral2.Models;
 using Referral2.Models.ViewModels;
 using Referral2.Models.ViewModels.Admin;
 using Referral2.Models.ViewModels.Support;
+using Microsoft.Extensions.Options;
 
 namespace Referral2.Services
 {
@@ -19,7 +20,7 @@ namespace Referral2.Services
     {
         Task<(bool, User)> ValidateUserCredentialsAsync(string Username, string Password);
 
-        Task<bool> ChangePasswordAsync(User user, string newPassword);
+        bool ChangePasswordAsync(User user, string newPassword);
 
         Task<bool> RegisterDoctorAsync(AddSupportViewModel model);
 
@@ -29,15 +30,17 @@ namespace Referral2.Services
     public class UserService : IUserService
     {
         private readonly ReferralDbContext _context;
-        private readonly ResourceManager Roles = new ResourceManager("Referral2.Roles", Assembly.GetExecutingAssembly());
+        private readonly IOptions<ReferralRoles> _roles;
+        //private readonly ResourceManager Roles = new ResourceManager("Referral2.Roles", Assembly.GetExecutingAssembly());
 
         public PasswordHasher<User> _hashPassword = new PasswordHasher<User>();
 
         
 
-        public UserService(ReferralDbContext context)
+        public UserService(ReferralDbContext context, IOptions<ReferralRoles> roles)
         {
             _context = context;
+            _roles = roles;
         }
 
         public Task<(bool, User)> ValidateUserCredentialsAsync(string Username, string Password)
@@ -72,7 +75,7 @@ namespace Referral2.Services
                 return Task.FromResult((false, user));
         }
 
-        public Task<bool> ChangePasswordAsync(User user, string newPassword)
+        public bool ChangePasswordAsync(User user, string newPassword)
         {
             var hashedPassword = _hashPassword.HashPassword(user, newPassword);
 
@@ -82,7 +85,7 @@ namespace Referral2.Services
             _context.Update(user);
             _context.SaveChangesAsync();
 
-            return Task.FromResult(true);
+            return true;
         }
 
         public Task<bool> RegisterDoctorAsync(AddSupportViewModel model)
@@ -105,7 +108,7 @@ namespace Referral2.Services
                 newUser.Designation = model.Designation;
                 newUser.Username = model.Username;
                 newUser.Password = hashedPass;
-                newUser.Level = Roles.GetString("SUPPORT");
+                newUser.Level = _roles.Value.SUPPORT;
                 newUser.DepartmentId = null;
                 newUser.Title = null;
                 newUser.BarangayId = facility.BarangayId;
@@ -134,9 +137,9 @@ namespace Referral2.Services
                 var facility = _context.Facility.First(x => x.Id.Equals(facilityId));
                 User newUser = new User();
                 string hashedPass = _hashPassword.HashPassword(newUser, model.Password);
-                newUser.Firstname = model.Firstname;
-                newUser.Middlename = model.Middlename;
-                newUser.Lastname = model.Lastname;
+                newUser.Firstname = GlobalFunctions.FixName(model.Firstname);
+                newUser.Middlename = GlobalFunctions.FixName(model.Middlename);
+                newUser.Lastname = GlobalFunctions.FixName(model.Lastname);
                 newUser.Contact = model.ContactNumber;
                 newUser.Email = model.Email;
                 newUser.FacilityId = facilityId;

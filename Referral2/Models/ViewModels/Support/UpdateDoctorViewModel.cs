@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Referral2.Models.ViewModels.Support
+﻿namespace Referral2.Models.ViewModels.Support
 {
-    public class UpdateDoctorViewModel : AddDoctorViewModel
+    public partial class UpdateDoctorViewModel : UpdateUserViewModel
     {
-        public string Status { get; set; }
+        public string Level { get; set; }
+        public int Department { get; set; }
     }
 }

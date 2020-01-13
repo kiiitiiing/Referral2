@@ -19,8 +19,9 @@
             <!-- REFER BODY -->
 
             <div class="modal-header">
-                <span class="text-sm-center">CENTRAL VISAYAS HEALTH REFERRAL SYSTEM</span><br />
-                <small class="text-sm-center">Clinical Referral Form</small>
+                <span class="justify-content-center">CENTRAL VISAYAS HEALTH REFERRAL SYSTEM</span>
+                <br />
+                <small class="justify-content-center">Clinical Referral Form</small>
             </div>
             <form asp-action="Refer">
                 <div class="modal-body">
@@ -30,28 +31,28 @@
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                             <tr>
                                 <td colspan="6">
-                                    <label class="control-label">Referring Facility:</label>
+                                    Name of Referring Facility:
                                     <span class="form-control text-danger">@referringFacility</span>
                                 </td>
                             </tr>
                             <!-- FACILITY ADDRESS -->
                             <tr>
                                 <td colspan="6">
-                                    Address:<br />
+                                    Address:
                                     <span class="text-success">@referringFacilityAddress</span>
                                 </td>
                             </tr>
                             <tr>
                                 <!-- REFERRED TO -->
                                 <td colspan="3">
-                                    <label class="control-label">Referred To:</label>
+                                    Referred to:&nbsp;&nbsp;&nbsp;
                                     <select id="facilityFilter" asp-for="FacilityId" asp-items="ViewBag.ReferredTo" class="form-control facilityFilter">
                                         <option>Select Facility...</option>
                                     </select>
                                 </td>
                                 <!-- DEPARTMENT -->
                                 <td colspan="3">
-                                    <label class="control-label">Department:</label>
+                                    Department:
                                     <select id="departmentFilter" asp-for="DepartmentId" class="form-control">
                                         <option>Select Department...</option>
                                     </select>
@@ -61,7 +62,7 @@
                             <tr>
                                 <td colspan="6">
                                     Address:
-                                    <span id="facilityAdress" class="text-success"></span>
+                                    <span id="facilityAdress" class="text-info"></span>
                                 </td>
                             </tr>
                             <tr>
@@ -78,44 +79,40 @@
                             <tr>
                                 <!-- NAME OF PATIENT -->
                                 <td colspan="3">
-                                    Name of Patient:<br />
+                                    Name of Patient:
                                     <span class="text-danger">@patientName</span>
                                 </td>
                                 <!-- AGE -->
                                 <td>
-                                    Age:<br />
-                                    <span class="text-danger">@age</span>
+                                    Age:&nbsp;<span class="text-danger">@age</span>
                                 </td>
 
                                 <!-- SEX -->
                                 <td>
-                                    Sex:<br />
-                                    <span class="text-danger">@sex</span>
-
+                                    Sex:&nbsp;<span class="text-danger">@sex</span>
                                 </td>
 
                                 <!-- STATUS -->
                                 <td>
-                                    Status:<br />
-                                    <span class="text-danger">@civilStat</span>
+                                    Status:&nbsp;<span class="text-danger">@civilStat</span>
                                 </td>
                             </tr>
                             <!-- ADDRESS OF PATIENT -->
                             <tr>
                                 <td colspan="6">
-                                    Address:<br />
+                                    Address:
                                     <span class="text-danger">@address</span>
                                 </td>
                             </tr>
                             <tr>
                                 <!-- PHILHEALTH STATUS -->
                                 <td colspan="3">
-                                    PhilHealth:<br />
+                                    PhilHealth:
                                     <span class="text-danger">@philHealthStat</span>
                                 </td>
                                 <!-- PHILHEALTH NUMBER -->
                                 <td colspan="3">
-                                    PhilHealth#:<br />
+                                    PhilHealth#:
                                     <span class="text-danger">@philHealthId</span>
                                 </td>
                             </tr>

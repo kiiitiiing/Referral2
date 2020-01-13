@@ -5,10 +5,9 @@ using System.Threading.Tasks;
 
 namespace Referral2.Models.ViewModels
 {
-    public class AdminDashboardViewModel : DashboardViewModel
+    public class AdminDashboardViewModel
     {
-        public AdminDashboardViewModel(int[] accepted, int[] redirected, int totalDoctor, int onlineDoctors, int activeFacilities, int referredPatients)
-            : base(accepted, redirected)
+        public AdminDashboardViewModel(int totalDoctor, int onlineDoctors, int activeFacilities, int referredPatients)
         {
             TotalDoctors = totalDoctor;
             OnlineDoctors = onlineDoctors;

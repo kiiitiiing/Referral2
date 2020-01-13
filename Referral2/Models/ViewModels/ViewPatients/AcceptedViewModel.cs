@@ -5,16 +5,16 @@ using System.Threading.Tasks;
 
 namespace Referral2.Models.ViewModels.ViewPatients
 {
-    public class AcceptedViewModel
+    public partial class AcceptedViewModel
     {
-        public string Code { get; set; }
-        public Patient Patient { get; set; }
-        public string Status { get; set; }
-        public User ActionMd { get; set; }
-        public DateTime DateAction { get; set; }
-        public Facility ReferredFrom { get; set; }
-        public int ReferredTo { get; set; }
+        public string ReferringFacility { get; set; }
         public string Type { get; set; }
-        public DateTime? UpdatedAt { get; set; }
+        public string PatientName { get; set; }
+        public string PatientCode { get; set; }
+        public DateTime DateAction { get; set; }
+        public string Status { get; set; }
+        public int ReferredToDepartment { get; set; }
+        public int ReferredTo { get; set; }
+        public DateTime UpdatedAt { get; set; }
     }
 }

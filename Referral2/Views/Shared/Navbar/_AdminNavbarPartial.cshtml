@@ -92,7 +92,7 @@
     <!-- LOGIN AS-->
     <li class="nav-item">
         <a class="nav-link" asp-area="" asp-controller="Provinces" asp-action="Create">
-            <i class="nav-icon fa fa-sign-in"></i>
+            <i class="nav-icon fa fa-sign-in-alt"></i>
             &nbsp;Login As
         </a>
     </li>
@@ -105,7 +105,7 @@
         <ul class="dropdown-menu">
             <!-- CHANGE PASSWORD -->
             <li class="dropdown-item">
-                <a class=" nav-link" data-target="modal" asp-area="" asp-controller="Home" asp-action="index">
+                <a class=" nav-link" data-toggle="ajax-modal" data-target="#change-password-modal" data-url="@Url.Action("ChangePassword","Users")">
                     <i class="fa fa-key"></i>
                     &nbsp;Change Password
                 </a>
@@ -113,7 +113,7 @@
             <!-- LOGOUT -->
             <li class="dropdown-item">
                 <a class=" nav-link" data-target="modal" asp-area="" asp-controller="Home" asp-action="loginas">
-                    <i class="fa fa-sign-out"></i>
+                    <i class="fa fa-sign-out-alt"></i>
                     &nbsp;Logout
                 </a>
             </li>
