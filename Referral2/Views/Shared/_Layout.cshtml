@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="~/assets/dist/css/bootstrap-select.css" />
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/assets/plugins/fontawesome-free/css/all.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/assets/daterangepicker/daterangepicker-bs3.css" />
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 
 
@@ -46,6 +47,10 @@
                         else if (User.FindFirstValue(ClaimTypes.Role).Equals("support"))
                         {
                             <partial name="~/Views/Shared/Navbar/_SupportNavbarPartial.cshtml" />
+                        }
+                        else if (User.FindFirstValue(ClaimTypes.Role).Equals("mcc"))
+                        {
+                            <partial name="~/Views/Shared/Navbar/_MccNavbarPartial.cshtml" />
                         }
 
                     }
@@ -85,6 +90,7 @@
 
     </div>
 
+
     <div class="modal fade" id="small-modal">
         <div class="modal-dialog modal-sm">
             <div class="modal-content" id="small-content">
@@ -104,12 +110,14 @@
     </div>
 
     <div class="modal fade" id="large-modal">
-        <div class="modal-dialog modal-sm">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content" id="large-content">
                 <div class="modal-body" id="large-body">
                     <div class="overlay d-flex justify-content-center align-items-center">
                         <i class="fas fa-2x fa-sync fa-spin"></i>
                     </div>
+                    <br />
+                    <br />
                     <br />
                     <br />
                     <br />
@@ -134,6 +142,8 @@
             <p class="text-center">All Rights Reserved 2020 | Version 2.1</p>
         </div>
     </footer>
+    <script type="text/javascript" src="~/assets/daterangepicker/moment.js"></script>
+    <script type="text/javascript" src="~/assets/daterangepicker/daterangepicker.js"></script>
     @RenderSection("Scripts", required: false)
 
 </body>

@@ -65,16 +65,40 @@ $(function () {
 
     var smallModal = $('#small-modal');
     var smallContent = $('#small-content');
+    var largeModel = $('#large-modal')
+    var largeContent = $('#large-content')
+
+    $('a[data-toggle="small-modal"]').click(function (event) {
+        var url = $(this).data('url');
+        CallSmallModal(url);
+    });
+
 
     $('button[data-toggle="small-modal"]').click(function (event) {
         var url = $(this).data('url');
+        CallSmallModal(url);
+    });
+
+    $('a[data-toggle="large-modal"]').click(function (event) {
+        var url = $(this).data('url');
+        CallLargeModel(url);
+    });
+
+    function CallLargeModel(url) {
+        $.get(url).done(function (data) {
+            largeModel.modal('show');
+            largeContent.empty();
+            largeContent.html(data);
+        });
+    }
+
+    function CallSmallModal(url) {
         $.get(url).done(function (data) {
             smallModal.modal('show');
             smallContent.empty();
             smallContent.html(data);
         });
-    });
-
+    }
 
     $('button[data-toggle="ajax-modal"]').click(function (event) {
         var url = $(this).data('url');

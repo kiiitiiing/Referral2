@@ -1,0 +1,57 @@
+﻿@model  IEnumerable<UserDepartmentViewModel>
+
+@{
+    ViewData["Title"] = "OnlineUsersDepartment";
+    var startDate = ViewBag.StartDate;
+    var endDate = ViewBag.EndDate;
+    var dateRange = startDate + " - " + endDate;
+}
+
+<div class="row">
+    <div class="col-md-3">
+        <partial name="~/Views/Shared/PartialViews/_MccDateFilterPartial.cshtml" />
+        <partial name="~/Views/Shared/PartialViews/_OtherLinksPartial.cshtml" />
+    </div>
+    <div class="col-md-9">
+        <div class="card card-success card-outline">
+            <div class="card-header ">
+                <h3 class="card-title">
+                    Online Users per Department
+                    <small class="fa-pull-right text-success">
+                        @dateRange
+                    </small>
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover table-bordered">
+                        <thead>
+                            <tr class="bg-black">
+                                <th>Department</th>
+                                <th class="text-center">On Duty</th>
+                                <th class="text-center">Off Duty</th>
+                                <th class="text-center"># of Users</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                var department = string.IsNullOrEmpty(item.Department)? "No Department" : item.Department;
+                                <tr>
+                                    <td class="text-warning">
+                                        @department
+                                    </td>
+                                    <td class="text-success text-center"><strong>@item.OnDuty</strong></td>
+                                    <td class="text-danger text-center"><strong>@item.OffDuty</strong></td>
+                                    <td class="text-info text-center"><strong>@item.NumberOfUsers</strong></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -30,7 +30,7 @@
             <input type="hidden" name="_token" value="" autocomplete="off" />
             <div class="card-body">
                 <table class="table table-striped">
-                    <thead>
+                    <thead class="bg-gray-light">
                         <tr>
                             <th>
                                 <p>Referring Facility</p>
@@ -72,7 +72,7 @@
                                 </td>
                                 <!-- PATIENT NAME -->
                                 <td>
-                                    <a href="#">
+                                    <a href="#" data-toggle="large-modal" data-target="large-modal" data-url="@Url.Action("PrintableNormalForm","ViewForms", new { code = item.PatientCode })">
                                         @item.PatientName
                                     </a>
                                     <p class="small text-muted">
@@ -102,7 +102,7 @@
                                         <button type="button" class="btn btn-sm btn-primary" data-toggle="ajax-modal" data-target="#arrived-modal" data-url="@Url.Action("ArrivedRemark","Remarks",new { code = item.PatientCode})">
                                             <i class="fa fa-wheelchair"></i>
                                         </button>
-                                        //reco
+                                        //reco  
                                         <button class="btn btn-sm btn-info" value="O">
                                             <i class="fa fa-comments"></i>
                                         </button>

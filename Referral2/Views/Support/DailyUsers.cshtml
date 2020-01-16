@@ -1,0 +1,117 @@
+﻿@model IEnumerable<DailyUsersViewModel>
+
+@{
+    ViewData["Title"] = "Incoming Patients";
+}
+
+<div class="content">
+    <div class="container">
+        <div class="row">
+            <!-- CARD DANGER -->
+            <div class="col-md-3">
+                <!-- SELECT DATE -->
+                <div class="card card-danger card-green">
+                    <!-- CARD DANGER HEADER -->
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            Filter Result
+                        </h3>
+                        <span class="badge fa-pull-right">
+                            Result: @ViewBag.Total
+                        </span>
+                    </div>
+                    <form asp-action="Incoming" method="get">
+                        <!-- CARD DANGER BODY -->
+                        <div class="card-body">
+                            <div class="card-body">
+                                <!-- SELECT DATE -->
+                                <div class="form-group">
+                                    <input class="form-control" type="date" name="daterange" value="" autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="form-group">
+                                <!-- FILTER -->
+                                <button type="submit" value="Filter" class="btn btn-block btn-success">
+                                    <i class="fa fa-filter"></i>
+                                    &nbsp;Filter Result
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <partial name="~/Views/Shared/PartialViews/_LinksPartial.cshtml" />
+            </div>
+            <div class="col-md-9">
+                <!-- PATIENT LIST -->
+                <div class="card card-outline">
+                    <!-- DAILY USERS HEADER -->
+                    <div class="card-header card-success with-border">
+                        <h2>
+                            Daily Users
+                        </h2>
+                    </div>
+                    <!-- DAILY USERS BODY -->
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover table-bordered">
+                                <thead>
+                                    <tr class="bg-black">
+                                        <th>User</th>
+                                        <th class="text-center">On Duty</th>
+                                        <th class="text-center">Off Duty</th>
+                                        <th class="text-center">Login</th>
+                                        <th class="text-center">Logout</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td style="font-size:0.9em;white-space: nowrap;">@item.MDName</td>
+                                            <td class="text-center text-success">
+                                                @if (item.LoggedIn)
+                                                {
+                                                    if (item.OnDuty.Equals("login"))
+                                                    {
+                                                        <i class="fa fa-check"></i>
+                                                    }
+                                                }
+                                            </td>
+                                            <td class="text-center text-danger"
+                                                @if (item.LoggedIn)
+                                                {
+                                                    if (item.OnDuty.Equals("login off"))
+                                                    {
+                                                        <i class="fa fa-check"></i>
+                                                    }
+                                                }>
+                                            </td>
+                                            <td class="text-center text-info">
+                                                @if (item.LoggedIn)
+                                                {
+                                                    item.LoginTime.ToString("h:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+                                                }
+
+                                            </td>
+                                            <td class="text-center text-warning">
+                                                @if(!item.LoggedIn)
+                                                {
+                                                    item.LogoutTime.ToString("h:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

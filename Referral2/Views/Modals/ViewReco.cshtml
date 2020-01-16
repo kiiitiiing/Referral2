@@ -2,10 +2,6 @@
 @{ 
     var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 }
-@*
-<div class="card card-success card-outline">
-            <div class="card-header with-border">    
-*@
 <div class="card card-success card-outline with-border direct-chat direct-chat-primary">
     <div class="card-header with-border">
         <h3 class="card-title">
@@ -21,11 +17,8 @@
             </button>
         </div>
     </div>
-    <!-- /.box-header -->
     <div class="card-body">
-        <!-- Conversations are loaded here -->
         <div class="direct-chat-messages" id="@ViewBag.Code">
-            <!-- Message. Default to the left -->
             <div class="reco-body">
                 @foreach (var item in Model)
                 {
@@ -56,20 +49,16 @@
                             <div class="direct-chat-text">
                                 @item.Message
                             </div>
-                            <!-- /.direct-chat-text -->
                         </div>
                     }
                 }
             </div>
         </div>
-        <!--/.direct-chat-messages-->
-        <!-- /.direct-chat-pane -->
     </div>
-    <!-- /.box-body -->
     <div class="modal-footer">
         <form asp-action="ViewReco" method="post" id="feedbackForm">
             <input type="hidden" name="MdId" value="@userId" autocomplete="off">
-            <input type="hidden" id="current_code" name="Code" autocomplete="off" value="@ViewBag.Code">
+            <input type="hidden" name="Code" autocomplete="off" value="@ViewBag.Code">
             <div class="input-group">
                 <input type="text" name="Message" required placeholder="Type Message..." class="form-control message" autocomplete="off">
                 <span class="input-group-btn">
@@ -78,5 +67,4 @@
             </div>
         </form>
     </div>
-    <!-- /.box-footer-->
 </div>

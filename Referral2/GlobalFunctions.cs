@@ -8,6 +8,7 @@ namespace Referral2
 {
     public class GlobalFunctions
     {
+        public static string FullName;
         public static string FixName(string input)
         {
             return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(input.ToLower());
@@ -50,12 +51,30 @@ namespace Referral2
             else
                 return "";
         }
+
+        public static string GetFullLastName(User user)
+        {
+            if (user != null)
+                return CheckName(user.Lastname) + ", " + CheckName(user.Firstname) + " " + CheckName(user.Middlename);
+            else
+                return "";
+        }
+        public static string GetFullName(User user)
+        {
+            if (user != null)
+                return CheckName(user.Firstname) + " " + CheckName(user.Middlename) + " " + CheckName(user.Lastname);
+            else
+                return "";
+        }
+
         public static string GetMDFullName(User doctor)
         {
             if (doctor != null)
-                return "Dr. " + CheckName(doctor.Firstname) + " " + CheckName(doctor.Middlename) + " " + CheckName(doctor.Lastname);
+                FullName = "Dr. " + CheckName(doctor.Firstname) + " " + CheckName(doctor.Middlename) + " " + CheckName(doctor.Lastname);
             else
-                return "";
+                FullName = "";
+
+            return FullName;
         }
 
         public static string CheckName(string name)

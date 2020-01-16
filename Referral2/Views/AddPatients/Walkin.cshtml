@@ -1,4 +1,262 @@
-﻿
-@*
-    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model PatientFormViewModel
+
+@{
+    var patientName = ViewBag.PatientName;
+    var age = ViewBag.PatientAge;
+    var sex = ViewBag.PatientSex;
+    var civilStat = ViewBag.PatientStatus;
+    var address = ViewBag.PatientAddress;
+    var philHealthStat = ViewBag.PatientPhilHealthStatus;
+    var philHealthId = ViewBag.PatientPhilHealthId;
+    var referringFacility = ViewBag.ReferringFacility;
+    var referringFacilityAddress = ViewBag.ReferringFacilityAddress;
+    var dateReferred = DateTime.Now.DayOfWeek + " " + DateTime.Now.ToString("MMMM d, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+    var facility = ViewBag.ReferredTo;
+}
+
+
+
+<!-- REFER BODY -->
+
+<div class="modal-header">
+    <span class="justify-content-center">CENTRAL VISAYAS HEALTH REFERRAL SYSTEM</span>
+    <br />
+    <small class="justify-content-center">Clinical Referral Form</small>
+</div>
+<form asp-action="Refer" method="post">
+    <div class="modal-body">
+        <table class="table table-striped">
+            <tbody>
+                <!-- FACILITY NAME-->
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input asp-for="PatientId" value="@Model.PatientId" />
+                <tr>
+                    <td colspan="6">
+                        Name of Referring Facility:
+                        <span class="form-control text-danger">@referringFacility</span>
+                    </td>
+                </tr>
+                <!-- FACILITY ADDRESS -->
+                <tr>
+                    <td colspan="6">
+                        Address:
+                        <span class="text-success">@referringFacilityAddress</span>
+                    </td>
+                </tr>
+                <tr>
+                    <!-- REFERRED TO -->
+                    <td colspan="3">
+                        Referred to:&nbsp;&nbsp;&nbsp;
+                        <select id="facilityFilter" asp-for="FacilityId" asp-items="ViewBag.ReferredTo" class="form-control facilityFilter">
+                            <option>Select Facility...</option>
+                        </select>
+                    </td>
+                    <!-- DEPARTMENT -->
+                    <td colspan="3">
+                        Department:
+                        <select id="departmentFilter" asp-for="DepartmentId" class="form-control">
+                            <option>Select Department...</option>
+                        </select>
+                    </td>
+                </tr>
+                <!-- ADDRESS OF REFERRED HOSPITAL -->
+                <tr>
+                    <td colspan="6">
+                        Address:
+                        <span id="facilityAdress" class="text-info"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <!-- DATE/TIME REFERRED -->
+                    <td colspan="3">
+                        Date/Time Referred (ReCo):
+                        <span class="text-success">@dateReferred</span>
+                    </td>
+                    <!-- DATE/TIME TRANSFERRED -->
+                    <td colspan="3">
+                        Date/Time Transferred:
+                    </td>
+                </tr>
+                <tr>
+                    <!-- NAME OF PATIENT -->
+                    <td colspan="3">
+                        Name of Patient:
+                        <span class="text-danger">@patientName</span>
+                    </td>
+                    <!-- AGE -->
+                    <td>
+                        Age:&nbsp;<span class="text-danger">@age</span>
+                    </td>
+
+                    <!-- SEX -->
+                    <td>
+                        Sex:&nbsp;<span class="text-danger">@sex</span>
+                    </td>
+
+                    <!-- STATUS -->
+                    <td>
+                        Status:&nbsp;<span class="text-danger">@civilStat</span>
+                    </td>
+                </tr>
+                <!-- ADDRESS OF PATIENT -->
+                <tr>
+                    <td colspan="6">
+                        Address:
+                        <span class="text-danger">@address</span>
+                    </td>
+                </tr>
+                <tr>
+                    <!-- PHILHEALTH STATUS -->
+                    <td colspan="3">
+                        PhilHealth:
+                        <span class="text-danger">@philHealthStat</span>
+                    </td>
+                    <!-- PHILHEALTH NUMBER -->
+                    <td colspan="3">
+                        PhilHealth#:
+                        <span class="text-danger">@philHealthId</span>
+                    </td>
+                </tr>
+                <!-- CASE SUMMARY -->
+                <tr>
+                    <td colspan="6">
+                        Case Summary (pertinent Hx/PE, including meds, labs, course etc.):<br />
+                        <textarea asp-for="CaseSummary" class="form-control" rows="7"></textarea>
+                        <span asp-validation-for="CaseSummary" class="text-danger"></span>
+                    </td>
+                </tr>
+                <!-- SUMMARY OF RECO -->
+                <tr>
+                    <td colspan="6">
+                        Summary of ReCo (Please refer to ReCo Guide in Referring Patients Checklist):
+                        <textarea asp-for="SummaryReCo" class="form-control" rows="7"></textarea>
+                        <span asp-validation-for="SummaryReCo" class="text-danger"></span>
+                    </td>
+                </tr>
+                <!-- DIAGNOSYS/IMPRESSION -->
+                <tr>
+                    <td colspan="6">
+                        Diagnosis/Impression:
+                        <textarea asp-for="Diagnosis" class="form-control" rows="7"></textarea>
+                        <span asp-validation-for="Diagnosis" class="text-danger"></span>
+                    </td>
+                </tr>
+                <!-- REASON -->
+                <tr>
+                    <td colspan="6">
+                        Reason for referral:
+                        <textarea asp-for="Reason" class="form-control" rows="7"></textarea>
+                        <span asp-validation-for="Reason" class="text-danger"></span>
+                    </td>
+                </tr>
+                <!-- NAME OF REFERRING -->
+                <tr>
+                    <td colspan="6">
+                        Name of Referring MD/HCW:
+                        <span class="form-control text-danger">@ViewBag.ReferringMd</span>
+                    </td>
+                </tr>
+                <!-- NAME OF REFERRED -->
+                <tr>
+                    <td colspan="6">
+                        <div class="col-md-5">
+                            Name of Referred MD/HCW - Mobile Contact Number (ReCo):
+                        </div>
+                        <div class="col-md-7">
+                            <select id="doctorFiltered" asp-for="ReferredMd" class="form-control">
+                                <option value="any">Any...</option>
+                            </select>
+                            <span class="" dir="ltr" style="width:100%;">
+                            </span>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <!-- REFER FOOTER -->
+    <div class="modal-footer justify-content-end">
+
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-success" data-save>Submit</button>
+    </div>
+</form>
+
+
+<script>
+    var facilityId = 0;
+    var departmentId = 0;
+    $('#facilityFilter').change(function () {
+        facilityId = $('#facilityFilter').val();
+
+        $.when(getDepartmentFiltered()).done(function (output) {
+
+            $('#facilityAdress').text(output.address);
+
+            $('#departmentFilter').empty()
+                .append($('<option>', {
+                    value: '',
+                    text: 'Select Department...'
+                }));
+
+            $('#doctorFiltered').empty()
+                .append($('<option>', {
+                    value: '',
+                    text: 'Any'
+                }));
+
+            jQuery.each(output.departments, function (i, item) {
+                $('#departmentFilter').append($('<option>', {
+                    value: item.departmentId,
+                    text: item.departmentName
+                }))
+            });
+        });
+    });
+
+
+    $('#departmentFilter').change(function () {
+        if (facilityId == '0') {
+            facilityId == '24';
+        }
+        departmentId = $('#departmentFilter').val();
+
+        $.when(getMdFiltered()).done(function (output) {
+            $('#doctorFiltered').empty()
+                .append($('<option>', {
+                    value: '',
+                    text: 'Any'
+                }));
+
+            jQuery.each(output, function (i, item) {
+                $('#doctorFiltered').append($('<option>', {
+                    value: item.mdId,
+                    text: item.doctorName
+                }));
+            });
+        });
+    });
+
+
+    function getDepartmentFiltered() {
+        var urls = "/NoReload/FilterDepartment?facilityId=" + facilityId;
+        return $.ajax({
+            url: urls,
+            type: 'get',
+            async: true
+        });
+    }
+
+
+
+    function getMdFiltered() {
+        var urls = "/NoReload/FilterUser?facilityId=" + facilityId + "&departmentId=" + departmentId;
+        return $.ajax({
+            url: urls,
+            type: 'get',
+            async: true
+        });
+    }
+</script>
+
+

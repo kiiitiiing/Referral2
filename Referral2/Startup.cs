@@ -61,6 +61,7 @@ namespace Referral2
                 options.AddPolicy("Administrator", polBuilder => polBuilder.RequireClaim(ClaimTypes.Role, "admin"));
                 options.AddPolicy("Doctor", polBuilder => polBuilder.RequireClaim(ClaimTypes.Role, "doctor"));
                 options.AddPolicy("Support", polBuilder => polBuilder.RequireClaim(ClaimTypes.Role, "support"));
+                options.AddPolicy("MCC", polBuilder => polBuilder.RequireClaim(ClaimTypes.Role, "mcc"));
             });
 
             services.Configure<CookiePolicyOptions>(options =>

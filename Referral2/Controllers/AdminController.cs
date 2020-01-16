@@ -39,6 +39,7 @@ namespace Referral2.Controllers
             _status = status;
         }
 
+        public DateTime Date { get; set; }
 
         public IActionResult AdminDashboard()
         {
@@ -71,8 +72,9 @@ namespace Referral2.Controllers
             return View(await support.ToListAsync());
         }
 
-        public async Task<IActionResult> Facilities(int? pageNumber)
+        public async Task<IActionResult> Facilities(int? pageNumber, string search)
         {
+            ViewBag.Search = search;
             var facilities = _context.Facility
                             .Select(x => new FacilitiesViewModel
                             {
@@ -88,36 +90,97 @@ namespace Referral2.Controllers
 
             int pageSize = 10;
 
+            if(!string.IsNullOrEmpty(search))
+            {
+                facilities = facilities.Where(x => x.Facility.Contains(search));
+            }
+
             return View(await facilities.OrderBy(a => a.Facility).ToListAsync());
             //return View(await PaginatedList<FacilitiesViewModel>.CreateAsync(facilities.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
-        public async Task<IActionResult> OnlineUsers(DateTime? setDate)
+        public IActionResult AddFacility()
         {
-            var onlineUsers = _context.Login.Where(x => x.Login1.Date.Equals(DateTime.Now.Date) && x.Logout.Equals(default))
-                                        .Select(x => new SubOnlineViewModel
-                                        {
-                                            Facility = x.User.Facility.Name,
-                                            Name = x.User.Lastname + ", " + x.User.Firstname + " " + x.User.Middlename,
-                                            Level = x.User.Level,
-                                            Department = x.User.Department.Description,
-                                            Status = x.Status,
-                                            Login = x.Login1
-                                        });
-            var facilityGroup = _context.Login.Where(x => x.Login1.Date.Equals(DateTime.Now.Date) && x.Logout.Equals(default))
-                                        .GroupBy(x => x.User.Facility.Name)
-                                        .Select(x => new
-                                        {
-                                            FacilityGroup = x.Key
-                                        });
+            var provinces = _context.Province;
+            ViewBag.Provinces = new SelectList(provinces, "Id", "Description");
+            ViewBag.HospitalLevels = new SelectList(ListContainer.HospitalLevel);
+            ViewBag.HospitalTypes = new SelectList(ListContainer.HospitalType);
+            return PartialView();
+        }
 
-            var onlinePerFacility = facilityGroup
-                                        .Select(x => new OnlineUsersAdminViewModel
-                                        {
-                                            Facility = x.FacilityGroup,
-                                            LoggedInUser = onlineUsers.Where(y => y.Facility.Equals(x.FacilityGroup))
-                                        });
-            return View(await onlinePerFacility.ToListAsync());
+        [HttpPost]
+        public async Task<IActionResult> AddFacility([Bind] Facility model)
+        {
+            model.Status = "1";
+            model.Picture = null;
+            model.CreatedAt = DateTime.Now;
+            model.UpdatedAt = DateTime.Now;
+            if(ModelState.IsValid)
+            {
+                await _context.AddAsync(model);
+                await _context.SaveChangesAsync();
+            }
+            var provinces = _context.Province;
+            ViewBag.Provinces = new SelectList(provinces, "Id", "Description",model.ProvinceId);
+            ViewBag.HospitalLevels = new SelectList(ListContainer.HospitalLevel,model.HospitalLevel);
+            ViewBag.HospitalTypes = new SelectList(ListContainer.HospitalType,model.HospitalType);
+            return PartialView(model);
+        }
+
+        public async Task<IActionResult> UpdateFacility(int? id)
+        {
+            var facility =await _context.Facility.FindAsync(id);
+
+            var province = _context.Province;
+            var muncity = _context.Muncity.Where(x => x.ProvinceId.Equals(facility.ProvinceId));
+            var barangay = _context.Barangay.Where(x => x.MuncityId.Equals(facility.BarangayId));
+
+            ViewBag.Provices = new SelectList(province, "Id", "Description", facility.ProvinceId);
+            ViewBag.Muncities = new SelectList(muncity, "Id", "Description", facility.MuncityId);
+            ViewBag.Barangays = new SelectList(barangay, "Id", "Description", facility.BarangayId);
+
+            return PartialView(facility);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateFacility([Bind] Facility model)
+        {
+            if(ModelState.IsValid)
+            {
+                _context.Update(model);
+                await _context.SaveChangesAsync();
+            }
+
+            return PartialView(model);
+        }
+
+        public async Task<IActionResult> OnlineUsers(string date)
+        {
+            Date = DateTime.Now.Date;
+
+            if(!string.IsNullOrEmpty(date))
+            {
+                Date = DateTime.Parse(date);
+            }
+
+            ViewBag.Date = Date.ToString("dd/MM/yyyy");
+
+            var onlineUsers = await _context.User
+                .Select(x => new OnlineAdminViewModel
+                {
+                    FacilityName = x.Facility.Name,
+                    UserFullName = GlobalFunctions.GetFullLastName(x),
+                    UserLevel = x.Level,
+                    UserDepartment = x.Department.Description,
+                    UserStatus = x.LoginStatus,
+                    UserLoginTime = x.LastLogin
+                })
+                .Where(x => x.UserLoginTime.Date.Equals(Date))
+                .OrderBy(x => x.FacilityName)
+                .AsNoTracking()
+                .ToListAsync();
+
+            return View(onlineUsers);
         }
 
         [HttpGet]

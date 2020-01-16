@@ -1,4 +1,207 @@
-﻿
-@*
-    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿<form method="POST" class="form-submit pregnant_form">
+    <div class="jim-content">
+        <div class="title-form">BEmONC/ CEmONC REFERRAL FORM</div>
+        <div class="form-group-sm form-inline">
+            <input type="hidden" name="_token" value="enhXwI5ZzCBSCuehc0emkiikMPoLLxRm9T7texfq" autocomplete="off">
+            <input type="hidden" name="patient_id" class="patient_id" value="7735" autocomplete="off">
+            <input type="hidden" name="date_referred" class="date_referred" value="2020-01-16 10:49:12" autocomplete="off">
+            <input type="hidden" name="code" value="" autocomplete="off">
+            <input type="hidden" name="source" value="referral" autocomplete="off">
+            <input type="hidden" class="referring_name" value="Vicente Sotto Memorial Medical Center" autocomplete="off">
+            <table class="table table-striped">
+                <tbody>
+                    <tr>
+                        <th colspan="4">REFERRAL RECORD</th>
+                    </tr>
+                    <tr>
+                        <td>Who is Referring: </td>
+                        <td>Record Number: <input type="text" class="form-control" name="record_no" placeholder="" autocomplete="off"></td>
+                        <td>Referred Date: <span class="text-success">Thursday Jan 16, 2020</span> </td>
+                        <td>Time: <span class="text-success">10:49 AM</span> </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <span class="text-success">Name Dr. DOH T. 7 IT</span>
+                        </td>
+                        <td>Arrival Date</td>
+                        <td>Time</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">Facility <span class="text-success">Vicente Sotto Memorial Medical Center</span> </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">Accompanied by the Health Worker: <input type="text" class="form-control" name="health_worker" style="width: 100%;" placeholder="Name of Health Worker" autocomplete="off"> </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    Referred to:
+                                </div>
+                                <div class="col-md-6">
+                                    <select name="referred_facility" class="form-control-select select2 select_facility select2-hidden-accessible" style="width: 100%" required="" tabindex="-1" aria-hidden="true">
+                                        <option value="">Select Facility...</option>
+                                    </select><span class="select2 select2-container select2-container--default" dir="ltr" style="width: 100%;"><span class="selection"><span class="select2-selection select2-selection--single" role="combobox" aria-autocomplete="list" aria-haspopup="true" aria-expanded="false" tabindex="0" aria-labelledby="select2-referred_facility-zy-container"><span class="select2-selection__rendered" id="select2-referred_facility-zy-container" title="Select Facility...">Select Facility...</span><span class="select2-selection__arrow" role="presentation"><b role="presentation"></b></span></span></span><span class="dropdown-wrapper" aria-hidden="true"></span></span>
+                                </div>
+                                <div class="col-md-4">
+                                    <select name="referred_department" class="form-control-select select_department select_department_pregnant" style="padding: 3px" required="">
+                                        <option value="">Select Department...</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    Address:
+                                </div>
+                                <div class="col-md-6">
+                                    <span class="text-primary facility_address"></span>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="col-sm-6">
+                <table class="table bg-warning">
+                    <tbody>
+                        <tr class="bg-gray">
+                            <th colspan="4">WOMAN</th>
+                        </tr>
+                        <tr>
+                            <td colspan="3">Name: <span class="text-danger patient_name">test test test</span></td>
+                            <td>Age: <span class="text-danger patient_age">19</span></td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">Address: <span class="text-danger patient_address">Tuyom, City Of Carcar, Cebu</span></td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                Main Reason for Referral
+                                <label><input type="radio" name="woman_reason" value="None" checked="" autocomplete="off"> None </label>
+                                <label><input type="radio" name="woman_reason" value="Emergency" autocomplete="off"> Emergency </label>
+                                <label><input type="radio" name="woman_reason" value="Non-Emergency" autocomplete="off"> Non-Emergency </label>
+                                <label><input type="radio" name="woman_reason" value="To accompany the baby" autocomplete="off"> To accompany the baby </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                Major Findings (Clinica and BP,Temp,Lab)
+                                <br>
+                                <textarea class="form-control" name="woman_major_findings" style="resize: none;width: 100%" rows="5" required=""></textarea>
+                            </td>
+                        </tr>
+                        <tr class="bg-gray">
+                            <td colspan="4">Treatments Give Time</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                Before Referral
+                                <br>
+                                <input type="text" class="form-control" name="woman_before_treatment" placeholder="Treatment Given" autocomplete="off">
+                                <input type="text" class="form-control form_datetime" name="woman_before_given_time" placeholder="Date/Time Given" autocomplete="off">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                During Transport
+                                <br>
+                                <input type="text" class="form-control" name="woman_during_treatment" placeholder="Treatment Given" autocomplete="off">
+                                <input type="text" class="form-control form_datetime" name="woman_during_given_time" placeholder="Date/Time Given" autocomplete="off">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                Information Given to the Woman and Companion About the Reason for Referral
+                                <br>
+                                <textarea class="form-control woman_information_given" name="woman_information_given" style="resize: none;width: 100%" rows="5" required=""></textarea>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="col-sm-6">
+                <table class="table bg-warning">
+                    <tbody>
+                        <tr class="bg-gray">
+                            <th colspan="4">BABY</th>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                Name :<br>
+                                <input type="text" class="form-control" style="width: 100%" name="baby_fname" placeholder="First Name" autocomplete="off"><br>
+                                <input type="text" class="form-control" style="width: 100%" name="baby_mname" placeholder="Middle Name" autocomplete="off"><br>
+                                <input type="text" class="form-control" style="width: 100%" name="baby_lname" placeholder="Last Name" autocomplete="off">
+                            </td>
+                            <td style="vertical-align: top !important;">
+                                Date and Hour of Birth:
+                                <br>
+                                <input type="text" class="form-control  form_datetime" style="width: 100%" name="baby_dob" placeholder="Date/Time" autocomplete="off"><br>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">Birth Weight: <input type="text" class="form-control" style="width: 100%" name="baby_weight" placeholder="kg or lbs" autocomplete="off"><br></td>
+                            <td>Gestational Age: <input type="text" class="form-control" style="width: 100%" name="baby_gestational_age" placeholder="age" autocomplete="off"><br></td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                Main Reason for Referral
+                                <label><input type="radio" name="baby_reason" value="None" checked="" autocomplete="off"> None </label>
+                                <label><input type="radio" name="baby_reason" value="Emergency" autocomplete="off"> Emergency </label>
+                                <label><input type="radio" name="baby_reason" value="Non-Emergency" autocomplete="off"> Non-Emergency </label>
+                                <label><input type="radio" name="baby_reason" value="To accompany the mother" autocomplete="off"> To accompany the mother </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                Major Findings (Clinica and BP,Temp,Lab)
+                                <br>
+                                <textarea class="form-control" name="baby_major_findings" style="resize: none;width: 100%" rows="5"></textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">Last (Breast) Feed (Time): <input type="text" class="form-control form_datetime" style="width: 100%" name="baby_last_feed" placeholder="Date/Time" autocomplete="off"><br></td>
+                        </tr>
+                        <tr class="bg-gray">
+                            <td colspan="4">Treatments Give Time</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                Before Referral
+                                <br>
+                                <input type="text" class="form-control" name="baby_before_treatment" placeholder="Treatment Given" autocomplete="off">
+                                <input type="text" class="form-control form_datetime" name="baby_before_given_time" placeholder="Date/Time Given" autocomplete="off">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                During Transport
+                                <br>
+                                <input type="text" class="form-control" name="baby_during_treatment" placeholder="Treatment Given" autocomplete="off">
+                                <input type="text" class="form-control form_datetime" name="baby_during_given_time" placeholder="Date/Time Given" autocomplete="off">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                Information Given to the Woman and Companion About the Reason for Referral
+                                <br>
+                                <textarea class="form-control" name="baby_information_given" style="resize: none;width: 100%" rows="5"></textarea>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <table class="table table-striped col-sm-6"></table>
+        <hr>
+        <div class="form-fotter pull-right">
+            <button class="btn btn-default btn-flat" data-dismiss="modal"><i class="fa fa-times"></i> Back</button>
+            <button type="submit" class="btn btn-success btn-flat"><i class="fa fa-send"></i> Send</button>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+</form>

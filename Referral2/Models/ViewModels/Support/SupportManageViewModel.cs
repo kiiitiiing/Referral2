@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Referral2.Models.ViewModels.Support
 {
-    public class SupportManageViewModel
+    public partial class SupportManageViewModel
     {
         public int Id { get; set; }
         public string DoctorName { get; set; }

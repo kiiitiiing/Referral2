@@ -3,9 +3,8 @@
 @{
     ViewData["Title"] = "Incoming Patients";
     var accept = "accept-modal";
-    var dateToday = DateTime.Now;
-    var firstDayOfMonth = new DateTime(dateToday.Year, 1, 1);
-    var lastDayOfMonth = new DateTime(dateToday.Year, 12, 31);
+    var startDate = ViewBag.StartDate;
+    var endDate = ViewBag.EndDate;
 }
 
 <div class="content">
@@ -26,27 +25,26 @@
                     </div>
                     <!-- CARD DANGER BODY -->
                     <div class="card-body">
-                        <form asp-action="Incoming" method="get">
-                            <input type="hidden" name="_token" value="" autocomplete="off" />
+                        <form asp-action="Incoming" method="post">
                             <div class="card-body">
                                 <!-- SEARCH -->
                                 <div class="form-group ">
-                                    <input class="form-control" type="text" placeholder="Seach Keyword..." name="SearchFilter" value="@ViewBag.CurrentSearchFilter" autocomplete="off" />
+                                    <input class="form-control" type="text" placeholder="Code, Firstname, Lastname" name="SearchFilter" value="@ViewBag.CurrentSearchFilter" autocomplete="off" />
                                 </div>
                                 <!-- DATE FILTER -->
                                 <div class="form-group">
-                                    <input class="form-control" type="text" id="daterange" name="daterange" value="@firstDayOfMonth.ToString("yyyy/MM/dd") - @lastDayOfMonth.ToString("yyyy/MM/dd")" autocomplete="off">
+                                    <input class="form-control" type="text" name="daterange" value="@startDate - @endDate" autocomplete="off">
                                 </div>
                                 <!-- DEPARTMENT -->
                                 <div class="form-group">
-                                    <select class="form-control" asp-items="ViewBag.Departments">
-                                        <option value="all">All Department</option>
+                                    <select class="form-control" asp-items="ViewBag.Departments" name="departmentFilter">
+                                        <option value="">All Department</option>
                                     </select>
                                 </div>
                                 <!-- STATUS -->
                                 <div class="form-group">
-                                    <select class="form-control">
-                                        <option value="all">Select All</option>
+                                    <select class="form-control" name="statusFilter">
+                                        <option value="">Select All</option>
                                         <option value="new">New Referral</option>
                                         <option value="accepted">Accepted</option>
                                     </select>
@@ -469,4 +467,11 @@
 
 
 <script>
+    $(document).ready(function () {
+        $('input[name="daterange"]').daterangepicker({
+            format: 'YYYY/MM/DD',
+            startDate: '@startDate',
+            endDate: '@endDate'
+        });
+    });
 </script>

@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Referral2.Helpers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Referral2.Controlers
 {
@@ -28,11 +29,16 @@ namespace Referral2.Controlers
 
         private readonly ReferralDbContext _context;
 
-        public AccountController(IUserService userService, IConfiguration configuration, ReferralDbContext context)
+        private readonly IOptions<ReferralRoles> _roles;
+        private readonly IOptions<ReferralStatus> _status;
+
+        public AccountController(IUserService userService, IConfiguration configuration, ReferralDbContext context, IOptions<ReferralRoles> roles, IOptions<ReferralStatus> status )
         {
             _userService = userService;
             _configuration = configuration;
             _context = context;
+            _roles = roles;
+            _status = status;
         }
         // GET
         [HttpGet]
@@ -48,16 +54,22 @@ namespace Referral2.Controlers
             }
             else
             {
-                if (User.FindFirstValue(ClaimTypes.Role).Equals("admin"))
+                if (User.FindFirstValue(ClaimTypes.Role).Equals(_roles.Value.ADMIN))
                     return RedirectToAction("AdminDashboard", "Admin");
-                else if (User.FindFirstValue(ClaimTypes.Role).Equals("doctor"))
+                else if (User.FindFirstValue(ClaimTypes.Role).Equals(_roles.Value.DOCTOR))
                 {
                     return RedirectToAction("Index", "Home");
                 }
-                else
+                else if (User.FindFirstValue(ClaimTypes.Role).Equals(_roles.Value.SUPPORT))
                 {
                     return RedirectToAction("SupportDashboard", "Support");
                 }
+                else if (User.FindFirstValue(ClaimTypes.Role).Equals(_roles.Value.MCC))
+                {
+                    return RedirectToAction("MccDashboard", "MedicalCenterChief");
+                }
+                else
+                    return NotFound();
             }
         }
 
@@ -77,15 +89,19 @@ namespace Referral2.Controlers
 
 
                     await _context.SaveChangesAsync();
-                    if(user.Level.Equals("admin"))
+                    if(user.Level.Equals(_roles.Value.ADMIN))
                         return RedirectToAction("AdminDashboard", "Admin");
-                    else if (user.Level.Equals("doctor"))
+                    else if (user.Level.Equals(_roles.Value.DOCTOR))
                     {
                         return RedirectToAction("Index", "Home");
                     }
-                    else if (user.Level.Equals("support"))
+                    else if (user.Level.Equals(_roles.Value.SUPPORT))
                     {
                         return RedirectToAction("SupportDashboard", "Support");
+                    }
+                    else if (user.Level.Equals(_roles.Value.MCC))
+                    {
+                        return RedirectToAction("MccDashboard", "MedicalCenterChief");
                     }
                 }
                 ModelState.AddModelError("InvalidCredentials", "Invalid credentials.");

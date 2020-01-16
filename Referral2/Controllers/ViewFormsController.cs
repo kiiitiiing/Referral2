@@ -33,33 +33,6 @@ namespace Referral2.Controllers
 
             var patientForm = _context.PatientForm.Single(x => x.Code.Equals(code));
 
-            /*var patientForm = from s in _context.PatientForm
-                              select new PatientFormViewModel
-                              {
-                                  ReferringFacility = s.ReferringFacility.Name,
-                                  ReferringFacilityAddress = s.ReferringFacility.Address,
-                                  ReferringFacilityBarangay = s.ReferringFacility.Barangay == null ? "" : s.ReferringFacility.Barangay.Description,
-                                  ReferringFacilityMuncity = s.ReferringFacility.Muncity == null ? "" : s.ReferringFacility.Muncity.Description,
-                                  ReferringFacilityProvince = s.ReferringFacility.Province == null ? "": s.ReferringFacility.Province.Description,
-                                  ReferredToFacility = s.ReferredToNavigation.Name,
-                                  ReferredToDepartment = s.Department.Description,
-                                  ReferredToAddress = s.ReferredToNavigation.Address,
-                                  ReferredToBarangay = s.ReferredToNavigation.Barangay == null? "": s.ReferredToNavigation.Barangay.Description,
-                                  ReferredToMuncity = s.ReferredToNavigation.Muncity == null? "" : s.ReferredToNavigation.Muncity.Description,
-                                  ReferredToProvince = s.ReferredToNavigation.Province == null? "" : s.ReferredToNavigation.Province.Description,
-                                  DateReferred = s.TimeReferred,
-                                  DateTransferred = s.TimeTransferred,
-                                  PatientName = s.Patient.FirstName+" "+s.Patient.MiddleName+" "+s.Patient.LastName,
-                                  PatientAge = GlobalFunctions.ComputeAge(s.Patient.DateOfBirth),
-                                  PatientSex = s.Patient.Sex,
-                                  PatientCivilStatus = s.Patient.CivilStatus,
-                                  PatientAddress = s.Patient.Barangay.Description+", "+s.Patient.Muncity.Description+", "+s.Patient.Province.Description,
-                                  PatientPhicStatus = s.Patient.PhicStatus,
-                                  PatientPhicId = s.Patient.PhicId,
-                                  CaseSummary = 
-
-                              }*/
-
             if (patientForm == null)
                 return NotFound();
 
@@ -81,6 +54,20 @@ namespace Referral2.Controllers
             _context.Add(seen);
             await _context.SaveChangesAsync();
             return PartialView(patientForm);
+        }
+
+        public async Task<IActionResult> PrintableNormalForm(string code)
+        {
+            var form = await _context.PatientForm.SingleOrDefaultAsync(x => x.Code.Equals(code));
+
+            return PartialView(form);
+        }
+
+        public async Task<IActionResult> PrintablePregnantForm(string code)
+        {
+            var form = await _context.PregnantForm.SingleOrDefaultAsync(x => x.Code.Equals(code));
+
+            return PartialView(form);
         }
 
         #region HELPERS

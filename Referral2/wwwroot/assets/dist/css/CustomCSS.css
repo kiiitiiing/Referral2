@@ -29,7 +29,18 @@ body {
     vertical-align: central;
 }
 
-.patientTitle{
+#normal-form-modal span {
+    color: #e08e0b;
+}
+
+.title-form{
+    text-align: center;
+    font-size: 1.3em;
+    margin-bottom: 30px;
+    margin-top: 20px;
+}
+
+.patientTitle {
     font-size: 1.4em;
     font-weight: bold;
     color: #AC2020;

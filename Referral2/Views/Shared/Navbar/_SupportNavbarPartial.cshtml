@@ -24,12 +24,12 @@
     <li class="nav-item dropdown">
         <a class="dropdown-toggle nav-link" href="#resetPasswordModal" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
             <i class="fa fa-print"></i>
-            &nbsp;Settings
+            &nbsp;Reports
         </a>
         <ul class="dropdown-menu">
             <!-- DAILY USERS -->
             <li class="dropdown-item">
-                <a class=" nav-link" data-target="modal" asp-area="" asp-controller="Home" asp-action="index">
+                <a class=" nav-link" data-target="modal" asp-area="" asp-controller="Support" asp-action="DailyUsers">
                     <i class="fa fa-users"></i>
                     &nbsp;Daily Users
                 </a>
@@ -45,14 +45,14 @@
             <li class="dropdown-divider"></li>
             <!-- INCOMING REFERRAL -->
             <li class="dropdown-item">
-                <a class=" nav-link" data-target="modal" asp-area="" asp-controller="Home" asp-action="index">
+                <a class=" nav-link" data-target="modal" asp-area="" asp-controller="Support" asp-action="IncomingReport">
                     <i class="fa fa-ambulance"></i>
-                    &nbsp;Daily Users
+                    &nbsp;Incoming Referrals
                 </a>
             </li>
             <!-- IT SUPPORT: GROUP CHAT -->
             <li class="dropdown-item">
-                <a class=" nav-link" data-target="modal" asp-area="" asp-controller="Home" asp-action="loginas">
+                <a class=" nav-link" data-target="modal" asp-area="" asp-controller="Support" asp-action="Chat">
                     <i class="fa fa-comments"></i>
                     &nbsp;IT Support Group Chat
                 </a>

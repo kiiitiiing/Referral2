@@ -6,20 +6,16 @@
     <div class="col-md-12">
         <div class="card card-success card-outline">
             <div class="card-header">
-                <form class="fa-pull-right" asp-action="Facilities" method="get">
-                    <div class="form-actions no-color">
-                        <p>
-                            <input type="text" placeholder="Search name..." name="SearchString" value="@ViewBag.SearchString" />
-                            <button type="submit" value="Search" class="btn btn-flat btn-sm btn-success">
+                <form class="fa-pull-right form-inline" asp-action="Facilities" method="get">
+                            <input class="form-control form-control-sm" type="text" placeholder="Search name..." name="search" value="@ViewBag.Search" />
+                            <button class="btn btn-sm btn-success" type="submit" value="Search" >
                                 <i class="fa fa-search"></i>
                                 &nbsp;Search
                             </button>
-                            <a class="btn btn-flat btn-sm btn-primary">
+                            <button type="button" class="btn btn-sm btn-primary" data-toggle="small-modal" data-target="#small-modal" data-url="@Url.Action("AddFacility")">
                                 <i class="fa fa-hospital"></i>
                                 &nbsp;Add Facility
-                            </a>
-                        </p>
-                    </div>
+                            </button>
                 </form>
                 <h3>List of Facility</h3>
             </div>
@@ -31,7 +27,7 @@
                                 <th>Facility</th>
                                 <th>Contact</th>
                                 <th>Email</th>
-                                <th>Hospital's Chief</th>
+                                <th>Chief Hospital</th>
                                 <th>Level</th>
                                 <th>Type</th>
                             </tr>
@@ -41,7 +37,10 @@
                             {
                                 <tr>
                                     <td>
-                                        <a href="#">@item.Facility</a><br />
+                                        <a href="#" data-toggle="small-modal" data-target="#small-modal" data-url="@Url.Action("UpdateFacility", "Admin", new { id = item.Id })">
+                                            @item.Facility
+                                        </a>
+                                        <br />
                                         <small class="text-success">(@item.Address)</small>
                                     </td>
                                     <td>

@@ -68,22 +68,23 @@ namespace Referral2.Controllers
         //GET: ReferPartial
         public IActionResult Refer(int id)
         {
-            var facility = _context.Facility;
+            var facility = _context.Facility.Single(x => x.Id.Equals(UserFacility()));
             var patient = _context.Patient.Find(id);
-            HttpContext.Session.SetInt32(SessionPatientId, id);
 
-            ViewBag.ReferringFacility = facility.Find(UserFacility()).Name;
-            ViewBag.ReferringFacilityAddress = facility.Find(UserFacility()).Address;
-            ViewBag.ReferringMd = UserName();
-            ViewBag.ReferredTo = new SelectList(facility.Where(x => !x.Id.Equals(UserFacility())), "Id", "Name");
-            ViewBag.PatientName = patient.FirstName + " " + patient.MiddleName + " " + patient.LastName;
-            ViewBag.PatientAge = DateTime.Now.Year - patient.DateOfBirth.Year;
-            ViewBag.PatientSex = patient.Sex;
-            ViewBag.PatientStatus = patient.CivilStatus;
-            ViewBag.PatientAddress = patient.Barangay.Description + ", " + patient.Muncity.Description + ", " + patient.Province.Description;
-            ViewBag.PatientPhilHealthStatus = patient.PhicStatus;
-            ViewBag.PatientPhilHealthId = patient.PhicId;
-            return PartialView();
+            var referModel = new ReferPatientViewModel
+            {
+                ReferringFacility = facility.Name,
+                ReferringFacilityAddress = GlobalFunctions.GetAddress(facility),
+                PatientId = patient.Id,
+                PatientName = GlobalFunctions.GetFullName(patient),
+                PatientAge = GlobalFunctions.ComputeAge(patient.DateOfBirth),
+                PatientSex = patient.Sex,
+                PatientCivilStatus = patient.CivilStatus,
+                PatientAddress = GlobalFunctions.GetAddress(patient),
+                PatientPhicStatus = patient.PhicStatus,
+                PatientPhicId = patient.PhicId
+            };
+            return PartialView(referModel);
         }
 
         //POst: ReferPartial Post
@@ -91,10 +92,8 @@ namespace Referral2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Refer([Bind] PatientFormViewModel model)
         {
-            var id = (int)HttpContext.Session.GetInt32(SessionPatientId);
-            model.PatientId = id;
             var facility = _context.Facility.Find(UserFacility());
-            var currentPatient = _context.Patient.Find(id);
+            var currentPatient = _context.Patient.Find(model.PatientId);
             if (ModelState.IsValid)
             {
                 var patient = setNormalPatientForm(model);
@@ -110,11 +109,12 @@ namespace Referral2.Controllers
             ViewBag.ReferringMd = UserName();
             ViewBag.DepartmentId = new SelectList(_context.Department, "Id", "Description", model.DepartmentId);
             ViewBag.ReferredMd = new SelectList(_context.User, "Id", "Lastname", model.ReferredMd);
-            ViewBag.PatientName = currentPatient.FirstName + " " + currentPatient.MiddleName + " " + currentPatient.LastName;
-            ViewBag.PatientAge = DateTime.Now.Year - currentPatient.DateOfBirth.Year;
+            ViewBag.PatientId = currentPatient.Id;
+            ViewBag.PatientName = GlobalFunctions.GetFullName(currentPatient);
+            ViewBag.PatientAge = GlobalFunctions.ComputeAge(currentPatient.DateOfBirth);
             ViewBag.PatientSex = currentPatient.Sex;
             ViewBag.PatientStatus = currentPatient.CivilStatus;
-            ViewBag.PatientAddress = currentPatient.Barangay.Description + ", " + currentPatient.Muncity.Description + ", " + currentPatient.Province.Description;
+            ViewBag.PatientAddress = GlobalFunctions.GetAddress(currentPatient);
             ViewBag.PatientPhilHealthStatus = currentPatient.PhicStatus;
             ViewBag.PatientPhilHealthId = currentPatient.PhicId;
             return PartialView(model);

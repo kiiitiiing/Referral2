@@ -17,6 +17,7 @@ using Referral2.Models.ViewModels.Support;
 using Referral2.Services;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Http;
+using Referral2.Models.ViewModels;
 
 namespace Referral2.Controllers
 {
@@ -35,6 +36,78 @@ namespace Referral2.Controllers
             _userService = userService;
             _roles = roles;
             _status = status;
+        }
+
+
+        public async Task<IActionResult> Chat()
+        {
+            var chats = await _context.Feedback
+                .Where(x => x.Code.Equals("it-support-chat") && x.Sender.FacilityId.Equals(UserFacility()))
+                .Select(x=> new SupportChatViewModel 
+                {
+                    SupportId = (int)x.SenderId,
+                    SupportFacilityName = x.Sender.Facility.Name,
+                    SupportName = GlobalFunctions.GetFullName(x.Sender),
+                    Message = x.Message,
+                    MessageDate = (DateTime)x.CreatedAt
+                }).AsNoTracking().ToListAsync();
+
+            return View(chats);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Chat([Bind] FeedbackViewModel model)
+        {
+            if(ModelState.IsValid)
+            {
+                var chat = new Feedback
+                {
+                    Code = model.Code,
+                    SenderId = model.MdId,
+                    RecieverId = null,
+                    Message = model.Message,
+                    UpdatedAt = DateTime.Now,
+                    CreatedAt = DateTime.Now
+                };
+                await _context.AddAsync(chat);
+                await _context.SaveChangesAsync();
+            };
+
+            return View();
+        }
+
+
+
+        public async Task<IActionResult> DailyUsers(string date)
+        {
+            var dailyUsers = _context.User
+                .Where(x => x.FacilityId.Equals(UserFacility()) && x.Level.Equals(_roles.Value.DOCTOR))
+                .Select(x => new DailyUsersViewModel
+                {
+                    MDName = GlobalFunctions.GetFullLastName(x),
+                    OnDuty = x.LoginStatus,
+                    LoggedIn = x.LoginStatus.Contains("login") ? true : false,
+                    LoginTime = x.LastLogin,
+                    LogoutTime = (DateTime)x.UpdatedAt
+                });
+
+            return View(await dailyUsers.AsNoTracking().ToListAsync());
+        }
+
+        public async Task<IActionResult> IncomingReport()
+        {
+            var incoming = await _context.Tracking
+                .Where(x => x.ReferredTo.Equals(UserFacility()))
+                .Select(x => new IncomingReferralViewModel
+                {
+                    PatientName = GlobalFunctions.GetFullName(x.Patient),
+                    ReferringFacility = x.ReferredFromNavigation.Name,
+                    Department = x.Department.Description,
+                    DateReferred = x.DateReferred,
+                    Status = x.Status
+                }).AsNoTracking().ToListAsync();
+
+            return View(incoming);
         }
 
         public IActionResult SupportDashboard()
@@ -59,17 +132,19 @@ namespace Referral2.Controllers
 
         public async Task<IActionResult> ManageUsers(string searchName)
         {
+            ViewBag.SearchString = searchName;
             var doctors = _context.User.Where(x => x.FacilityId.Equals(UserFacility()) && x.Level.Equals(_roles.Value.DOCTOR))
                                        .Select(y => new SupportManageViewModel
                                        {
                                            Id = y.Id,
-                                           DoctorName = "Dr. " + y.Firstname + " " + y.Middlename + " " + y.Lastname,
+                                           DoctorName = y.Firstname + " " + y.Middlename + " " + y.Lastname,
                                            Contact = string.IsNullOrEmpty(y.Contact) ? "N/A" : y.Contact,
                                            DepartmentName = y.Department.Description,
                                            Username = y.Username,
                                            Status = y.Status,
                                            LastLogin = y.LastLogin.Equals(default) ? "Never Login" : y.LastLogin.ToString("MMM dd, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture)
                                        });
+
 
             if(!string.IsNullOrEmpty(searchName))
             {
@@ -190,24 +265,23 @@ namespace Referral2.Controllers
                 var updateFacility = UpdateFacility(model);
                 _context.Update(updateFacility);
                 await _context.SaveChangesAsync();
+                int provinceFacility = UserProvince();
+                int muncityFacility = UserMuncity();
+                var muncities = _context.Muncity.Where(x => x.ProvinceId.Equals(provinceFacility));
+                var barangays = _context.Barangay.Where(x => x.ProvinceId.Equals(provinceFacility) && x.MuncityId.Equals(muncityFacility));
+
+                ViewBag.Muncities = new SelectList(muncities, "Id", "Description", updateFacility.MuncityId);
+                ViewBag.Barangays = new SelectList(barangays, "Id", "Description", updateFacility.BarangayId);
+                ViewBag.Statuses = new SelectList(ListContainer.Status, model.Status);
             }
 
             return View(model);
         }
 
-        public async Task<IActionResult> DailyUsers(string date)
-        {
-            var facilityUsers =await _context.User.Where(x => x.FacilityId.Equals(UserFacility())).AsNoTracking().ToListAsync();
-
-
-            return View(facilityUsers);
-        }
-
-
-
 
 
         #region HELPERS
+
         private User SetDoctorViewModel(UpdateDoctorViewModel model)
         {
             var doctor = _context.User.First(x => x.Username.Equals(model.Username));

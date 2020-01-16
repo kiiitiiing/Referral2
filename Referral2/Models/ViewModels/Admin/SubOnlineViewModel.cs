@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 
 namespace Referral2.Models.ViewModels.Admin
 {
-    public class SubOnlineViewModel
+    public partial class SubOnlineViewModel
     {
-        public string Facility { get; set; }
         public string Name { get; set; }
         public string Level { get; set; }
         public string Department { get; set; }

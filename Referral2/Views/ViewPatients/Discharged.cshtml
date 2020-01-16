@@ -48,15 +48,11 @@
                     <tbody>
                         @foreach (var item in Model)
                         {
-                            var facility = item.ReferredFrom.Name;
-                            var patientName = item.Patient.FirstName + " " + item.Patient.MiddleName + " " + item.Patient.LastName;
-                            var code = item.Code;
-                            var status = item.Status;
                             var dateDischarged = item.DateAction.ToString("MMMM dd, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
                             <tr>
                                 <td>
                                     <span class="facility-color">
-                                        @facility
+                                        @item.ReferringFacility
                                     </span>
                                     <br />
                                     @if (item.Type.Equals("pregnant"))
@@ -70,17 +66,17 @@
                                 </td>
                                 <td>
                                     <a href="#">
-                                        @patientName
+                                        @item.PatientName
                                     </a>
                                     <p class="small text-muted">
-                                        @code
+                                        @item.Code
                                     </p>
                                 </td>
                                 <td>
                                     <span>@dateDischarged</span>
                                 </td>
                                 <td>
-                                    @status.ToUpper()s
+                                    @item.Status.ToUpper()s
                                 </td>
                                 <td>
                                     <button class="btn btn-success" asp-action="Track" asp-route-code="@item.Code">

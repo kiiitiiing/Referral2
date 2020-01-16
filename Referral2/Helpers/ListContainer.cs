@@ -58,8 +58,32 @@ namespace Referral2.Helpers
                 };
             }
         }
+        public static List<string> HospitalLevel
+        {
+            get
+            {
+                return new List<string>
+                {
+                    "Level 1",
+                    "Level 2",
+                    "Level 3"
+                };
+            }
+        }
 
-        
+        public static List<string> HospitalType
+        {
+            get
+            {
+                return new List<string>
+                {
+                    "Government",
+                    "Private"
+                };
+            }
+        }
+
+
 
         public static bool computeHours(DateTime time)
         {

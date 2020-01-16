@@ -1,0 +1,34 @@
+﻿@model SearchModel
+
+@{ 
+    var startDate = ViewBag.StartDate;
+    var endDate = ViewBag.EndDate;
+    var dateRange = startDate + " - " + endDate;
+}
+
+<div class="card card-success">
+    <div class="card-header">
+        <h3 class="card-title">Filter Date</h3>
+    </div>
+    <form asp-action="@Model.Action" method="post">
+        <div class="card-body">
+            <input class="form-control form-control-sm" type="text" value="@dateRange" id="daterange" name="daterange" autocomplete="off">
+        </div>
+        <div class="card-footer">
+            <button type="submit" value="Search" class="btn btn-success">
+                <i class="fa fa-filter"></i>
+                &nbsp;Filter Result
+            </button>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('input[name="daterange"]').daterangepicker({
+            format: 'YYYY/MM/DD',
+            startDate: '@startDate',
+            endDate: '@endDate'
+        });
+    });
+</script>
