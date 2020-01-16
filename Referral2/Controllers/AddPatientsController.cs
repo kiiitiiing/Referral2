@@ -90,7 +90,7 @@ namespace Referral2.Controllers
         //POst: ReferPartial Post
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Refer([Bind] PatientFormViewModel model)
+        public async Task<IActionResult> Refer([Bind] ReferPatientViewModel model)
         {
             var facility = _context.Facility.Find(UserFacility());
             var currentPatient = _context.Patient.Find(model.PatientId);
@@ -107,8 +107,8 @@ namespace Referral2.Controllers
             }
             ViewBag.ReferringFacility = facility.Name;
             ViewBag.ReferringMd = UserName();
-            ViewBag.DepartmentId = new SelectList(_context.Department, "Id", "Description", model.DepartmentId);
-            ViewBag.ReferredMd = new SelectList(_context.User, "Id", "Lastname", model.ReferredMd);
+            ViewBag.DepartmentId = new SelectList(_context.Department, "Id", "Description", model.Department);
+            ViewBag.ReferredMd = new SelectList(_context.User, "Id", "Lastname", model.ReferredToMd);
             ViewBag.PatientId = currentPatient.Id;
             ViewBag.PatientName = GlobalFunctions.GetFullName(currentPatient);
             ViewBag.PatientAge = GlobalFunctions.ComputeAge(currentPatient.DateOfBirth);
@@ -124,24 +124,24 @@ namespace Referral2.Controllers
 
         #region Helpers
 
-        public PatientForm setNormalPatientForm(PatientFormViewModel model)
+        public PatientForm setNormalPatientForm(ReferPatientViewModel model)
         {
             PatientForm patient = new PatientForm
             {
                 UniqueId = model.PatientId + "-" + UserFacility() + "-" + DateTime.Now.ToString("yyMMddhh"),
                 Code = DateTime.Now.ToString("yyMMdd") + "-" + UserFacility().ToString().PadLeft(3, '0') + "-" + DateTime.Now.ToString("hhmmss"),
                 ReferringFacilityId = UserFacility(),
-                ReferredTo = model.FacilityId,
-                DepartmentId = model.DepartmentId,
+                ReferredTo = model.ReferredTo,
+                DepartmentId = model.Department,
                 TimeReferred = DateTime.Now,
                 TimeTransferred = default,
                 PatientId = model.PatientId,
                 CaseSummary = model.CaseSummary,
-                RecommendSummary = model.SummaryReCo,
+                RecommendSummary = model.SummaryReco,
                 Diagnosis = model.Diagnosis,
                 Reason = model.Reason,
                 ReferringMd = UserId(),
-                ReferredMd = model.ReferredMd,
+                ReferredMd = model.ReferredToMd,
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now                
             };
