@@ -165,13 +165,15 @@ namespace Referral2.Controllers
         [HttpPost]
         public async Task<IActionResult> AddUser([Bind] AddDoctorViewModel model)
         {
-            if(ModelState.IsValid)
+            var departments = _context.Department;
+            if (ModelState.IsValid)
             {
                 if(await _userService.RegisterSupportAsync(model, UserFacility()))
                 {
                     return RedirectToAction("ManageUsers");
                 }
             }
+            ViewBag.Departments = new SelectList(departments, "Id", "Description", model.Department);
 
             return PartialView(model);
         }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Referral2.Models.ViewModels.Support
 {
-    public class SupportDashboadViewModel 
+    public partial class SupportDashboadViewModel 
     {
         public SupportDashboadViewModel(int totalDoctors, int onlineDoctors, int referredPatients)
         {

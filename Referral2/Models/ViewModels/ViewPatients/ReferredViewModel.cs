@@ -9,7 +9,7 @@ namespace Referral2.Models.ViewModels.ViewPatients
     {
         public string PatientName { get; set; }
         public string PatientSex { get; set; }
-        public int PatientAge { get; set; }
+        public int PatientAge { get; set; } 
         public int TrackingId { get; set; }
         public int SeenCount { get; set; }
         public int CallerCount { get; set; }

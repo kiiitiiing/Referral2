@@ -1,21 +1,9 @@
-﻿@model PatientFormViewModel
+﻿@model WalkinPatientViewModel
 
 @{
-    var patientName = ViewBag.PatientName;
-    var age = ViewBag.PatientAge;
-    var sex = ViewBag.PatientSex;
-    var civilStat = ViewBag.PatientStatus;
-    var address = ViewBag.PatientAddress;
-    var philHealthStat = ViewBag.PatientPhilHealthStatus;
-    var philHealthId = ViewBag.PatientPhilHealthId;
-    var referringFacility = ViewBag.ReferringFacility;
-    var referringFacilityAddress = ViewBag.ReferringFacilityAddress;
     var dateReferred = DateTime.Now.DayOfWeek + " " + DateTime.Now.ToString("MMMM d, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
-    var facility = ViewBag.ReferredTo;
+
 }
-
-
-
 <!-- REFER BODY -->
 
 <div class="modal-header">
@@ -24,37 +12,36 @@
     <small class="justify-content-center">Clinical Referral Form</small>
 </div>
 <form asp-action="Refer" method="post">
+    <input type="hidden" asp-for="PatientId" value="@Model.PatientId" />
     <div class="modal-body">
         <table class="table table-striped">
             <tbody>
                 <!-- FACILITY NAME-->
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <input asp-for="PatientId" value="@Model.PatientId" />
                 <tr>
                     <td colspan="6">
                         Name of Referring Facility:
-                        <span class="form-control text-danger">@referringFacility</span>
+                        <select id="facilityFilter" asp-for="ReferringFacility" asp-items="ViewBag.ReferringFacility" class="form-control facilityFilter">
+                            <option>Select Facility...</option>
+                        </select>
                     </td>
                 </tr>
                 <!-- FACILITY ADDRESS -->
                 <tr>
                     <td colspan="6">
                         Address:
-                        <span class="text-success">@referringFacilityAddress</span>
+                        <span class="text-info" id="facilityAdress"></span>
                     </td>
                 </tr>
                 <tr>
                     <!-- REFERRED TO -->
                     <td colspan="3">
                         Referred to:&nbsp;&nbsp;&nbsp;
-                        <select id="facilityFilter" asp-for="FacilityId" asp-items="ViewBag.ReferredTo" class="form-control facilityFilter">
-                            <option>Select Facility...</option>
-                        </select>
+                        <span class="form-control text-success">@Model.ReferredTo</span>
                     </td>
                     <!-- DEPARTMENT -->
                     <td colspan="3">
                         Department:
-                        <select id="departmentFilter" asp-for="DepartmentId" class="form-control">
+                        <select id="departmentFilter" asp-for="Department" class="form-control">
                             <option>Select Department...</option>
                         </select>
                     </td>
@@ -63,7 +50,7 @@
                 <tr>
                     <td colspan="6">
                         Address:
-                        <span id="facilityAdress" class="text-info"></span>
+                        <span  class="text-info">@Model.ReferredToAddress</span>
                     </td>
                 </tr>
                 <tr>
@@ -81,40 +68,40 @@
                     <!-- NAME OF PATIENT -->
                     <td colspan="3">
                         Name of Patient:
-                        <span class="text-danger">@patientName</span>
+                        <span class="text-danger">@Model.PatientName</span>
                     </td>
                     <!-- AGE -->
                     <td>
-                        Age:&nbsp;<span class="text-danger">@age</span>
+                        Age:&nbsp;<span class="text-danger">@Model.PatientAge</span>
                     </td>
 
                     <!-- SEX -->
                     <td>
-                        Sex:&nbsp;<span class="text-danger">@sex</span>
+                        Sex:&nbsp;<span class="text-danger">@Model.PatientSex</span>
                     </td>
 
                     <!-- STATUS -->
                     <td>
-                        Status:&nbsp;<span class="text-danger">@civilStat</span>
+                        Status:&nbsp;<span class="text-danger">@Model.PatientCivilStatus</span>
                     </td>
                 </tr>
                 <!-- ADDRESS OF PATIENT -->
                 <tr>
                     <td colspan="6">
                         Address:
-                        <span class="text-danger">@address</span>
+                        <span class="text-danger">@Model.PatientAddress</span>
                     </td>
                 </tr>
                 <tr>
                     <!-- PHILHEALTH STATUS -->
                     <td colspan="3">
                         PhilHealth:
-                        <span class="text-danger">@philHealthStat</span>
+                        <span class="text-danger">@Model.PatientPhicStatus</span>
                     </td>
                     <!-- PHILHEALTH NUMBER -->
                     <td colspan="3">
                         PhilHealth#:
-                        <span class="text-danger">@philHealthId</span>
+                        <span class="text-danger">@Model.PatientPhicId</span>
                     </td>
                 </tr>
                 <!-- CASE SUMMARY -->
@@ -129,8 +116,8 @@
                 <tr>
                     <td colspan="6">
                         Summary of ReCo (Please refer to ReCo Guide in Referring Patients Checklist):
-                        <textarea asp-for="SummaryReCo" class="form-control" rows="7"></textarea>
-                        <span asp-validation-for="SummaryReCo" class="text-danger"></span>
+                        <textarea asp-for="SummaryReco" class="form-control" rows="7"></textarea>
+                        <span asp-validation-for="SummaryReco" class="text-danger"></span>
                     </td>
                 </tr>
                 <!-- DIAGNOSYS/IMPRESSION -->
@@ -163,7 +150,7 @@
                             Name of Referred MD/HCW - Mobile Contact Number (ReCo):
                         </div>
                         <div class="col-md-7">
-                            <select id="doctorFiltered" asp-for="ReferredMd" class="form-control">
+                            <select id="doctorFiltered" asp-for="ReferredToMd" class="form-control">
                                 <option value="any">Any...</option>
                             </select>
                             <span class="" dir="ltr" style="width:100%;">

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Referral2.Models.ViewModels
 {
-    public class ReferViewModel
+    public partial class ReferViewModel
     {
         public string Code { get; set; }
         public string Remarks { get; set; }

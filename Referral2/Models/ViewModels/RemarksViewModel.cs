@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Referral2.Models.ViewModels
 {
-    public class RemarksViewModel
+    public partial class RemarksViewModel
     {
         [Required]
         public string Code { get; set; }

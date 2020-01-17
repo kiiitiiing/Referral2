@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Referral2.Models.ViewModels
 {
-    public class DischargeRemarkViewModel
+    public partial class DischargeRemarkViewModel
     {
         public string Code { get; set; }
         public DateTime DateDischarged { get; set; }

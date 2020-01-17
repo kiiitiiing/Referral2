@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Referral2.Models.ViewModels.Support
 {
-    public class HospitalInfoViewModel
+    public partial class HospitalInfoViewModel
     {
         public string FacilityName { get; set; }
         public string Abbreviation { get; set; }

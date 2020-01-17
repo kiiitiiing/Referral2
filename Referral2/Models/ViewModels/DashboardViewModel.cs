@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Referral2.Models.ViewModels
 {
-    public class DashboardViewModel
+    public partial class DashboardViewModel
     {
         public DashboardViewModel(int[] accepted, int[] redirected)
         {

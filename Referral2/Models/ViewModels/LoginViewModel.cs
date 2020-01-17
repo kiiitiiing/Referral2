@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Referral2.Models.ViewModels
 {
-    public class LoginViewModel
+    public partial class LoginViewModel
     {
         [Required]
         public string Username { get; set; }

@@ -17,6 +17,7 @@ using Referral2.Models.ViewModels;
 using Referral2.Models.ViewModels.ViewPatients;
 using Microsoft.Extensions.Options;
 using static Referral2.Controllers.NoReloadController;
+using Referral2.Models.ViewModels.Doctor;
 
 namespace Referral2.Controllers
 {
@@ -42,7 +43,7 @@ namespace Referral2.Controllers
         public DateTime EndDate { get; set; }
 
         //GET: Patients
-        public async Task<IActionResult> ListPatients(string currentFilter, string searchString, int muncityId, int barangayId, int? pageNumber)
+        public async Task<IActionResult> ListPatients(string currentFilter, string searchString, int? muncityId, int? barangayId, int? pageNumber)
         {
             if (searchString != null)
                 pageNumber = 1;
@@ -52,23 +53,28 @@ namespace Referral2.Controllers
             ViewBag.Muncities = new SelectList(_context.Muncity.Where(x => x.ProvinceId.Equals(UserProvince())), "Id", "Description");
             ViewBag.CurrentFilter = searchString;
 
-            var patients = from s in _context.Patient
-                                    .Include(x => x.Barangay)
-                                    .Include(x => x.Muncity)
-                                    .Include(x => x.Province)
-                                    .OrderByDescending(x => x.CreatedAt)
-                           select s;
 
-            if (!string.IsNullOrEmpty(searchString))
-                patients = patients.Where(s => s.LastName.Contains(searchString) ||
-                                                s.FirstName.Contains(searchString) ||
-                                                s.MiddleName.Contains(searchString))
-                                                .OrderByDescending(x => x.CreatedAt);
+            var patients = _context.Patient
+            .Select(x => new PatientsViewModel
+            {
+                PatientId = x.Id,
+                PatientName = x.FirstName + " " + x.MiddleName + " " + x.LastName,
+                PatientSex = x.Sex,
+                PatientAge = GlobalFunctions.ComputeAge(x.DateOfBirth),
+                DateofBirth = x.DateOfBirth,
+                MuncityId = x.MuncityId,
+                Muncity = x.Muncity == null ? "" : x.Muncity.Description,
+                BarangayId = x.BarangayId,
+                Barangay = x.Barangay == null ? "" : x.Barangay.Description,
+                CreatedAt = (DateTime)x.CreatedAt
+            })
+            .Where(x => x.PatientName.Contains(searchString) && x.MuncityId.Equals(muncityId) && x.BarangayId.Equals(barangayId));
+
 
             int pageSize = 5;
 
 
-            return View(await PaginatedList<Patient>.CreateAsync(patients.AsNoTracking(), pageNumber ?? 1, pageSize));
+            return View(await PaginatedList<PatientsViewModel>.CreateAsync(patients.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
 
@@ -311,40 +317,41 @@ namespace Referral2.Controllers
         }
 
         //GET: Track patients
-        public IActionResult Track(string code)
+        public async Task<IActionResult> Track(string code)
         {
 
             ViewBag.CurrentCode = code;
             var activities = _context.Activity.Where(x => x.Code.Equals(code));
             var feedbacks = _context.Feedback.Where(x => x.Code.Equals(code));
 
-            var track = from t in _context.Tracking.Where(x => x.Code.Equals(code))
-                        select new ReferredViewModel
-                        {
-                            PatientName = t.Patient.FirstName+" "+t.Patient.MiddleName+" "+t.Patient.LastName,
-                            PatientSex = t.Patient.Sex,
-                            PatientAge = GlobalFunctions.ComputeAge(t.Patient.DateOfBirth),
-                            PatientAddress = GlobalFunctions.GetAddress(t.Patient),
-                            ReferredBy = t.ReferringMdNavigation == null ? "" : GlobalFunctions.GetMDFullName(t.ReferringMdNavigation),
-                            ReferredTo = t.ActionMdNavigation == null ? "" : GlobalFunctions.GetMDFullName(t.ActionMdNavigation),
-                            SeenCount = _context.Seen.Where(x => x.TrackingId.Equals(t.Id)).Count(),
-                            CallerCount = activities == null? 0 : activities.Where(x => x.Status.Equals(_status.Value.CALLING)).Count(),
-                            ReCoCount = feedbacks == null? 0 : feedbacks.Count(),
-                            Code = t.Code,
-                            Status = t.Status,
-                            Activities = activities.OrderByDescending(x => x.CreatedAt),
-                            UpdatedAt = t.UpdatedAt
-                        };
+            var track = await _context.Tracking
+                .Where(x => x.Code.Equals(code))
+                .Select(t => new ReferredViewModel
+                {
+                    PatientName = t.Patient.FirstName + " " + t.Patient.MiddleName + " " + t.Patient.LastName,
+                    PatientSex = t.Patient.Sex,
+                    PatientAge = GlobalFunctions.ComputeAge(t.Patient.DateOfBirth),
+                    PatientAddress = GlobalFunctions.GetAddress(t.Patient),
+                    ReferredBy = t.ReferringMdNavigation == null ? "" : GlobalFunctions.GetMDFullName(t.ReferringMdNavigation),
+                    ReferredTo = t.ActionMdNavigation == null ? "" : GlobalFunctions.GetMDFullName(t.ActionMdNavigation),
+                    SeenCount = _context.Seen.Where(x => x.TrackingId.Equals(t.Id)).Count(),
+                    CallerCount = activities == null ? 0 : activities.Where(x => x.Status.Equals(_status.Value.CALLING)).Count(),
+                    ReCoCount = feedbacks == null ? 0 : feedbacks.Count(),
+                    Code = t.Code,
+                    Status = t.Status,
+                    Activities = activities.OrderByDescending(x => x.CreatedAt),
+                    UpdatedAt = t.UpdatedAt
+                })
+                .FirstOrDefaultAsync();
 
-            var tracking = track.FirstOrDefault();
 
-            if(tracking != null)
+            if(track != null)
             {
-                ViewBag.Code = tracking.Code;
+                ViewBag.Code = track.Code;
             }
             
 
-            return View(tracking);
+            return View(track);
         }
 
 

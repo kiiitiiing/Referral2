@@ -393,30 +393,26 @@
                         <i class="fa fa-folder"></i>
                         &nbsp;View Form
                     </button>
-                    <button type="button" class="btn btn-success btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens","Modals", new { trackingId = item.TrackingId })">
-                        <i class="fa fa-user-md"></i>
-                        &nbsp;Seen
-                        @if (seenCount > 0)
-                        {
+                    @if (seenCount > 0)
+                    {
+                        <button type="button" class="btn btn-success btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens", "Modals", new { trackingId = item.TrackingId })">
+                            <i class="fa fa-user-md"></i>
+                            &nbsp;Seen
+
                             <small class="badge bg-green">@seenCount</small>
-                        }
-                    </button>
-                    <button class="btn btn-xs bg-gradient-primary">
-                        <i class="fa fa-phone"></i>
-                        &nbsp;Caller
-                        @if (callerCount > 0)
-                        {
+
+                        </button>
+                    }
+                    @if (callerCount > 0)
+                    {
+                        <button class="btn btn-xs bg-gradient-primary">
+                            <i class="fa fa-phone"></i>
+                            &nbsp;Caller
+
                             <small class="badge bg-blue">@callerCount</small>
-                        }
-                    </button>
-                    <button class="btn btn-xs bg-gradient-success">
-                        <i class="fa fa-ambulance"></i>
-                        &nbsp;Travel
-                        @if (travelCount > 0)
-                        {
-                            <small class="badge bg-green">@travelCount</small>
-                        }
-                    </button>
+
+                        </button>
+                    }
                     <button type="button" class="btn btn-info btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
                         <i class="fa fa-comments"></i>
                         &nbsp;ReCo
@@ -429,10 +425,13 @@
                         <i class="fa fa-exclamation-triangle"></i>
                         &nbsp;Issue and Concern
                     </button>
-                    <button type="button" class="btn btn-xs btn-default" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("CancelRemark","Remarks", new { code = item.Code })">
-                        <i class="fa fa-times"></i>
-                        &nbsp;Cancel
-                    </button>
+                    @if (!item.Status.Equals("cancelled") && !item.Status.Equals("discharged"))
+                    {
+                        <button type="button" class="btn btn-xs btn-default" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("CancelRemark","Remarks", new { code = item.Code })">
+                            <i class="fa fa-times"></i>
+                            &nbsp;Cancel
+                        </button>
+                    }
                 </div>
             </div>
         }

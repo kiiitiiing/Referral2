@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Referral2.Models.ViewModels
 {
-    public class AdminDashboardViewModel
+    public partial class AdminDashboardViewModel
     {
         public AdminDashboardViewModel(int totalDoctor, int onlineDoctors, int activeFacilities, int referredPatients)
         {

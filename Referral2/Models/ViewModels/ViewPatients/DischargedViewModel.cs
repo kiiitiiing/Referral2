@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Referral2.Models.ViewModels.ViewPatients
 {
-    public class DischargedViewModel
+    public partial class DischargedViewModel
     {
         public string ReferringFacility { get; set; }
         public string Type { get; set; }

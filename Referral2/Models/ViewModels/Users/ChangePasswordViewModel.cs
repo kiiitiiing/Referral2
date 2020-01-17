@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Referral2.Models.ViewModels.Users
 {
-    public class ChangePasswordViewModel
+    public partial class ChangePasswordViewModel
     {
         [Required(ErrorMessage = "Password is required")]
         [DataType(DataType.Password)]

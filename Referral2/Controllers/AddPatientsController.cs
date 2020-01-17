@@ -59,19 +59,19 @@ namespace Referral2.Controllers
             ViewBag.BarangayId = new SelectList(_context.Barangay, "Id", "Description", patient.BarangayId);
             ViewBag.MuncityId = new SelectList(_context.Muncity, "Id", "Description", patient.MuncityId);
             ViewBag.ProvinceId = new SelectList(_context.Province, "Id", "Description", patient.ProvinceId);
-            ViewBag.CivilStatus = new SelectList(ListContainer.CivilStatus);
-            ViewBag.PhicStatus = new SelectList(ListContainer.PhicStatus);
+            ViewBag.CivilStatus = new SelectList(ListContainer.CivilStatus, patient.CivilStatus);
+            ViewBag.PhicStatus = new SelectList(ListContainer.PhicStatus, patient.PhicStatus);
             return View(patient);
         }
 
 
         //GET: ReferPartial
-        public IActionResult Refer(int id)
+        public IActionResult Refer(int? id)
         {
             var facility = _context.Facility.Single(x => x.Id.Equals(UserFacility()));
             var patient = _context.Patient.Find(id);
 
-            var referModel = new ReferPatientViewModel
+            var refer = new ReferPatientViewModel
             {
                 ReferringFacility = facility.Name,
                 ReferringFacilityAddress = GlobalFunctions.GetAddress(facility),
@@ -82,10 +82,17 @@ namespace Referral2.Controllers
                 PatientCivilStatus = patient.CivilStatus,
                 PatientAddress = GlobalFunctions.GetAddress(patient),
                 PatientPhicStatus = patient.PhicStatus,
-                PatientPhicId = patient.PhicId
+                PatientPhicId = patient.PhicId,
+                ReferringMd = UserName()
             };
-            return PartialView(referModel);
+            var referTo = _context.Facility.Where(x => x.Id != UserFacility());
+
+            ViewBag.ReferredTo = new SelectList( referTo, "Id", "Name");
+
+            return PartialView(refer);
         }
+
+        
 
         //POst: ReferPartial Post
         [HttpPost]
@@ -105,19 +112,54 @@ namespace Referral2.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction("ListPatients","ViewPatients");
             }
-            ViewBag.ReferringFacility = facility.Name;
-            ViewBag.ReferringMd = UserName();
-            ViewBag.DepartmentId = new SelectList(_context.Department, "Id", "Description", model.Department);
-            ViewBag.ReferredMd = new SelectList(_context.User, "Id", "Lastname", model.ReferredToMd);
-            ViewBag.PatientId = currentPatient.Id;
-            ViewBag.PatientName = GlobalFunctions.GetFullName(currentPatient);
-            ViewBag.PatientAge = GlobalFunctions.ComputeAge(currentPatient.DateOfBirth);
-            ViewBag.PatientSex = currentPatient.Sex;
-            ViewBag.PatientStatus = currentPatient.CivilStatus;
-            ViewBag.PatientAddress = GlobalFunctions.GetAddress(currentPatient);
-            ViewBag.PatientPhilHealthStatus = currentPatient.PhicStatus;
-            ViewBag.PatientPhilHealthId = currentPatient.PhicId;
+            var referTo = _context.Facility.Where(x => x.Id != UserFacility());
+            ViewBag.ReferredTo = new SelectList(referTo, "Id", "Name", model.ReferredTo);
             return PartialView(model);
+        }
+
+        public IActionResult Walkin(int? id)
+        {
+            var facility = _context.Facility.Single(x => x.Id.Equals(UserFacility()));
+            var patient = _context.Patient.Find(id);
+
+            var walkin = new WalkinPatientViewModel
+            {
+                ReferredTo = facility.Name,
+                ReferredToAddress = GlobalFunctions.GetAddress(facility),
+                PatientId = patient.Id,
+                PatientName = GlobalFunctions.GetFullName(patient),
+                PatientAge = GlobalFunctions.ComputeAge(patient.DateOfBirth),
+                PatientSex = patient.Sex,
+                PatientCivilStatus = patient.CivilStatus,
+                PatientAddress = GlobalFunctions.GetAddress(patient),
+                PatientPhicStatus = patient.PhicStatus,
+                PatientPhicId = patient.PhicId
+            };
+
+            ViewBag.ReferringFacility = new SelectList(_context.Facility.Where(x => x.Id != UserFacility()), "Id", "Name");
+            return PartialView(walkin);
+        }
+
+        public async Task<IActionResult> PregnantRefer(int? id)
+        {
+            return PartialView();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PregnantRefer()
+        {
+            return PartialView();
+        }
+
+        public async Task<IActionResult> PregnantWalkin(int? id)
+        {
+            return PartialView();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PregnantWalkin()
+        {
+            return PartialView();
         }
 
 

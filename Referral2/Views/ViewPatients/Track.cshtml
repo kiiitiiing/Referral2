@@ -45,9 +45,9 @@
             <div class="col-md-9">
                 @if (Model != null)
                 {
-                    var seenCount = Model.SeenCount;
-                    var callerCount = Model.CallerCount;
-                    var travelCount = Model.TravelCount;
+                    var seenCount = Model.SeenCount > 0;
+                    var callerCount = Model.CallerCount > 0;
+                    var travelCount = Model.TravelCount > 0;
                     var recoCount = Model.ReCoCount;
                     
                     switch (Model.Status)
@@ -312,34 +312,36 @@
                                 <i class="fa fa-folder"></i>
                                 &nbsp;View Form
                             </button>
-                            <button class="btn btn-xs bg-gradient-success">
-                                <i class="fa fa-user-md"></i>
-                                &nbsp;Seen
-                                @if(seenCount>0)
-                                {
+                            @if (seenCount)
+                            {
+                                <button class="btn btn-xs bg-gradient-success">
+                                    <i class="fa fa-user-md"></i>
+                                    &nbsp;Seen
                                     <small class="badge bg-green">@seenCount</small>
-                                }
-                            </button>
-                            <button class="btn btn-xs bg-gradient-primary">
-                                <i class="fa fa-phone"></i>
-                                &nbsp;Caller
-                                @if(callerCount>0)
-                                {
+
+                                </button>
+                            }
+                            @if (callerCount)
+                            {
+                                <button class="btn btn-xs bg-gradient-primary">
+                                    <i class="fa fa-phone"></i>
+                                    &nbsp;Caller
+
                                     <small class="badge bg-blue">@callerCount</small>
-                                }
-                            </button>
-                            <button class="btn btn-xs bg-gradient-success">
-                                <i class="fa fa-ambulance"></i>
-                                &nbsp;Travel
-                                @if(travelCount>0)
-                                {
-                                    <small class="badge bg-green">@travelCount</small>
-                                }
-                            </button>
+
+                                </button>
+                            }
+                            @if (Model.Status.Equals("accepted"))
+                            {
+                                <button class="btn btn-xs bg-gradient-success">
+                                    <i class="fa fa-ambulance"></i>
+                                    &nbsp;Travel
+                                </button>
+                            }
                             <button class="btn btn-xs bg-gradient-info">
                                 <i class="fa fa-comments"></i>
                                 &nbsp;ReCo
-                                @if(recoCount>0)
+                                @if (recoCount > 0)
                                 {
                                     <small class="badge bg-blue">@recoCount</small>
                                 }

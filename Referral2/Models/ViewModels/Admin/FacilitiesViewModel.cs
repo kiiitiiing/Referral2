@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Referral2.Models.ViewModels.Admin
 {
-    public class FacilitiesViewModel
+    public partial class FacilitiesViewModel
     {
         public int Id { get; set; }
         public string Facility { get; set; }

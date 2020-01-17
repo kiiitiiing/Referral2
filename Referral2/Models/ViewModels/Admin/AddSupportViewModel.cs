@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Referral2.Models.ViewModels.Admin
 {
-    public class AddSupportViewModel : AddUserViewModel
+    public partial class AddSupportViewModel : AddUserViewModel
     {
         [Required]
         public int FacilityId { get; set; }

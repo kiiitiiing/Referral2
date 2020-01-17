@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Referral2.Models.ViewModels.ViewPatients
 {
-    public class IncomingViewModel
+    public partial class IncomingViewModel
     {
         public int TrackingId { get; set; }
         public string Code { get; set; }
