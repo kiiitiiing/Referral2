@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Referral2.Data;
 using Referral2.Services;
 using Referral2.Models;
-using Referral2.Models.ViewModels;
+using Referral2.Models.ViewModels.Account;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -17,10 +17,11 @@ using Microsoft.AspNetCore.Authorization;
 using Referral2.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 
 namespace Referral2.Controlers
 {
-    [Route("account")]
     public class AccountController : Controller
     {
         private readonly IUserService _userService;
@@ -40,9 +41,77 @@ namespace Referral2.Controlers
             _roles = roles;
             _status = status;
         }
+
+        public partial class ChangeLoginViewModel
+        {
+            public int Id { get; set; }
+            public string UserLastname { get; set; }
+        }
+
+        
+
+        public IActionResult SwitchUser()
+        {
+            var users = _context.User
+                .Where(x => x.FacilityId.Equals(UserFacility()) && x.Id != UserId() && x.Level.Equals(_roles.Value.DOCTOR))
+                .Select(x => new ChangeLoginViewModel
+                {
+                    Id = x.Id,
+                    UserLastname = x.Lastname + ", " + x.Firstname
+                });
+
+            ViewBag.Users = new SelectList(users, "Id", "UserLastname", UserId());
+            return PartialView("~/Views/Account/SwitchUser.cshtml");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SwitchUser([Bind] SwitchUserModel model)
+        {
+            var users = _context.User
+                .Where(x => x.FacilityId.Equals(UserFacility()))
+                .Select(x => new ChangeLoginViewModel
+                {
+                    Id = x.Id,
+                    UserLastname = x.Lastname + ", " + x.Firstname
+                });
+            if (ModelState.IsValid)
+            {
+                var (isValid, user) = await _userService.SwitchUserAsync(model.Id, model.Password);
+
+                if (isValid)
+                {
+                    await ChangeUser();
+                    await LoginAsync(user, false);
+                    CreateLogin(user.Id);
+
+                    await _context.SaveChangesAsync();
+                    if (user.Level.Equals(_roles.Value.ADMIN))
+                        return RedirectToAction("AdminDashboard", "Admin");
+                    else if (user.Level.Equals(_roles.Value.DOCTOR))
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
+                    else if (user.Level.Equals(_roles.Value.SUPPORT))
+                    {
+                        return RedirectToAction("SupportDashboard", "Support");
+                    }
+                    else if (user.Level.Equals(_roles.Value.MCC))
+                    {
+                        return RedirectToAction("MccDashboard", "MedicalCenterChief");
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError("Password", "Wrong Password.");
+                }
+            }
+            ViewBag.Users = new SelectList(users, "Id", "UserLastname", UserId());
+            return PartialView("~/Views/Account/SwitchUser.cshtml", model);
+        }
+
+
         // GET
         [HttpGet]
-        [Route("login")]
         public IActionResult Login(string returnUrl)
         {
             if(!User.Identity.IsAuthenticated)
@@ -74,7 +143,6 @@ namespace Referral2.Controlers
         }
 
         [HttpPost]
-        [Route("login")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
@@ -84,7 +152,7 @@ namespace Referral2.Controlers
 
                 if(isValid)
                 {
-                    await LoginAsync(user, model);
+                    await LoginAsync(user, model.RememberMe);
                     CreateLogin(user.Id);
 
 
@@ -104,13 +172,24 @@ namespace Referral2.Controlers
                         return RedirectToAction("MccDashboard", "MedicalCenterChief");
                     }
                 }
-                ModelState.AddModelError("InvalidCredentials", "Invalid credentials.");
+                else
+                {
+                    if (user == null)
+                    {
+                        ModelState.AddModelError("Username", "User does not exists");
+                        ViewBag.Username = "invalid";
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("Username", "Wrong Password");
+                        ViewBag.Password = "invalid";
+                    }
+                }
             }
 
             return View(model);
         }
 
-        [Route("logout")]
         public async Task<IActionResult> Logout(string returnUrl)
         {
             ViewBag.ReturnUrl = returnUrl;
@@ -122,7 +201,6 @@ namespace Referral2.Controlers
 
             return View();
         }
-        [Route("accessdenied")]
         public IActionResult AccessDenied(string returnUrl)
         {
             ViewBag.ReturnUrl = returnUrl;
@@ -141,7 +219,6 @@ namespace Referral2.Controlers
         }
 
         [HttpPost]
-        [Route("logout")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
@@ -155,7 +232,6 @@ namespace Referral2.Controlers
         }
 
         [HttpGet]
-        [Route("profile")]
         public IActionResult Profile()
         {
             var user = _context.User.Find(UserId());
@@ -175,12 +251,12 @@ namespace Referral2.Controlers
             return !string.IsNullOrWhiteSpace(returnUrl) && Uri.IsWellFormedUriString(returnUrl, UriKind.Relative);
         }
 
-        private async Task LoginAsync(User user, LoginViewModel model)
+        private async Task LoginAsync(User user, bool rememberMe)
         {
             var properties = new AuthenticationProperties
             {
                 AllowRefresh = false,
-                IsPersistent = model.RememberMe
+                IsPersistent = rememberMe
             };
 
             var claims = new List<Claim>
@@ -214,6 +290,13 @@ namespace Referral2.Controlers
             newLogin.CreatedAt = DateTime.Now;
             newLogin.UpdatedAt = DateTime.Now;
             _context.Add(newLogin);
+        }
+
+        public async Task<bool> ChangeUser()
+        {
+            UpdateLogin(UserId());
+            await HttpContext.SignOutAsync();
+            return true;
         }
 
         public void UpdateLogin(int userId)

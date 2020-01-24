@@ -10,6 +10,7 @@ namespace Referral2.Models.ViewModels
     {
         [Required]
         public string Firstname { get; set; }
+        [Required]
         public string Middlename { get; set; }
         [Required]
         public string Lastname { get; set; }

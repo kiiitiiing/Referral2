@@ -1,0 +1,30 @@
+﻿@model TravelViewModel
+
+<form asp-action="Travel" method="post">
+    <div class="modal-header">
+        <h4>
+            <i class="fa fa-exclamation-triangle"></i>
+            &nbsp;Mode of Transportation 
+        </h4>
+    </div>
+    <div class="modal-body">
+        <input type="hidden" name="TrackingId" value="@ViewBag.TrackingId" autocomplete="off">
+        <div class="form-group transportation_body">
+            <select class="form-control" asp-for="TranspoId" asp-items="ViewBag.Transpo">
+            </select><br>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="modal-footer">
+        <div class="pull-right">
+            <button type="button" data-dismiss="modal" class="btn btn-default btn-sm">
+                <i class="fa fa-times"></i> Close
+            </button>
+            <button type="submit" class="btn btn-success btn-sm">
+                <i class="fa fa-check"></i> Submit
+            </button>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+
+</form>

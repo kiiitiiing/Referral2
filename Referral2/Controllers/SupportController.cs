@@ -24,7 +24,6 @@ namespace Referral2.Controllers
     [Authorize(Policy = "support")]
     public class SupportController : Controller
     {
-        const string SessionDoctorUsername = "_username";
         private readonly ReferralDbContext _context;
         private readonly IUserService _userService;
         private readonly IOptions<ReferralRoles> _roles;
@@ -133,17 +132,18 @@ namespace Referral2.Controllers
         public async Task<IActionResult> ManageUsers(string searchName)
         {
             ViewBag.SearchString = searchName;
-            var doctors = _context.User.Where(x => x.FacilityId.Equals(UserFacility()) && x.Level.Equals(_roles.Value.DOCTOR))
-                                       .Select(y => new SupportManageViewModel
-                                       {
-                                           Id = y.Id,
-                                           DoctorName = y.Firstname + " " + y.Middlename + " " + y.Lastname,
-                                           Contact = string.IsNullOrEmpty(y.Contact) ? "N/A" : y.Contact,
-                                           DepartmentName = y.Department.Description,
-                                           Username = y.Username,
-                                           Status = y.Status,
-                                           LastLogin = y.LastLogin.Equals(default) ? "Never Login" : y.LastLogin.ToString("MMM dd, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture)
-                                       });
+            var doctors = _context.User
+                .Where(x => x.FacilityId.Equals(UserFacility()) && x.Level.Equals(_roles.Value.DOCTOR))
+                .Select(y => new SupportManageViewModel
+                {
+                    Id = y.Id,
+                    DoctorName = y.Firstname + " " + y.Middlename + " " + y.Lastname,
+                    Contact = string.IsNullOrEmpty(y.Contact) ? "N/A" : y.Contact,
+                    DepartmentName = y.Department.Description,
+                    Username = y.Username,
+                    Status = y.Status,
+                    LastLogin = y.LastLogin.Equals(default) ? "Never Login" : y.LastLogin.ToString("MMM dd, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture)
+                });
 
 
             if(!string.IsNullOrEmpty(searchName))
@@ -191,14 +191,12 @@ namespace Referral2.Controllers
             }
 
             var doctor = returnDoctorInfo(currentMd);
-            HttpContext.Session.SetString(SessionDoctorUsername, doctor.Username);
 
             return PartialView(doctor);
         }
         [HttpPost]
         public async Task<IActionResult> UpdateUser([Bind] UpdateDoctorViewModel model)
         {
-            var doctorLastUsername = HttpContext.Session.GetString(SessionDoctorUsername);
             var departments = _context.Department;
             var doctor = SetDoctorViewModel(model);
             if (ModelState.IsValid)
@@ -212,7 +210,8 @@ namespace Referral2.Controllers
                 }
                 else
                 {
-                    if(!_context.User.Any(x => x.Username.Equals(model.Username)))
+                    var doctors = _context.User.Where(x => x.Id != doctor.Id);
+                    if(!doctors.Any(x => x.Username.Equals(model.Username)))
                     {
                         _context.Update(doctor);
                         await _context.SaveChangesAsync();

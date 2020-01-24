@@ -23,9 +23,7 @@ namespace Referral2.Models
         public DateTime ReferredDate { get; set; }
         public int ReferredTo { get; set; }
         public int DepartmentId { get; set; }
-        [Required]
-        [StringLength(50)]
-        public string ArrivalDate { get; set; }
+        public DateTime ArrivalDate { get; set; }
         [Required]
         [StringLength(50)]
         public string HealthWorker { get; set; }

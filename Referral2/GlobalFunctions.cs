@@ -3,10 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Globalization;
 
 namespace Referral2
 {
-    public class GlobalFunctions
+    public partial class GlobalFunctions
     {
         public static string FullName;
         public static string FixName(string input)
@@ -24,6 +25,21 @@ namespace Referral2
                 age--;
 
             return age;
+        }
+
+        public static string GetDate(DateTime date, string format)
+        {
+            if (date != default)
+            {
+                if (!format.Contains("tt"))
+                {
+                    return date.ToString(format);
+                }
+                else
+                    return date.ToString(format, CultureInfo.InvariantCulture);
+            }
+            else
+                return "";
         }
         public static string GetAddress(Facility facility)
         {

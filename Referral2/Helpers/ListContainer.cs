@@ -14,7 +14,7 @@ namespace Referral2.Helpers
                 return new List<string>
                 {
                     "None",
-                    "Memeber",
+                    "Member",
                     "Dependent"
                 };
             }
@@ -82,6 +82,21 @@ namespace Referral2.Helpers
                 };
             }
         }
+        public static List<string> TranspoMode
+        {
+            get
+            {
+                return new List<string>
+                {
+                    "Ambulance (Level 1)",
+                    "Ambulance (Level 2)",
+                    "Patient Transport Vehicle",
+                    "Personal Transportation",
+                    "Others..."
+                };
+            }
+        }
+
 
 
 

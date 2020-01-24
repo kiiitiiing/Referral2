@@ -3,7 +3,7 @@
 <div class="modal fade" role="dialog" id="arrived-modal">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
-            <form asp-action="ArrivedRemark">
+            <form asp-action="ArrivedRemark" method="post" id="arrive-form">
                 <div class="modal-header">
                     <h4>
                         PATIENT ARRIVED
@@ -31,3 +31,6 @@
     </div>
 </div>
     
+<script>
+    $.validator.unobtrusive.parse("#arrive-form");
+</script>

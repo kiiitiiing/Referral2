@@ -9,7 +9,7 @@
         <div class="row">
             <!-- ADD NEW PATIENT CARD START -->
             <div class="col-md-9">
-                <form method="post" class="" id="form-sumbit" asp-action="Add">
+                <form asp-action="Add" method="post">
                     <div class="card card-outline">
                         <!-- CARD HEADER -->
                         <div class="card-header with-border">
@@ -139,7 +139,7 @@
                                     &nbsp;Back
                                 </a>
                                 <!-- SUMBIT BUTTON-->
-                                <button id="submitBtn" type="submit" class="btn btn-sm btn-success">
+                                <button type="submit" class="btn btn-sm btn-success">
                                     <i class="fa fa-send"></i>
                                     &nbsp;Submit
                                 </button>
@@ -188,26 +188,6 @@
         return this;
     };
 
-    /*var muncityId = 0;
-    $('#muncityFilter').change(function () {
-        muncityId = $('#muncityFilter').val();
-
-        if (muncityId != 'none') {
-            $.when(getBarangayFiltered()).done(function (output) {
-            $('#barangay').empty()
-                .append($('<option>', {
-                    value: '',
-                    text: 'Select Barangay...'
-                }))
-            jQuery.each(output, function (i, item) {
-                $('#barangay').append($('<option>', {
-                    value: item.id,
-                    text: item.description
-                }));
-            });
-        });
-        }
-    });*/
 
     function getBarangayFiltered() {
         var urls = "/NoReload/FilteredBarangay?muncityId=" + muncityId;

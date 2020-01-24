@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Reflection;
-using System.Resources;
-using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +12,6 @@ using Referral2.Models;
 using Referral2.Models.ViewModels;
 using Referral2.Models.ViewModels.Admin;
 using Referral2.Services;
-using Referral2.Resources;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Http;
 
@@ -298,6 +293,35 @@ namespace Referral2.Controllers
             support.Username = model.Username;
             support.UpdatedAt = DateTime.Now;
             return support;
+        }
+
+        public int UserId()
+        {
+            return int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        }
+        public int UserFacility()
+        {
+            return int.Parse(User.FindFirstValue("Facility"));
+        }
+        public int UserDepartment()
+        {
+            return int.Parse(User.FindFirstValue("Department"));
+        }
+        public int UserProvince()
+        {
+            return int.Parse(User.FindFirstValue("Province"));
+        }
+        public int UserMuncity()
+        {
+            return int.Parse(User.FindFirstValue("Muncity"));
+        }
+        public int UserBarangay()
+        {
+            return int.Parse(User.FindFirstValue("Barangay"));
+        }
+        public string UserName()
+        {
+            return "Dr. " + User.FindFirstValue(ClaimTypes.GivenName) + " " + User.FindFirstValue(ClaimTypes.Surname);
         }
 
         #endregion

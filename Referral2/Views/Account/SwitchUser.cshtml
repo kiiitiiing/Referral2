@@ -1,0 +1,36 @@
+﻿@model SwitchUserModel
+<div class="modal fade" id="switch-user-modal" tabindex="-1" role="dialog" aria-labelledby="addContactLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4><i class="fa fa-user-md"></i> Change Login</h4>
+            </div>
+            <form asp-controller="Account" asp-action="SwitchUser" method="post" id="switch-user-form">
+                <div class="modal-body" style="padding-bottom:5px">
+                    <div class="form-group">
+                        <label style="padding: 0px;">User</label>
+                        <select class="form-control" asp-items="ViewBag.Users" asp-for="Id" required>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label style="padding: 0px;">Password</label>
+                        <input class="form-control" type="password" asp-for="Password" required>
+                        <span class="text-danger" asp-validation-for="Password"></span>
+                    </div>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button class="btn btn-success" type="submit" data-save="modal" data-url="@Url.Action("SwitchUser","Account")">
+                    <i class="fa fa-sign-in"></i> Login
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var form = $('#switch-user-form');
+    form.removeData('validator');
+    form.removeData('unobtrusiveValidation');
+    $.validator.unobtrusive.parse(form);
+</script>

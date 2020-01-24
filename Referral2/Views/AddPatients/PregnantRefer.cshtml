@@ -1,13 +1,17 @@
-﻿<form method="POST" class="form-submit pregnant_form">
-    <div class="jim-content">
-        <div class="title-form">BEmONC/ CEmONC REFERRAL FORM</div>
-        <div class="form-group-sm form-inline">
-            <input type="hidden" name="_token" value="enhXwI5ZzCBSCuehc0emkiikMPoLLxRm9T7texfq" autocomplete="off">
-            <input type="hidden" name="patient_id" class="patient_id" value="7735" autocomplete="off">
-            <input type="hidden" name="date_referred" class="date_referred" value="2020-01-16 10:49:12" autocomplete="off">
-            <input type="hidden" name="code" value="" autocomplete="off">
-            <input type="hidden" name="source" value="referral" autocomplete="off">
-            <input type="hidden" class="referring_name" value="Vicente Sotto Memorial Medical Center" autocomplete="off">
+﻿@model PregnantReferViewModel
+@{ 
+    var patient = ViewBag.Patient;
+    var dateReferred = DateTime.Now.DayOfWeek + " " + DateTime.Now.ToString("MMMM d, yyyy");
+    var timeReferred = DateTime.Now.ToString("hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+    var referringMd = "Dr. " + User.FindFirstValue(ClaimTypes.GivenName) + " " + User.FindFirstValue(ClaimTypes.Surname);
+}
+
+
+<div class="title-form">BEmONC/ CEmONC REFERRAL FORM</div>
+<form asp-action="PregnantRefer" method="post" id="pregnant-refer-form">
+    <input asp-for="PatientId" value="@patient.Id" hidden />
+    <div class="modal-body">
+        <div class="form-group-sm">
             <table class="table table-striped">
                 <tbody>
                     <tr>
@@ -15,22 +19,45 @@
                     </tr>
                     <tr>
                         <td>Who is Referring: </td>
-                        <td>Record Number: <input type="text" class="form-control" name="record_no" placeholder="" autocomplete="off"></td>
-                        <td>Referred Date: <span class="text-success">Thursday Jan 16, 2020</span> </td>
-                        <td>Time: <span class="text-success">10:49 AM</span> </td>
+                        <td class="in-line">
+                            <label>Record Number:</label>
+                            <input type="text" class="form-control form-control-sm" asp-for="RecordNumber" autocomplete="off">
+                        </td>
+                        <td>
+                            Referred Date:
+                            <span class="text-success">
+                                @dateReferred
+                            </span>
+                        </td>
+                        <td>
+                            Time:
+                            <span class="text-success">
+                                @timeReferred
+                            </span>
+                        </td>
                     </tr>
                     <tr>
                         <td colspan="2">
-                            <span class="text-success">Name Dr. DOH T. 7 IT</span>
+                            <span class="text-success">
+                                @referringMd
+                            </span>
                         </td>
                         <td>Arrival Date</td>
                         <td>Time</td>
                     </tr>
                     <tr>
-                        <td colspan="4">Facility <span class="text-success">Vicente Sotto Memorial Medical Center</span> </td>
+                        <td colspan="4">
+                            Facility:
+                            <span class="text-success">
+                                @ViewBag.Facility
+                            </span>
+                        </td>
                     </tr>
                     <tr>
-                        <td colspan="4">Accompanied by the Health Worker: <input type="text" class="form-control" name="health_worker" style="width: 100%;" placeholder="Name of Health Worker" autocomplete="off"> </td>
+                        <td colspan="4">
+                            Accompanied by the Health Worker:
+                            <input type="text" class="form-control form-control-sm" asp-for="HealthWorker" placeholder="Name of Health Worker">
+                        </td>
                     </tr>
                     <tr>
                         <td colspan="4">
@@ -39,78 +66,16 @@
                                     Referred to:
                                 </div>
                                 <div class="col-md-6">
-                                    <select name="referred_facility" class="form-control-select select2 select_facility select2-hidden-accessible" style="width: 100%" required="" tabindex="-1" aria-hidden="true">
+                                    <select class="form-control form-control-sm" asp-for="ReferredTo" asp-items="ViewBag.Facilities" id="facilityFilter" style="width:100%" required>
                                         <option value="">Select Facility...</option>
-                                        <option data-name="Amio Community Primary Hospital" value="48">Amio Community Primary Hospital</option>
-                                        <option data-name="Asturias Infirmary Clinic" value="65">Asturias Infirmary Clinic</option>
-                                        <option data-name="Badian District Hospital" value="13">Badian District Hospital</option>
-                                        <option data-name="Bais District Hospital" value="49">Bais District Hospital</option>
-                                        <option data-name="Bantayan District Hospital" value="17">Bantayan District Hospital</option>
-                                        <option data-name="Barili District Hospital" value="26">Barili District Hospital</option>
-                                        <option data-name="Bayawan District Hospital" value="50">Bayawan District Hospital</option>
-                                        <option data-name="Bindoy District Hospital" value="51">Bindoy District Hospital</option>
-                                        <option data-name="Brigadier General Benito N. Ebuen Air Base Hospital" value="10">Brigadier General Benito N. Ebuen Air Base Hospital</option>
-                                        <option data-name="Calape Mother And Child Hospital" value="31">Calape Mother And Child Hospital</option>
-                                        <option data-name="Camp Lapulapu Army Station Hospital" value="21">Camp Lapulapu Army Station Hospital</option>
-                                        <option data-name="Candijay Community Hospital" value="39">Candijay Community Hospital</option>
-                                        <option data-name="Canlaon District Hospital" value="52">Canlaon District Hospital</option>
-                                        <option data-name="Catigbian District Hospital" value="32">Catigbian District Hospital</option>
-                                        <option data-name="Cebu City Medical Center" value="1">Cebu City Medical Center</option>
-                                        <option data-name="Cebu Provincial Hospital - Bogo City" value="7">Cebu Provincial Hospital - Bogo City</option>
-                                        <option data-name="Cebu Provincial Hospital (Balamban)" value="8">Cebu Provincial Hospital (Balamban)</option>
-                                        <option data-name="Cebu Provincial Hospital (Carcar City)" value="4">Cebu Provincial Hospital (Carcar City)</option>
-                                        <option data-name="Cebu Provincial Hospital (Danao City)" value="3">Cebu Provincial Hospital (Danao City)</option>
-                                        <option data-name="Clarin Community Hospital" value="38">Clarin Community Hospital</option>
-                                        <option data-name="Cong. Lamberto L. Macias Memorial Hospital" value="53">Cong. Lamberto L. Macias Memorial Hospital</option>
-                                        <option data-name="Cong. Simeon G. Toribio Memorial Hospital (Carmen)" value="34">Cong. Simeon G. Toribio Memorial Hospital (Carmen)</option>
-                                        <option data-name="Congressman Natalio P. Castillo Senior Memorial Hospital (Loon)" value="43">Congressman Natalio P. Castillo Senior Memorial Hospital (Loon)</option>
-                                        <option data-name="Daanbantayan District Hospital" value="27">Daanbantayan District Hospital</option>
-                                        <option data-name="Dawis Primary Community Hospital" value="54">Dawis Primary Community Hospital</option>
-                                        <option data-name="Department of Health - RO7" value="63">Department of Health - RO7</option>
-                                        <option data-name="Dimiao Municipal Infirmary" value="41">Dimiao Municipal Infirmary</option>
-                                        <option data-name="Don Emilio Del Valle Memorial Hospital" value="33">Don Emilio Del Valle Memorial Hospital</option>
-                                        <option data-name="Dr. Jose Ma. Borromeo Memorial Hospital (Pinamungajan)" value="14">Dr. Jose Ma. Borromeo Memorial Hospital (Pinamungajan)</option>
-                                        <option data-name="Eversley Childs Sanitarium" value="25">Eversley Childs Sanitarium</option>
-                                        <option data-name="Francisco Dagohoy Municipal Hospital (Inabanga)" value="35">Francisco Dagohoy Municipal Hospital (Inabanga)</option>
-                                        <option data-name="Garcia Memorial Provincial Hospital" value="44">Garcia Memorial Provincial Hospital</option>
-                                        <option data-name="Gov. Celestino Gallares Memorial Hospital" value="30">Gov. Celestino Gallares Memorial Hospital</option>
-                                        <option data-name="Gov. William (Billy) Villegas Memorial Hospital" value="55">Gov. William (Billy) Villegas Memorial Hospital</option>
-                                        <option data-name="Guba Community Hospital" value="12">Guba Community Hospital</option>
-                                        <option data-name="Inapoy Community Primary Hospital" value="56">Inapoy Community Primary Hospital</option>
-                                        <option data-name="Isidro Kintanar Memorial Hospital (Argao)" value="5">Isidro Kintanar Memorial Hospital (Argao)</option>
-                                        <option data-name="Juan B. Dosado Memorial Hospital (Sogod)" value="22">Juan B. Dosado Memorial Hospital (Sogod)</option>
-                                        <option data-name="Kalumboyan Community Primary Hospital" value="57">Kalumboyan Community Primary Hospital</option>
-                                        <option data-name="Lapu-Lapu City Hospital" value="9">Lapu-Lapu City Hospital</option>
-                                        <option data-name="Lazi Medicare Community Hospital" value="46">Lazi Medicare Community Hospital</option>
-                                        <option data-name="Liloan Community Medical and Emergency Services" value="64">Liloan Community Medical and Emergency Services</option>
-                                        <option data-name="Luz-Sikatuna Community Primary Hospital" value="58">Luz-Sikatuna Community Primary Hospital</option>
-                                        <option data-name="Mabinay Medicare Community Hospital" value="59">Mabinay Medicare Community Hospital</option>
-                                        <option data-name="Mandaue City Hospital" value="18">Mandaue City Hospital</option>
-                                        <option data-name="Mariano Jesus Cuenco Memorial Hospital (Malabuyoc)" value="16">Mariano Jesus Cuenco Memorial Hospital (Malabuyoc)</option>
-                                        <option data-name="Maribojoc Community Hospital" value="40">Maribojoc Community Hospital</option>
-                                        <option data-name="Minglanilla District Hospital" value="11">Minglanilla District Hospital</option>
-                                        <option data-name="Nabilog Community Primary Hospital" value="60">Nabilog Community Primary Hospital</option>
-                                        <option data-name="Negros Oriental Provincial Hospital" value="61">Negros Oriental Provincial Hospital</option>
-                                        <option data-name="Oslob District Hospital" value="28">Oslob District Hospital</option>
-                                        <option data-name="Pacuan Community Primary Hospital" value="62">Pacuan Community Primary Hospital</option>
-                                        <option data-name="Pnp Station Hospital" value="6">Pnp Station Hospital</option>
-                                        <option data-name="President Carlos P. Garcia Municipal Hospital" value="36">President Carlos P. Garcia Municipal Hospital</option>
-                                        <option data-name="Ricardo L. Maningo Memorial Hospital (Camotes)" value="20">Ricardo L. Maningo Memorial Hospital (Camotes)</option>
-                                        <option data-name="Saint Anthony Mother And Child Hospital" value="19">Saint Anthony Mother And Child Hospital</option>
-                                        <option data-name="San Miguel Hospital" value="37">San Miguel Hospital</option>
-                                        <option data-name="Santa Rosa Community Hospital" value="29">Santa Rosa Community Hospital</option>
-                                        <option data-name="Siquijor Provincial Hospital" value="47">Siquijor Provincial Hospital</option>
-                                        <option data-name="Talisay District Hospital" value="23">Talisay District Hospital</option>
-                                        <option data-name="Teodoro B. Galagar District Hospital" value="45">Teodoro B. Galagar District Hospital</option>
-                                        <option data-name="Toledo City General Hospital" value="2">Toledo City General Hospital</option>
-                                        <option data-name="Tubigon Community Hospital" value="42">Tubigon Community Hospital</option>
-                                        <option data-name="Tuburan District Hospital" value="15">Tuburan District Hospital</option>
-                                    </select><span class="select2 select2-container select2-container--default" dir="ltr" style="width: 100%;"><span class="selection"><span class="select2-selection select2-selection--single" role="combobox" aria-autocomplete="list" aria-haspopup="true" aria-expanded="false" tabindex="0" aria-labelledby="select2-referred_facility-zy-container"><span class="select2-selection__rendered" id="select2-referred_facility-zy-container" title="Select Facility...">Select Facility...</span><span class="select2-selection__arrow" role="presentation"><b role="presentation"></b></span></span></span><span class="dropdown-wrapper" aria-hidden="true"></span></span>
+                                    </select>
+                                    <span class="text-danger" asp-validation-for="ReferredTo"></span>
                                 </div>
                                 <div class="col-md-4">
-                                    <select name="referred_department" class="form-control-select select_department select_department_pregnant" style="padding: 3px" required="">
+                                    <select class="form-control form-control-sm" asp-for="Department" id="departmentFilter" style="width:100%" required>
                                         <option value="">Select Department...</option>
                                     </select>
+                                    <span class="text-danger" asp-validation-for="Department"></span>
                                 </div>
                             </div>
                         </td>
@@ -122,150 +87,298 @@
                                     Address:
                                 </div>
                                 <div class="col-md-6">
-                                    <span class="text-primary facility_address"></span>
+                                    <span class="text-primary" id="facilityAdress"></span>
                                 </div>
                             </div>
                         </td>
                     </tr>
                 </tbody>
             </table>
-            <div class="col-sm-6">
-                <table class="table bg-warning">
-                    <tbody>
-                        <tr class="bg-gray">
-                            <th colspan="4">WOMAN</th>
-                        </tr>
-                        <tr>
-                            <td colspan="3">Name: <span class="text-danger patient_name">test test test</span></td>
-                            <td>Age: <span class="text-danger patient_age">19</span></td>
-                        </tr>
-                        <tr>
-                            <td colspan="4">Address: <span class="text-danger patient_address">Tuyom, City Of Carcar, Cebu</span></td>
-                        </tr>
-                        <tr>
-                            <td colspan="4">
-                                Main Reason for Referral
-                                <label><input type="radio" name="woman_reason" value="None" checked="" autocomplete="off"> None </label>
-                                <label><input type="radio" name="woman_reason" value="Emergency" autocomplete="off"> Emergency </label>
-                                <label><input type="radio" name="woman_reason" value="Non-Emergency" autocomplete="off"> Non-Emergency </label>
-                                <label><input type="radio" name="woman_reason" value="To accompany the baby" autocomplete="off"> To accompany the baby </label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="4">
-                                Major Findings (Clinica and BP,Temp,Lab)
-                                <br>
-                                <textarea class="form-control" name="woman_major_findings" style="resize: none;width: 100%" rows="5" required=""></textarea>
-                            </td>
-                        </tr>
-                        <tr class="bg-gray">
-                            <td colspan="4">Treatments Give Time</td>
-                        </tr>
-                        <tr>
-                            <td colspan="4">
-                                Before Referral
-                                <br>
-                                <input type="text" class="form-control" name="woman_before_treatment" placeholder="Treatment Given" autocomplete="off">
-                                <input type="text" class="form-control form_datetime" name="woman_before_given_time" placeholder="Date/Time Given" autocomplete="off">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="4">
-                                During Transport
-                                <br>
-                                <input type="text" class="form-control" name="woman_during_treatment" placeholder="Treatment Given" autocomplete="off">
-                                <input type="text" class="form-control form_datetime" name="woman_during_given_time" placeholder="Date/Time Given" autocomplete="off">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="4">
-                                Information Given to the Woman and Companion About the Reason for Referral
-                                <br>
-                                <textarea class="form-control woman_information_given" name="woman_information_given" style="resize: none;width: 100%" rows="5" required=""></textarea>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="col-sm-6">
-                <table class="table bg-warning">
-                    <tbody>
-                        <tr class="bg-gray">
-                            <th colspan="4">BABY</th>
-                        </tr>
-                        <tr>
-                            <td colspan="2">
-                                Name :<br>
-                                <input type="text" class="form-control" style="width: 100%" name="baby_fname" placeholder="First Name" autocomplete="off"><br>
-                                <input type="text" class="form-control" style="width: 100%" name="baby_mname" placeholder="Middle Name" autocomplete="off"><br>
-                                <input type="text" class="form-control" style="width: 100%" name="baby_lname" placeholder="Last Name" autocomplete="off">
-                            </td>
-                            <td style="vertical-align: top !important;">
-                                Date and Hour of Birth:
-                                <br>
-                                <input type="text" class="form-control  form_datetime" style="width: 100%" name="baby_dob" placeholder="Date/Time" autocomplete="off"><br>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2">Birth Weight: <input type="text" class="form-control" style="width: 100%" name="baby_weight" placeholder="kg or lbs" autocomplete="off"><br></td>
-                            <td>Gestational Age: <input type="text" class="form-control" style="width: 100%" name="baby_gestational_age" placeholder="age" autocomplete="off"><br></td>
-                        </tr>
-                        <tr>
-                            <td colspan="4">
-                                Main Reason for Referral
-                                <label><input type="radio" name="baby_reason" value="None" checked="" autocomplete="off"> None </label>
-                                <label><input type="radio" name="baby_reason" value="Emergency" autocomplete="off"> Emergency </label>
-                                <label><input type="radio" name="baby_reason" value="Non-Emergency" autocomplete="off"> Non-Emergency </label>
-                                <label><input type="radio" name="baby_reason" value="To accompany the mother" autocomplete="off"> To accompany the mother </label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="4">
-                                Major Findings (Clinica and BP,Temp,Lab)
-                                <br>
-                                <textarea class="form-control" name="baby_major_findings" style="resize: none;width: 100%" rows="5"></textarea>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="4">Last (Breast) Feed (Time): <input type="text" class="form-control form_datetime" style="width: 100%" name="baby_last_feed" placeholder="Date/Time" autocomplete="off"><br></td>
-                        </tr>
-                        <tr class="bg-gray">
-                            <td colspan="4">Treatments Give Time</td>
-                        </tr>
-                        <tr>
-                            <td colspan="4">
-                                Before Referral
-                                <br>
-                                <input type="text" class="form-control" name="baby_before_treatment" placeholder="Treatment Given" autocomplete="off">
-                                <input type="text" class="form-control form_datetime" name="baby_before_given_time" placeholder="Date/Time Given" autocomplete="off">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="4">
-                                During Transport
-                                <br>
-                                <input type="text" class="form-control" name="baby_during_treatment" placeholder="Treatment Given" autocomplete="off">
-                                <input type="text" class="form-control form_datetime" name="baby_during_given_time" placeholder="Date/Time Given" autocomplete="off">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="4">
-                                Information Given to the Woman and Companion About the Reason for Referral
-                                <br>
-                                <textarea class="form-control" name="baby_information_given" style="resize: none;width: 100%" rows="5"></textarea>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="row">
+                <div class="col-sm-6">
+                    <table class="table pregnant-bg-warning">
+                        <thead>
+                            <tr class="bg-gray-light">
+                                <th colspan="4">WOMAN</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="3">
+                                    Name:
+                                    <span class="text-danger">
+                                        @patient.Name
+                                    </span>
+                                </td>
+                                <td>
+                                    Age:
+                                    <span class="text-danger">
+                                        @patient.Age
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    Address:
+                                    <span class="text-danger">
+                                        @patient.Address
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    Main Reason for Referral:
+                                    <label>
+                                        <input type="radio" asp-for="WomanMainReason" id="womannone" value="None" checked=""> None
+                                    </label>
+                                    <label>
+                                        <input type="radio" asp-for="WomanMainReason" id="womanemergency" value="Emergency"> Emergency
+                                    </label>
+                                    <label>
+                                        <input type="radio" asp-for="WomanMainReason" id="womannonemergency" value="Non-Emergency"> Non-Emergency
+                                    </label>
+                                    <label>
+                                        <input type="radio" asp-for="WomanMainReason" id="womanaccompany" value="To accompany the baby"> To accompany the baby
+                                    </label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    Major Findings (Clinica and BP,Temp,Lab)
+                                    <br>
+                                    <textarea class="form-control" asp-for="WomanMajorFindings" style="resize: none;width: 100%" rows="5" required></textarea>
+                                    <span class="text-danger" asp-validation-for="WomanMajorFindings"></span>
+                                </td>
+                            </tr>
+                            <tr class="bg-gray-light">
+                                <td colspan="4">Treatments Give Time</td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    Before Referral:
+                                    <div class="row">
+                                        <div class="col-sm-6 col-cs">
+                                            <input type="text" class="form-control form-control-sm" asp-for="WomanBeforeTreatmentGiven" placeholder="Treatment Given">
+                                        </div>
+                                        <div class="col-sm-6 col-cs">
+                                            <input type="text" class="form-control form-control-sm" asp-for="WomanBeforeDateTimeGiven" placeholder="Date/Time Given">
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    During Transport
+                                    <div class="row">
+                                        <div class="col-sm-6 col-cs">
+                                            <input type="text" class="form-control form-control-sm" asp-for="WomanDuringTreatmentGiven" placeholder="Treatment Given">
+                                        </div>
+                                        <div class="col-sm-6 col-cs">
+                                            <input type="text" class="form-control form-control-sm" asp-for="WomanDuringDateTimeGiven" placeholder="Date/Time Given">
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    Information Given to the Woman and Companion About the Reason for Referral
+                                    <br>
+                                    <textarea class="form-control" asp-for="WomanInformationGiven" style="resize: none;width: 100%" rows="5" required></textarea>
+                                    <span class="text-danger" asp-validation-for="WomanInformationGiven"></span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-sm-6">
+                    <table class="table pregnant-bg-warning">
+                        <thead>
+                            <tr class="bg-gray-light">
+                                <th colspan="4">BABY</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="2">
+                                    Name :<br>
+                                    <input class="form-control form-control-sm" asp-for="BabyFirstName" placeholder="First Name" autocomplete="off"><br>
+                                    <input class="form-control form-control-sm" asp-for="BabyMiddleName" placeholder="Middle Name" autocomplete="off"><br>
+                                    <input class="form-control form-control-sm" asp-for="BabyLastName" placeholder="Last Name" autocomplete="off">
+                                </td>
+                                <td style="vertical-align: top !important;">
+                                    Date and Hour of Birth:
+                                    <br>
+                                    <input class="form-control form-control-sm" asp-for="BabyDateOfBirth" type="date" autocomplete="off"><br>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    Birth Weight:
+                                    <input class="form-control form-control-sm" asp-for="BabyBirthWeight" placeholder="kg or lbs" autocomplete="off"><br>
+                                </td>
+                                <td>
+                                    Gestational Age:
+                                    <input class="form-control form-control-sm" asp-for="GestationalAge" placeholder="age" autocomplete="off"><br>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    Main Reason for Referral
+                                    <label>
+                                        <input type="radio" asp-for="BabyMainReason" value="None" id="none" checked autocomplete="off"> None
+                                    </label>
+                                    <label>
+                                        <input type="radio" asp-for="BabyMainReason" value="Emergency" id="emergency" autocomplete="off"> Emergency
+                                    </label>
+                                    <label>
+                                        <input type="radio" asp-for="BabyMainReason" value="Non-Emergency" id="nonemergency" autocomplete="off"> Non-Emergency
+                                    </label>
+                                    <label>
+                                        <input type="radio" asp-for="BabyMainReason" value="To accompany the mother" id="accompany" autocomplete="off"> To accompany the mother
+                                    </label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    Major Findings (Clinica and BP,Temp,Lab)
+                                    <br>
+                                    <textarea class="form-control" asp-for="BabyMajorFindings" style="resize: none;width: 100%" rows="5"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    Last (Breast) Feed (Time):
+                                    <input class="form-control form-control-sm" asp-for="BabyLastFeed" placeholder="Date/Time" autocomplete="off"><br>
+                                </td>
+                            </tr>
+                            <tr class="bg-gray-light">
+                                <td colspan="4">Treatments Give Time</td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    Before Referral:
+                                    <div class="row">
+                                        <div class="col-sm-6 col-cs">
+                                            <input class="form-control form-control-sm" asp-for="BabyBeforeTreatmentGiven" placeholder="Treatment Given" autocomplete="off">
+                                        </div>
+                                        <div class="col-sm-6 col-cs">
+                                            <input class="form-control form-control-sm" asp-for="BabyBeforeDateTimeGiven" placeholder="Date/Time Given" autocomplete="off">
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    During Transport:
+                                    <div class="row">
+                                        <div class="col-sm-6 col-cs">
+                                            <input class="form-control form-control-sm" asp-for="BabyDuringTreatmentGiven" placeholder="Treatment Given" autocomplete="off">
+                                        </div>
+                                        <div class="col-sm-6 col-cs">
+                                            <input class="form-control form-control-sm" asp-for="BabyDuringDateTimeGiven" placeholder="Date/Time Given" autocomplete="off">
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    Information Given to the Woman and Companion About the Reason for Referral
+                                    <br>
+                                    <textarea class="form-control" asp-for="BabyInformationGiven" style="resize: none;width: 100%" rows="5"></textarea>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-        <table class="table table-striped col-sm-6"></table>
-        <hr>
-        <div class="form-fotter pull-right">
-            <button class="btn btn-default btn-flat" data-dismiss="modal"><i class="fa fa-times"></i> Back</button>
-            <button type="submit" class="btn btn-success btn-flat"><i class="fa fa-send"></i> Send</button>
-        </div>
-        <div class="clearfix"></div>
+    </div>
+    <div class="modal-footer justify-content-end">
+        <button class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Back</button>
+        <button type="submit" class="btn btn-success"><i class="fa fa-send"></i> Send</button>
     </div>
 </form>
+
+<script>
+    var form = $('#pregnant-refer-form');
+    form.removeData('validator');
+    form.removeData('unobtrusiveValidation');
+    $.validator.unobtrusive.parse(form);
+
+    var facilityId = 0;
+    var departmentId = 0;
+    $('#facilityFilter').change(function () {
+        facilityId = $('#facilityFilter').val();
+
+        $.when(getDepartmentFiltered()).done(function (output) {
+
+            $('#facilityAdress').text(output.address);
+
+            $('#departmentFilter').empty()
+                .append($('<option>', {
+                    value: '',
+                    text: 'Select Department...'
+                }));
+
+            $('#doctorFiltered').empty()
+                .append($('<option>', {
+                    value: '0',
+                    text: 'Any'
+                }));
+
+            jQuery.each(output.departments, function (i, item) {
+                $('#departmentFilter').append($('<option>', {
+                    value: item.departmentId,
+                    text: item.departmentName
+                }))
+            });
+        });
+    });/*
+
+
+
+    $('#departmentFilter').change(function () {
+        if (facilityId == '0') {
+            facilityId == '24';
+        }
+        departmentId = $('#departmentFilter').val();
+
+        $.when(getMdFiltered()).done(function (output) {
+            $('#doctorFiltered').empty()
+                .append($('<option>', {
+                    value: '0',
+                    text: 'Any'
+                }));
+
+            jQuery.each(output, function (i, item) {
+                $('#doctorFiltered').append($('<option>', {
+                    value: item.mdId,
+                    text: item.doctorName
+                }));
+            });
+        });
+    });*/
+
+
+
+
+    function getDepartmentFiltered() {
+        var urls = "/NoReload/FilterDepartment?facilityId=" + facilityId;
+        return $.ajax({
+            url: urls,
+            type: 'get',
+            async: true
+        });
+    }
+
+
+
+    function getMdFiltered() {
+        var urls = "/NoReload/FilterUser?facilityId=" + facilityId + "&departmentId=" + departmentId;
+        return $.ajax({
+            url: urls,
+            type: 'get',
+            async: true
+        });
+    }
+</script>

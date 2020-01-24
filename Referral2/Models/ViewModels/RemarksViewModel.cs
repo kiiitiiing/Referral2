@@ -10,7 +10,7 @@ namespace Referral2.Models.ViewModels
     {
         [Required]
         public string Code { get; set; }
-
+        [Required]
         [DataType(DataType.MultilineText)]
         public string Remarks { get; set; }
     }

@@ -8,6 +8,7 @@ namespace Referral2.Helpers
     public partial class ReferralStatus
     {
         public string SEEN {get;set;}
+        public string TRAVEL { get; set; }
         public string ARRIVED {get;set;}
         public string CALLING {get;set;}
         public string ACCEPTED {get;set;}

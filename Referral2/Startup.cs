@@ -37,6 +37,7 @@ namespace Referral2
 
             services.Configure<ReferralRoles>(Configuration);
             services.Configure<ReferralStatus>(Configuration);
+            services.Configure<TrackingType>(Configuration);
 
             services.AddLocalization(options => options.ResourcesPath = "Resources");
 
@@ -51,9 +52,9 @@ namespace Referral2
             })
             .AddCookie(options =>
             {
-                options.LoginPath = "/account/login";
-                options.LogoutPath = "/account/logout";
-                options.AccessDeniedPath = "/account/accessdenied";
+                options.LoginPath = "/Account/Login";
+                options.LogoutPath = "/Account/Logout";
+                options.AccessDeniedPath = "/Account/AccessDenied";
             });
 
             services.AddAuthorization(options =>
@@ -70,21 +71,6 @@ namespace Referral2
                 options.MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.None;
             });
 
-            /*services.Configure<RequestLocalizationOptions>(options =>
-            {
-                var supportedCulture = new[]
-                {
-                    new CultureInfo("en-US"),
-                    new CultureInfo("en-GB"),
-                    new CultureInfo("de-DE")
-                };
-                options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("en-US", "en-US");
-
-                options.SupportedCultures = supportedCulture;
-
-                options.SupportedUICultures = supportedCulture;
-
-            });*/
 
             services.AddMvc()
                         .SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_3_0)

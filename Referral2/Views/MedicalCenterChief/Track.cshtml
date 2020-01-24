@@ -45,7 +45,6 @@
         {
             var seenCount = Model.SeenCount;
             var callerCount = Model.CallerCount;
-            var travelCount = Model.TravelCount;
             var recoCount = Model.ReCoCount;
 
             switch (Model.Status)
@@ -318,20 +317,19 @@
                             <small class="badge bg-green">@seenCount</small>
                         }
                     </button>
+                    @if (Model.Status.Equals("accepted") && Model.Travel)
+                    {
+                        <button type="button" class="btn btn-success btn-xs" data-toggle="small-modal" data-target="#small-modal" data-url="@Url.Action("Travel", "Remarks", new { id = Model.TrackingId })">
+                            <i class="fa fa-ambulance"></i>
+                            &nbsp;Travel
+                        </button>
+                    }
                     <button class="btn btn-xs bg-gradient-primary">
                         <i class="fa fa-phone"></i>
                         &nbsp;Caller
                         @if (callerCount > 0)
                         {
                             <small class="badge bg-blue">@callerCount</small>
-                        }
-                    </button>
-                    <button class="btn btn-xs bg-gradient-success">
-                        <i class="fa fa-ambulance"></i>
-                        &nbsp;Travel
-                        @if (travelCount > 0)
-                        {
-                            <small class="badge bg-green">@travelCount</small>
                         }
                     </button>
                     <button class="btn btn-xs bg-gradient-info">

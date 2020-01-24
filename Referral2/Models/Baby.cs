@@ -9,7 +9,7 @@ namespace Referral2.Models
     {
         [Key]
         public int Id { get; set; }
-        public int BabyId { get; set; }
+        public int? BabyId { get; set; }
         public int MotherId { get; set; }
         public int Weight { get; set; }
         public int GestationalAge { get; set; }

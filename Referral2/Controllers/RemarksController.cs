@@ -15,6 +15,7 @@ using Referral2.Models;
 using Referral2.Models.ViewModels;
 using Referral2.Resources;
 using Microsoft.Extensions.Options;
+using Referral2.Models.ViewModels.Remarks;
 
 namespace Referral2.Controllers
 {
@@ -37,6 +38,51 @@ namespace Referral2.Controllers
 
         public int Id { get; set; }
 
+        #region ISSUES AND CONCERN
+
+        public IActionResult Issues(int? id)
+        {
+
+            return PartialView();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Issues([Bind]Issue model)
+        {
+            return PartialView();
+        }
+
+        #endregion
+
+        #region TRAVEL
+
+        public IActionResult Travel(int? id)
+        {
+            var transportations = _context.Transportation;
+            ViewBag.TrackingId = id;
+            ViewBag.Transpo = new SelectList(transportations, "Id", "Transportation1");
+            return PartialView();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Travel([Bind]TravelViewModel model)
+        {
+            if(ModelState.IsValid)
+            {
+                var tracking = TravelTracking(model);
+                var activity = TravelActivity(tracking);
+                _context.Update(tracking);
+                _context.Add(activity);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction("Referred", "ViewPatients");
+            }
+            return PartialView();
+        }
+
+        
+
+        #endregion
 
         #region ACCEPTED
         [HttpGet]
@@ -289,9 +335,17 @@ namespace Referral2.Controllers
 
         #region Helpers
 
-        
-        
-        
+
+        private Tracking TravelTracking(TravelViewModel model)
+        {
+            var tracking = _context.Tracking.Find(model.TrackingId);
+            tracking.Transportation = model.TranspoId.ToString();
+            tracking.UpdatedAt = DateTime.Now;
+
+            return tracking;
+        }
+
+
 
         private Tracking NewTracking(Tracking tracking, ReferViewModel model)
         {
@@ -392,6 +446,25 @@ namespace Referral2.Controllers
             return updateTracking;
         }
 
+        private Activity TravelActivity(Tracking tracking)
+        {
+            Activity activity = new Activity();
+            activity.Code = tracking.Code;
+            activity.PatientId = tracking.PatientId;
+            activity.DateReferred = DateTime.Now;
+            activity.DateSeen = default;
+            activity.CreatedAt = DateTime.Now;
+            activity.UpdatedAt = DateTime.Now;
+            activity.ReferredFrom = UserFacility();
+            activity.ReferredTo = UserFacility();
+            activity.DepartmentId = UserDepartment();
+            activity.ReferringMd = UserId();
+            activity.ActionMd = UserId();
+            activity.Remarks = tracking.Transportation;
+            activity.Status = _status.Value.TRAVEL;
+            return activity;
+        }
+
 
 
         private Activity NewActivity(Tracking tracking, DateTime dateAction)
@@ -401,6 +474,7 @@ namespace Referral2.Controllers
             activity.Code = tracking.Code;
             activity.PatientId = tracking.PatientId;
             activity.DateReferred = dateAction;
+            activity.DateSeen = default;
             activity.CreatedAt = DateTime.Now;
             activity.UpdatedAt = DateTime.Now;
 

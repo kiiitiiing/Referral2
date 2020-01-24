@@ -1,10 +1,66 @@
-body {
+.container-auth-bg {
     background-image: url('../img/backdrop.png'),radial-gradient(#CCC,#DDD);
+}
+
+body {
+    background: #d2d6de;
+}
+
+.modal-body{
+    padding: 12px!important;
+}
+
+.bg-pregnant {
+    color: #3C763D;
+    background-color: #f2dede;
+}
+
+#pregnant-form-modal span {
+    color: #1e8a2a;
+}
+
+.col-cs{
+    padding-left:3px;
+    padding-right: 3px;
+}
+
+.preg-btn{
+    display:inline-block;
+    margin: 0 auto;
+}
+
+input {
+    display: inline;
+}
+
+td{
+    padding: 8px!important;
+}
+
+label {
+    display: inline !important;
+    text-align: left!important;
+}
+
+.modal{
+    font-size: 14px!important;
+}
+
+.modal-lg{
+    max-width: 900px!important;
 }
 
 .alert-warning {
     background-color: #F39C12 !important;
     background-image: linear-gradient(to bottom,#fcf8e3 0,#f8efc0 100%);
+}
+
+.pregnant-bg-warning {
+    background-color: #fcf8e3;
+}
+
+.fa-eye, .fa-eye-slash{
+    cursor:pointer;
 }
 
 .title-info {
@@ -27,6 +83,10 @@ body {
     line-height: 40px !important;
     background-color: #2F4054;
     vertical-align: central;
+}
+
+.bg-gradient-warning, btn-warning {
+    color: #FFF !important;
 }
 
 #normal-form-modal span {

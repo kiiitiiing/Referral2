@@ -62,13 +62,19 @@
                     <!-- STATUS -->
                     <div class="form-group">
                         <label>Status:</label>
-                        <input type="text" class="form-control" asp-for="Status" autofocus required autocomplete="off">
+                        <select type="text" class="form-control" asp-for="Status" autofocus required autocomplete="off">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
                         <span asp-validation-for="Status" class="text-danger"></span>
                     </div>
                     <!-- LEVEL -->
                     <div class="form-group">
                         <label>Level:</label>
-                        <input type="text" class="form-control" asp-for="Level" autofocus required autocomplete="off">
+                        <select class="form-control" asp-for="Level" autofocus required autocomplete="off">
+                            <option value="doctor">Doctor</option>
+                            <option value="mcc">Medical Center Chief</option>
+                        </select>
                         <span asp-validation-for="Level" class="text-danger"></span>
                     </div>
                     <hr />

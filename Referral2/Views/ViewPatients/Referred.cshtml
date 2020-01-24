@@ -11,8 +11,7 @@
     var arrived = "disabled";
     var admitted = "disabled";
     var discharged = "disabled";
-    var referredText = "Referred";
-    var referredClass = "";
+    var transpo = ListContainer.TranspoMode;
                     
     void SetStatus(string status)
     {
@@ -20,7 +19,6 @@
         {
             case "cancelled":
                 {
-                    referredText = "Cancelled";
                     referred = "active";
                     seen = "disabled";
                     accepted = "disabled";
@@ -31,8 +29,6 @@
                 }
             case "referred":
                 {
-                    referredText = "Referred";
-                    referredClass = "";
                     referred = "active";
                     seen = "disabled";
                     accepted = "disabled";
@@ -150,297 +146,339 @@
 
 
     <div class="col-md-9">
-        @foreach (var item in Model)
+        @if (Model.Count() > 0)
         {
-            var seenCount = item.SeenCount;
-            var callerCount = item.CallerCount;
-            var travelCount = item.TravelCount;
-            var recoCount = item.ReCoCount;
-            seen = "disabled";
-            accepted = "disabled";
-            arrived = "disabled";
-            admitted = "disabled";
-            discharged = "disabled";
-            referredText = "Referred";
-            referredClass = "";
-            SetStatus(item.Status);
-            <div style="border:2px solid #7E7E7E" class="card card-outline">
-                <!-- DAILY USERS HEADER -->
+            foreach (var item in Model)
+            {
+                var headerclass = item.Pregnant ? "bg-pregnant" : "card-custom-bg";
+                var seenCount = item.SeenCount;
+                var callerCount = item.CallerCount;
+                var recoCount = item.ReCoCount;
+                seen = "disabled";
+                accepted = "disabled";
+                arrived = "disabled";
+                admitted = "disabled";
+                discharged = "disabled";
+                SetStatus(item.Status);
+                <div style="border:2px solid #7E7E7E" class="card card-outline">
+                    <!-- DAILY USERS HEADER -->
 
-                <div class="card-header card-custom-bg">
-                    <span class="patientTitle">
-                        <i class="fa fa-wheelchair"></i>
-                        &nbsp;@item.PatientName
-                        <small class="text-sm text-muted">[@item.PatientSex, @item.PatientAge] from @item.PatientAddress</small><br />
-                    </span>
-                    <span class="text-success">Referred by:</span>
-                    <strong class="text-info">@item.ReferredBy.ToUpper()</strong><br />
-                    <span class="text-success">Patient Code:</span>
-                    <span class="code-color" id="code-holder">@item.Code</span>
-                    <span id="status-holder" hidden>@item.Status</span>
-                </div>
-                <!-- DAILY USERS BODY -->
-                <div class="card-body">
-                    <div id="code-holder" hidden>@item.Code</div>
-                    <!-- BS-WIZARD START -->
-                    <div class="row bs-wizard" style="border-bottom:0;">
-                        
-                        <div class="col-sm-2 bs-wizard-step @referred">
-                        <!-- REFERRED -->
-                        @if (item.Status.Equals("cancelled"))
-                        {
-                            <div class="text-center bs-wizard-stepnum">
-                                <span class="text-danger">Cancelled</span>
-                            </div>
-                            <div class="progress"><div class="progress-bar"></div></div>
-                            <a href="javascript:void(0)" class="bs-wizard-dot" title="Referred" style="background:#a94442;"></a>
-                            
-                        }
-                        else
-                        {
-                            <div class="text-center bs-wizard-stepnum">
-                                Referred
-                            </div>
-                            <div class="progress"><div class="progress-bar"></div></div>
-                            <a href="javascript:void(0)" class="bs-wizard-dot" title="Referred" ></a>
-                        }
-                        </div>
-
-                        <div class="col-sm-2 bs-wizard-step @seen">
-                            <!-- SEEN -->
-                            <div class="text-center bs-wizard-stepnum">Seen</div>
-                            <div class="progress"><div class="progress-bar"></div></div>
-                            <a href="javascript:void(0)" class="bs-wizard-dot"></a>
-                        </div>
-
-                        <div class="col-sm-2 bs-wizard-step @accepted">
-                            <!-- ACCEPTED -->
-                            <div class="text-center bs-wizard-stepnum">Accepted</div>
-                            <div class="progress"><div class="progress-bar"></div></div>
-                            <a href="javascript:void(0)" class="bs-wizard-dot"></a>
-                        </div>
-
-                        <div class="col-sm-2 bs-wizard-step @arrived">
-                            <!-- ARRIVED -->
-                            <div class="text-center bs-wizard-stepnum">
-                                Arrived
-                            </div>
-                            <div class="progress"><div class="progress-bar"></div></div>
-                            <a href="javascript:void(0)" class="bs-wizard-dot"></a>
-                        </div>
-                        <div class="col-sm-2 bs-wizard-step @admitted">
-                            <!-- ADMITTED -->
-                            <div class="text-center bs-wizard-stepnum">Admitted</div>
-                            <div class="progress"><div class="progress-bar"></div></div>
-                            <a href="javascript:void(0)" class="bs-wizard-dot"></a>
-                        </div>
-                        <div class="col-xs-2 bs-wizard-step @discharged">
-                            <!-- DISCHARGED -->
-                            <div class="text-center bs-wizard-stepnum">Discharged</div>
-                            <div class="progress"><div class="progress-bar"></div></div>
-                            <a href="javascript:void(0)" class="bs-wizard-dot"></a>
-                        </div>
+                    <div class="card-header @headerclass">
+                        <span class="patientTitle">
+                            <i class="fa fa-wheelchair"></i>
+                            &nbsp;@item.PatientName
+                            <small class="text-sm text-muted">[@item.PatientSex, @item.PatientAge] from @item.PatientAddress</small><br />
+                        </span>
+                        <span class="text-success">Referred by:</span>
+                        <strong class="text-info">@item.ReferredBy.ToUpper()</strong><br />
+                        <span class="text-success">Patient Code:</span>
+                        <span class="code-color" id="code-holder">@item.Code</span>
+                        <span id="status-holder" hidden>@item.Status</span>
                     </div>
-                    <!-- TABLE START-->
-                    <div class="tracking-activities col-md-12">
-                        <div class="table-responsive">
-                            <table>
-                                <tbody>
+                    <!-- DAILY USERS BODY -->
+                    <div class="card-body">
+                        <div id="code-holder" hidden>@item.Code</div>
+                        <!-- BS-WIZARD START -->
+                        <div class="row bs-wizard" style="border-bottom:0;">
 
-                                    @foreach (var item2 in item.Activities)
-                                    {
+                            <div class="col-sm-2 bs-wizard-step @referred">
+                                <!-- REFERRED -->
+                                @if (item.Status.Equals("cancelled"))
+                                {
+                                    <div class="text-center bs-wizard-stepnum">
+                                        <span class="text-danger">Cancelled</span>
+                                    </div>
+                                    <div class="progress"><div class="progress-bar"></div></div>
+                                    <a href="javascript:void(0)" class="bs-wizard-dot" title="Referred" style="background:#a94442;"></a>
 
-                                        var dateReferred = item2.DateReferred.ToString("MMM dd, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
-                                        var patientName = GlobalFunctions.GetFullName(item2.Patient);
-                                        var referredFrom = item2.ReferredFromNavigation.Name;
-                                        var facilityContact = item2.ReferredFromNavigation.Contact;
-                                        var referredTo = item2.ReferredToNavigation == null ? "" : item2.ReferredToNavigation.Name;
-                                        var actionMd = GlobalFunctions.GetMDFullName(item2.ActionMdNavigation);
-                                        var actionMdFacility = item2.ActionMdNavigation == null ? "" : item2.ActionMdNavigation.Facility.Name;
-                                        var referringMd = GlobalFunctions.GetMDFullName(item2.ReferringMdNavigation);
-                                        var referringMdFacililty = item2.ReferredFromNavigation.Name;
-                                        var remarks = item2.Remarks;
+                                }
+                                else
+                                {
+                                    <div class="text-center bs-wizard-stepnum">
+                                        Referred
+                                    </div>
+                                    <div class="progress"><div class="progress-bar"></div></div>
+                                    <a href="javascript:void(0)" class="bs-wizard-dot" title="Referred"></a>
+                                }
+                            </div>
 
-                                        switch (item2.Status)
+                            <div class="col-sm-2 bs-wizard-step @seen">
+                                <!-- SEEN -->
+                                <div class="text-center bs-wizard-stepnum">Seen</div>
+                                <div class="progress"><div class="progress-bar"></div></div>
+                                <a href="javascript:void(0)" class="bs-wizard-dot"></a>
+                            </div>
+
+                            <div class="col-sm-2 bs-wizard-step @accepted">
+                                <!-- ACCEPTED -->
+                                <div class="text-center bs-wizard-stepnum">Accepted</div>
+                                <div class="progress"><div class="progress-bar"></div></div>
+                                <a href="javascript:void(0)" class="bs-wizard-dot"></a>
+                            </div>
+
+                            <div class="col-sm-2 bs-wizard-step @arrived">
+                                <!-- ARRIVED -->
+                                <div class="text-center bs-wizard-stepnum">
+                                    Arrived
+                                </div>
+                                <div class="progress"><div class="progress-bar"></div></div>
+                                <a href="javascript:void(0)" class="bs-wizard-dot"></a>
+                            </div>
+                            <div class="col-sm-2 bs-wizard-step @admitted">
+                                <!-- ADMITTED -->
+                                <div class="text-center bs-wizard-stepnum">Admitted</div>
+                                <div class="progress"><div class="progress-bar"></div></div>
+                                <a href="javascript:void(0)" class="bs-wizard-dot"></a>
+                            </div>
+                            <div class="col-xs-2 bs-wizard-step @discharged">
+                                <!-- DISCHARGED -->
+                                <div class="text-center bs-wizard-stepnum">Discharged</div>
+                                <div class="progress"><div class="progress-bar"></div></div>
+                                <a href="javascript:void(0)" class="bs-wizard-dot"></a>
+                            </div>
+                        </div>
+                        <!-- TABLE START-->
+                        <div class="tracking-activities col-md-12">
+                            <div class="table-responsive">
+                                <table>
+                                    <tbody>
+
+                                        @foreach (var item2 in item.Activities)
                                         {
-                                            case "referred":
-                                                {
-                                                    <tr>
-                                                        <td class="table-date">
-                                                            <span class="text-muted">@dateReferred</span>
-                                                        </td>
-                                                        <td>
-                                                            <span class="patient-color">@patientName</span>
-                                                            was referred by
-                                                            <span class="md-color">@referringMd</span>
-                                                            of
-                                                            <span class="hospital-color">@referredFrom</span>
-                                                            to
-                                                            <span class="hospital-color">@referredTo</span>
-                                                        </td>
-                                                    </tr>
-                                                    break;
-                                                }
-                                            case "accepted":
-                                                {
-                                                    <tr>
-                                                        <td class="table-date">
-                                                            <span class="text-muted">@dateReferred</span>
-                                                        </td>
-                                                        <td>
-                                                            <span class="patient-color">@patientName</span>
-                                                            was accepted by
-                                                            <span class="md-color">@actionMd</span>
-                                                            of
-                                                            <span class="hospital-color">@actionMdFacility</span>
-                                                            <br />
-                                                            <span class="text-warning">Remarks: @remarks</span>
-                                                        </td>
-                                                    </tr>
-                                                    break;
-                                                }
-                                            case "arrived":
-                                                {
-                                                    <tr>
-                                                        <td class="table-date">
-                                                            <span class="text-muted">@dateReferred</span>
-                                                        </td>
-                                                        <td>
-                                                            <span class="patient-color">@patientName</span>
-                                                            has arrived at
-                                                            <span class="hospital-color">@actionMdFacility</span>
-                                                            <br />
-                                                            <span class="text-warning">Remarks: @remarks</span>
-                                                        </td>
-                                                    </tr>
-                                                    break;
-                                                }
-                                            case "admitted":
-                                                {
-                                                    <tr>
-                                                        <td class="table-date">
-                                                            <span class="text-muted">@dateReferred</span>
-                                                        </td>
-                                                        <td>
-                                                            <span class="patient-color">@patientName</span>
-                                                            was admitted at
-                                                            <span class="hospital-color">@actionMdFacility</span>
-                                                            <br />
-                                                            <span class="text-warning">Remarks: @remarks</span>
-                                                        </td>
-                                                    </tr>
-                                                    break;
-                                                }
-                                            case "discharged":
-                                                {
-                                                    <tr>
-                                                        <td class="table-date">
-                                                            <span class="text-muted">@dateReferred</span>
-                                                        </td>
-                                                        <td>
-                                                            <span class="patient-color">@patientName</span>
-                                                            was discharged from
-                                                            <span class="hospital-color">@actionMdFacility</span>
-                                                            <br />
-                                                            <span class="text-warning">Remarks: @remarks</span>
-                                                        </td>
-                                                    </tr>
-                                                    break;
-                                                }
-                                            case "calling":
-                                                {
-                                                    <tr>
-                                                        <td class="table-date">
-                                                            <span class="text-muted">@dateReferred</span>
-                                                        </td>
-                                                        <td>
-                                                            <span class="md-color">@actionMd</span>
-                                                            of
-                                                            <span class="hospital-color">@actionMdFacility</span>
-                                                            is requesting a call from
-                                                            <span class="hospital-color">@referringMdFacililty</span>.
-                                                            Please contact this number
-                                                            <span class="contact-color">Remarks: @facilityContact</span>
-                                                        </td>
-                                                    </tr>
-                                                    break;
-                                                }
-                                            case "cancelled":
-                                                {
-                                                    <tr>
-                                                        <td class="table-date">
-                                                            <span class="text-muted">@dateReferred</span>
-                                                        </td>
-                                                        <td>
-                                                            <span class="patient-color">@patientName</span>
-                                                            was cancelled by
-                                                            <span class="md-color">@actionMd</span>
-                                                            <br />
-                                                            <span class="text-warning">Remarks: @remarks</span>
-                                                        </td>
-                                                    </tr>
-                                                    break;
-                                                }
+
+                                            var dateReferred = item2.DateReferred.ToString("MMM dd, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+                                            var patientName = GlobalFunctions.GetFullName(item2.Patient);
+                                            var referredFrom = item2.ReferredFromNavigation.Name;
+                                            var facilityContact = item2.ReferredFromNavigation.Contact;
+                                            var referredTo = item2.ReferredToNavigation == null ? "" : item2.ReferredToNavigation.Name;
+                                            var actionMd = GlobalFunctions.GetMDFullName(item2.ActionMdNavigation);
+                                            var actionMdFacility = item2.ActionMdNavigation == null ? "" : item2.ActionMdNavigation.Facility.Name;
+                                            var referringMd = GlobalFunctions.GetMDFullName(item2.ReferringMdNavigation);
+                                            var referringMdFacililty = item2.ReferredFromNavigation.Name;
+                                            var remarks = item2.Remarks;
+
+                                            switch (item2.Status)
+                                            {
+                                                case "travel":
+                                                    {
+                                                        <tr>
+                                                            <td class="table-date">
+                                                                <span class="text-muted">@dateReferred</span>
+                                                            </td>
+                                                            <td>
+                                                                <span class="patient-color">@patientName</span>
+                                                                has departed by
+                                                                <span class="md-color">@transpo[int.Parse(remarks) + 1]</span>
+                                                            </td>
+                                                        </tr>
+                                                        break;
+                                                    }
+                                                case "referred":
+                                                    {
+                                                        <tr>
+                                                            <td class="table-date">
+                                                                <span class="text-muted">@dateReferred</span>
+                                                            </td>
+                                                                @if (!item.Walkin)
+                                                                {
+                                                                    <td>
+                                                                        <span class="patient-color">@patientName</span>
+                                                                        was referred by
+                                                                        <span class="md-color">@referringMd</span>
+                                                                        of
+                                                                        <span class="hospital-color">@referredFrom</span>
+                                                                        to
+                                                                        <span class="hospital-color">@referredTo</span>
+                                                                    </td>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <td>
+                                                                        <strong>Walk-In Patient: </strong>
+                                                                        <span class="patient-color">@patientName</span>
+                                                                    </td>
+                                                                }
+                                                        </tr>
+                                                        break;
+                                                    }
+                                                case "accepted":
+                                                    {
+                                                        <tr>
+                                                            <td class="table-date">
+                                                                <span class="text-muted">@dateReferred</span>
+                                                            </td>
+                                                            <td>
+                                                                <span class="patient-color">@patientName</span>
+                                                                was accepted by
+                                                                <span class="md-color">@actionMd</span>
+                                                                of
+                                                                <span class="hospital-color">@actionMdFacility</span>
+                                                                <br />
+                                                                <span class="text-warning">Remarks: @remarks</span>
+                                                            </td>
+                                                        </tr>
+                                                        break;
+                                                    }
+                                                case "arrived":
+                                                    {
+                                                        <tr>
+                                                            <td class="table-date">
+                                                                <span class="text-muted">@dateReferred</span>
+                                                            </td>
+                                                            <td>
+                                                                <span class="patient-color">@patientName</span>
+                                                                has arrived at
+                                                                <span class="hospital-color">@actionMdFacility</span>
+                                                                <br />
+                                                                <span class="text-warning">Remarks: @remarks</span>
+                                                            </td>
+                                                        </tr>
+                                                        break;
+                                                    }
+                                                case "admitted":
+                                                    {
+                                                        <tr>
+                                                            <td class="table-date">
+                                                                <span class="text-muted">@dateReferred</span>
+                                                            </td>
+                                                            <td>
+                                                                <span class="patient-color">@patientName</span>
+                                                                was admitted at
+                                                                <span class="hospital-color">@actionMdFacility</span>
+                                                                <br />
+                                                                <span class="text-warning">Remarks: @remarks</span>
+                                                            </td>
+                                                        </tr>
+                                                        break;
+                                                    }
+                                                case "discharged":
+                                                    {
+                                                        <tr>
+                                                            <td class="table-date">
+                                                                <span class="text-muted">@dateReferred</span>
+                                                            </td>
+                                                            <td>
+                                                                <span class="patient-color">@patientName</span>
+                                                                was discharged from
+                                                                <span class="hospital-color">@actionMdFacility</span>
+                                                                <br />
+                                                                <span class="text-warning">Remarks: @remarks</span>
+                                                            </td>
+                                                        </tr>
+                                                        break;
+                                                    }
+                                                case "calling":
+                                                    {
+                                                        <tr>
+                                                            <td class="table-date">
+                                                                <span class="text-muted">@dateReferred</span>
+                                                            </td>
+                                                            <td>
+                                                                <span class="md-color">@actionMd</span>
+                                                                of
+                                                                <span class="hospital-color">@actionMdFacility</span>
+                                                                is requesting a call from
+                                                                <span class="hospital-color">@referringMdFacililty</span>.
+                                                                Please contact this number
+                                                                <span class="contact-color">Remarks: @facilityContact</span>
+                                                            </td>
+                                                        </tr>
+                                                        break;
+                                                    }
+                                                case "cancelled":
+                                                    {
+                                                        <tr>
+                                                            <td class="table-date">
+                                                                <span class="text-muted">@dateReferred</span>
+                                                            </td>
+                                                            <td>
+                                                                <span class="patient-color">@patientName</span>
+                                                                was cancelled by
+                                                                <span class="md-color">@actionMd</span>
+                                                                <br />
+                                                                <span class="text-warning">Remarks: @remarks</span>
+                                                            </td>
+                                                        </tr>
+                                                        break;
+                                                    }
+                                            }
                                         }
-                                    }
-                                </tbody>
-                            </table>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="card-footer card-custom-bg">
-                    <button class="btn btn-xs bg-gradient-warning">
-                        <i class="fa fa-folder"></i>
-                        &nbsp;View Form
-                    </button>
-                    @if (seenCount > 0)
-                    {
-                        <button type="button" class="btn btn-success btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens", "Modals", new { trackingId = item.TrackingId })">
-                            <i class="fa fa-user-md"></i>
-                            &nbsp;Seen
-
-                            <small class="badge bg-green">@seenCount</small>
-
-                        </button>
+                    @{ 
+                        var dataTarget = item.Pregnant ? "pregnant-form-modal" : "normal-form-modal";
+                        var dataUrl = item.Pregnant ? Url.Action("PrintablePregnantForm","ViewForms", new { code = item.Code }) : Url.Action("PrintableNormalForm", "ViewForms", new { code = item.Code });
                     }
-                    @if (callerCount > 0)
-                    {
-                        <button class="btn btn-xs bg-gradient-primary">
-                            <i class="fa fa-phone"></i>
-                            &nbsp;Caller
-
-                            <small class="badge bg-blue">@callerCount</small>
-
+                    <div class="card-footer card-custom-bg">
+                        <button class="btn btn-xs bg-gradient-warning" data-target="#@dataTarget" data-toggle="ajax-modal" data-url="@dataUrl">
+                            <i class="fa fa-folder"></i>
+                            &nbsp;View Form
                         </button>
-                    }
-                    <button type="button" class="btn btn-info btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
-                        <i class="fa fa-comments"></i>
-                        &nbsp;ReCo
-                        @if (recoCount > 0)
+                        @if (seenCount > 0)
                         {
-                            <small class="badge bg-blue">@recoCount</small>
+                            <button type="button" class="btn btn-success btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens", "Modals", new { trackingId = item.TrackingId })">
+                                <i class="fa fa-user-md"></i>
+                                &nbsp;Seen
+
+                                <small class="badge bg-green">@seenCount</small>
+
+                            </button>
                         }
-                    </button>
-                    <button class="btn btn-xs bg-gradient-danger">
-                        <i class="fa fa-exclamation-triangle"></i>
-                        &nbsp;Issue and Concern
-                    </button>
-                    @if (!item.Status.Equals("cancelled") && !item.Status.Equals("discharged"))
-                    {
-                        <button type="button" class="btn btn-xs btn-default" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("CancelRemark","Remarks", new { code = item.Code })">
-                            <i class="fa fa-times"></i>
-                            &nbsp;Cancel
+                        @if (item.Status.Equals("accepted") && item.Travel)
+                        {
+                            <button type="button" class="btn btn-success btn-xs" data-toggle="small-modal" data-target="#small-modal" data-url="@Url.Action("Travel", "Remarks", new { id = item.TrackingId })">
+                                <i class="fa fa-ambulance"></i>
+                                &nbsp;Travel
+                            </button>
+                        }
+                        @if (callerCount > 0)
+                        {
+                            <button class="btn btn-xs bg-gradient-primary">
+                                <i class="fa fa-phone"></i>
+                                &nbsp;Caller
+
+                                <small class="badge bg-blue">@callerCount</small>
+
+                            </button>
+                        }
+                        <button type="button" class="btn btn-info btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
+                            <i class="fa fa-comments"></i>
+                            &nbsp;ReCo
+                            @if (recoCount > 0)
+                            {
+                                <small class="badge bg-blue">@recoCount</small>
+                            }
                         </button>
-                    }
+                        <button type="button" class="btn btn-xs bg-gradient-danger" data-toggle="small-modal" data-target="#small-modal" data-url="@Url.Action("Issues","Remarks", new { code = item.TrackingId })">
+                            <i class="fa fa-exclamation-triangle"></i>
+                            &nbsp;Issue and Concern
+                        </button>
+                        @if (!item.Status.Equals("cancelled") && !item.Status.Equals("discharged"))
+                        {
+                            <button type="button" class="btn btn-xs btn-default" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("CancelRemark","Remarks", new { code = item.Code })">
+                                <i class="fa fa-times"></i>
+                                &nbsp;Cancel
+                            </button>
+                        }
+                    </div>
                 </div>
+            }
+        }
+        else
+        {
+            <div class="alert alert-warning">
+                <span class="text-warning" style="font-weight: bold; font-size: 1.2em;">
+                    <i class="fa fa-exclamation-triangle"></i>
+                    &nbsp;No Referred Patients!
+                </span>
             </div>
         }
     </div>
 </div>
 
-<script type="text/javascript" src="~/assets/daterangepicker/moment.js"></script>
-<script type="text/javascript" src="~/assets/daterangepicker/daterangepicker.js"></script>
-<link rel="stylesheet" type="text/css" href="~/assets/daterangepicker/daterangepicker-bs3.css" />
 <script type="text/javascript">
 
     $(document).ready(function () {

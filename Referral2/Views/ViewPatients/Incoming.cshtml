@@ -26,38 +26,36 @@
                     <!-- CARD DANGER BODY -->
                     <div class="card-body">
                         <form asp-action="Incoming" method="post">
-                            <div class="card-body">
-                                <!-- SEARCH -->
-                                <div class="form-group ">
-                                    <input class="form-control" type="text" placeholder="Code, Firstname, Lastname" name="SearchFilter" value="@ViewBag.CurrentSearchFilter" autocomplete="off" />
-                                </div>
-                                <!-- DATE FILTER -->
-                                <div class="form-group">
-                                    <input class="form-control" type="text" name="daterange" value="@startDate - @endDate" autocomplete="off">
-                                </div>
-                                <!-- DEPARTMENT -->
-                                <div class="form-group">
-                                    <select class="form-control" asp-items="ViewBag.Departments" name="departmentFilter">
-                                        <option value="">All Department</option>
-                                    </select>
-                                </div>
-                                <!-- STATUS -->
-                                <div class="form-group">
-                                    <select class="form-control" name="statusFilter">
-                                        <option value="">Select All</option>
-                                        <option value="new">New Referral</option>
-                                        <option value="accepted">Accepted</option>
-                                    </select>
-                                </div>
-                                <div class="form-group hide"></div>
-                                <!-- BUTTONS -->
-                                <div class="form-group">
-                                    <!-- FILTER -->
-                                    <button type="submit" value="Filter" class="btn btn-block btn-success">
-                                        <i class="fa fa-filter"></i>
-                                        &nbsp;Filter Result
-                                    </button>
-                                </div>
+                            <!-- SEARCH -->
+                            <div class="form-group ">
+                                <input class="form-control" type="text" placeholder="Code, Firstname, Lastname" name="SearchFilter" value="@ViewBag.CurrentSearchFilter" autocomplete="off" />
+                            </div>
+                            <!-- DATE FILTER -->
+                            <div class="form-group">
+                                <input class="form-control" type="text" name="daterange" value="@startDate - @endDate" autocomplete="off">
+                            </div>
+                            <!-- DEPARTMENT -->
+                            <div class="form-group">
+                                <select class="form-control" asp-items="ViewBag.Departments" name="departmentFilter">
+                                    <option value="">All Department</option>
+                                </select>
+                            </div>
+                            <!-- STATUS -->
+                            <div class="form-group">
+                                <select class="form-control" name="statusFilter">
+                                    <option value="">Select All</option>
+                                    <option value="new">New Referral</option>
+                                    <option value="accepted">Accepted</option>
+                                </select>
+                            </div>
+                            <div class="form-group hide"></div>
+                            <!-- BUTTONS -->
+                            <div class="form-group">
+                                <!-- FILTER -->
+                                <button type="submit" value="Filter" class="btn btn-block btn-success">
+                                    <i class="fa fa-filter"></i>
+                                    &nbsp;Filter Result
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -76,351 +74,368 @@
                     <!-- DAILY USERS BODY -->
                     <div class="card-body">
                         <div class="timeline">
-                            @foreach (var item in Model)
+                            @if (Model.Count() > 0)
                             {
-                                var dateAction = item.DateAction.ToString("MMM dd, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
-                                var currentUserFacility = int.Parse(User.FindFirstValue("Facility"));
-                                var currentUserDepartment = int.Parse(User.FindFirstValue("Department"));
-
-                                switch (item.Status)
+                                foreach (var item in Model)
                                 {
-                                    case "accepted":
-                                        {
-                                            <div>
-                                                <i class="fa fa-user-plus bg-olive"></i>
-                                                <div class="timeline-item">
-                                                    <span class="time">
-                                                        <i class="fa fa-calendar">
-                                                            &nbsp;@dateAction
-                                                        </i>
-                                                    </span>
-                                                    <h3 class="timeline-header no-border">
-                                                        <small class="text-bold">@item.Code</small>
-                                                        <a href="#">@item.PatientName</a>
-                                                        was accepted by
-                                                        <span class="text-success">@item.ActionMd</span>
-                                                    </h3>
-                                                    <div class="timeline-footer">
-                                                        <div class="form-inline">
-                                                            <div class="form-group">
-                                                                @if (item.SeenCount > 0)
-                                                                {
-                                                                    <button type="button" class="btn btn-success btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens","Modals", new { trackingId = item.TrackingId })">
-                                                                        <i class="fa fa-user-md"></i>
-                                                                        &nbsp;Seen
-                                                                        <small class="badge bg-green">@item.SeenCount</small>
-                                                                    </button>
-                                                                }
-                                                                <button type="button" class="btn btn-info btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
-                                                                    <i class="fa fa-comments"></i>
-                                                                    &nbsp;ReCo
-                                                                    @if (item.FeedbackCount > 0)
-                                                                    {
-                                                                        <small class="badge bg-blue">@item.FeedbackCount</small>
-                                                                    }
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            break;
-                                        }
-                                    case "transferred":
-                                        {
-                                            <div>
-                                                <i class="fa fa-user-plus bg-olive"></i>
-                                                <div class="timeline-item">
-                                                    <span class="time">
-                                                        <i class="fa fa-calendar">
-                                                            &nbsp;@dateAction
-                                                        </i>
-                                                    </span>
-                                                    <h3 class="timeline-header no-border">
-                                                        <small class="text-bold">@item.Code</small>
-                                                        <a href="#">@item.PatientName</a>
-                                                        was transferred by
-                                                        <span class="text-success">@item.ActionMd</span>'s
-                                                    </h3>
-                                                </div>
-                                            </div>
-                                            break;
-                                        }
-                                    case "arrived":
-                                        {
-                                            <div>
-                                                <i class="fa fa-user-plus bg-olive"></i>
-                                                <div class="timeline-item">
-                                                    <span class="time">
-                                                        <i class="fa fa-calendar">
-                                                            &nbsp;@dateAction
-                                                        </i>
-                                                    </span>
-                                                    <h3 class="timeline-header no-border">
-                                                        <small class="text-bold">@item.Code</small>
-                                                        <a href="#">@item.PatientName</a>
-                                                        has arrived by
-                                                        <span class="text-success">@item.ActionMd</span>'s
-                                                        department
-                                                    </h3>
-                                                    <div class="timeline-footer">
-                                                        <div class="form-inline">
-                                                            <div class="form-group">
-                                                                @if (item.SeenCount > 0)
-                                                                {
-                                                                    <button type="button" class="btn btn-success btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens","Modals", new { trackingId = item.TrackingId })">
-                                                                        <i class="fa fa-user-md"></i>
-                                                                        &nbsp;Seen
-                                                                        <small class="badge bg-green">@item.SeenCount</small>
-                                                                    </button>
-                                                                }
-                                                                <button type="button" class="btn btn-info btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
-                                                                    <i class="fa fa-comments"></i>
-                                                                    &nbsp;ReCo
-                                                                    @if (item.FeedbackCount > 0)
-                                                                    {
-                                                                        <small class="badge bg-blue">@item.FeedbackCount</small>
-                                                                    }
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            break;
-                                        }
-                                    case "cancelled":
-                                        {
-                                            <div>
-                                                <i class="fa fa-ban bg-danger"></i>
-                                                <div class="timeline-item">
-                                                    <span class="time">
-                                                        <i class="fa fa-calendar">
-                                                            &nbsp;@dateAction
-                                                        </i>
-                                                    </span>
-                                                    <h3 class="timeline-header no-border">
-                                                        <small class="text-bold">@item.Code</small>
-                                                        <a href="#">@item.PatientName</a>
-                                                        was 
-                                                        <span class="badge badge-danger">
-                                                            cancelled
-                                                        </span>
-                                                        by
-                                                        <span class="text-success">@item.ActionMd</span>
-                                                    </h3>
-                                                    <div class="timeline-footer">
-                                                        <div class="form-inline">
-                                                            <div class="form-group">
-                                                                @if (item.SeenCount > 0)
-                                                                {
-                                                                    <button type="button" class="btn btn-success btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens","Modals", new { trackingId = item.TrackingId })">
-                                                                        <i class="fa fa-user-md"></i>
-                                                                        &nbsp;Seen
-                                                                        <small class="badge bg-green">@item.SeenCount</small>
-                                                                    </button>
-                                                                }
-                                                                <button type="button" class="btn btn-info btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
-                                                                    <i class="fa fa-comments"></i>
-                                                                    &nbsp;ReCo
-                                                                    @if (item.FeedbackCount > 0)
-                                                                    {
-                                                                        <small class="badge bg-blue">@item.FeedbackCount</small>
-                                                                    }
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            break;
-                                        }
-                                    case "admitted":
-                                        {
-                                            <div>
-                                                <i class="fa fa-user-plus bg-olive"></i>
-                                                <div class="timeline-item">
-                                                    <span class="time">
-                                                        <i class="fa fa-calendar">
-                                                            &nbsp;@dateAction
-                                                        </i>
-                                                    </span>
-                                                    <h3 class="timeline-header no-border">
-                                                        <small class="text-bold">@item.Code</small>
-                                                        <a href="#">@item.PatientName</a>
-                                                        was admitted by
-                                                        <span class="text-success">@item.ActionMd</span>
-                                                    </h3>
-                                                    <div class="timeline-footer">
-                                                        <div class="form-inline">
-                                                            <div class="form-group">
-                                                                @if (item.SeenCount > 0)
-                                                                {
-                                                                    <button type="button" class="btn btn-success btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens","Modals", new { trackingId = item.TrackingId })">
-                                                                        <i class="fa fa-user-md"></i>
-                                                                        &nbsp;Seen
-                                                                        <small class="badge bg-green">@item.SeenCount</small>
-                                                                    </button>
-                                                                }
-                                                                <button type="button" class="btn btn-info btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
-                                                                    <i class="fa fa-comments"></i>
-                                                                    &nbsp;ReCo
-                                                                    @if (item.FeedbackCount > 0)
-                                                                    {
-                                                                        <small class="badge bg-blue">@item.FeedbackCount</small>
-                                                                    }
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            break;
-                                        }
-                                    case "rejected":
-                                        {
-                                            <div>
-                                                <i class="fa fa-user-plus bg-olive"></i>
-                                                <div class="timeline-item">
-                                                    <span class="time">
-                                                        <i class="fa fa-calendar">
-                                                            &nbsp;@dateAction
-                                                        </i>
-                                                    </span>
-                                                    <h3 class="timeline-header no-border">
-                                                        <small class="text-bold">@item.Code</small>
-                                                        <a href="#">@item.PatientName</a>
-                                                        was admitted by
-                                                        <span class="text-success">@item.ActionMd</span>
-                                                    </h3>
-                                                    <div class="timeline-footer">
-                                                        <div class="form-inline">
-                                                            <div class="form-group">
-                                                                @if (item.SeenCount > 0)
-                                                                {
-                                                                    <button type="button" class="btn btn-success btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens","Modals", new { trackingId = item.TrackingId })">
-                                                                        <i class="fa fa-user-md"></i>
-                                                                        &nbsp;Seen
-                                                                        <small class="badge bg-green">@item.SeenCount</small>
-                                                                    </button>
-                                                                }
-                                                                <button type="button" class="btn btn-info btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
-                                                                    <i class="fa fa-comments"></i>
-                                                                    &nbsp;ReCo
-                                                                    @if (item.FeedbackCount > 0)
-                                                                    {
-                                                                        <small class="badge bg-blue">@item.FeedbackCount</small>
-                                                                    }
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            break;
-                                        }
-                                    case "referred":
-                                        {
-                                            <div>
-                                                <i class="fa fa-ambulance bg-gradient-blue"></i>
-                                                <div class="timeline-item">
-                                                    <span class="time">
-                                                        <i class="fa fa-calendar">
-                                                            &nbsp;@dateAction
-                                                        </i>
-                                                    </span>
-                                                    <h3 class="timeline-header no-border">
-                                                        <small class="text-bold">@item.Code</small>
-                                                        <a href="#">@item.PatientName</a>
-                                                        <small class="text-muted">[@item.PatientSex, @item.PatientAge]</small>
-                                                        was <span class="badge bg-blue">referred</span> to
-                                                        <span class="text-danger">@item.Department</span>
-                                                        by
-                                                        <span class="text-success">@item.ReferringMd</span>
-                                                        of
-                                                        <span class="text-warning">@item.ReferredFrom</span>
-                                                    </h3>
-                                                    <div class="timeline-footer">
-                                                        <div class="form-inline">
-                                                            <div class="form-group">
-                                                                @if (currentUserFacility == item.ReferredToId && currentUserDepartment == item.DepartmentId)
-                                                                {
+                                    var dateAction = item.DateAction.ToString("MMM dd, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+                                    var currentUserFacility = int.Parse(User.FindFirstValue("Facility"));
+                                    var currentUserDepartment = int.Parse(User.FindFirstValue("Department"));
 
-                                                                    <button type="button" class="btn btn-warning btn-xs" data-toggle="ajax-modal" data-target="#patient-form-modal" data-url="@Url.Action("PatientForm","ViewForms",new {code = item.Code })">
-                                                                        <i class="fa fa-user-md"></i>
-                                                                        &nbsp;View Form
-                                                                    </button>
-                                                                }
-                                                                @if (item.SeenCount > 0)
-                                                                {
-                                                                    <button type="button" class="btn btn-success btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens","Modals", new { trackingId = item.TrackingId })">
-                                                                        <i class="fa fa-user-md"></i>
-                                                                        &nbsp;Seen
-                                                                        <small class="badge bg-green">@item.SeenCount</small>
-                                                                    </button>
-                                                                }
-                                                                <button type="button" class="btn btn-info btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
-                                                                    <i class="fa fa-comments"></i>
-                                                                    &nbsp;ReCo
-                                                                    @if (item.FeedbackCount > 0)
-                                                                    {
-                                                                        <small class="badge bg-blue">@item.FeedbackCount</small>
-                                                                    }
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            break;
-                                        }
-                                    case "discharged":
-                                        {
-                                            <div>
-                                                <i class="fa fa-user-plus bg-olive"></i>
-                                                <div class="timeline-item">
-                                                    <span class="time">
-                                                        <i class="fa fa-calendar">
-                                                            &nbsp;@dateAction
-                                                        </i>
-                                                    </span>
-                                                    <h3 class="timeline-header no-border">
-                                                        <small class="text-bold">@item.Code</small>
-                                                        <a href="#">@item.PatientName</a>
-                                                        was
-                                                        <span class="badge badge-success">
-                                                            discharged
+                                    switch (item.Status)
+                                    {
+                                        case "accepted":
+                                            {
+                                                <div>
+                                                    <i class="fa fa-user-plus bg-olive"></i>
+                                                    <div class="timeline-item">
+                                                        <span class="time">
+                                                            <i class="fa fa-calendar">
+                                                                &nbsp;@dateAction
+                                                            </i>
                                                         </span>
-                                                        by
-                                                        <span class="text-success">@item.ActionMd</span>
-                                                    </h3>
-                                                    <div class="timeline-footer">
-                                                        <div class="form-inline">
-                                                            <div class="form-group">
-                                                                @if (item.SeenCount > 0)
-                                                                {
-                                                                    <button type="button" class="btn btn-success btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens","Modals", new { trackingId = item.TrackingId })">
-                                                                        <i class="fa fa-user-md"></i>
-                                                                        &nbsp;Seen
-                                                                        <small class="badge bg-green">@item.SeenCount</small>
-                                                                    </button>
-                                                                }
-                                                                <button type="button" class="btn btn-info btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
-                                                                    <i class="fa fa-comments"></i>
-                                                                    &nbsp;ReCo
-                                                                    @if (item.FeedbackCount > 0)
+                                                        <h3 class="timeline-header no-border">
+                                                            <small class="text-bold">@item.Code</small>
+                                                            <a href="#">@item.PatientName</a>
+                                                            was accepted by
+                                                            <span class="text-success">@item.ActionMd</span>
+                                                        </h3>
+                                                        <div class="timeline-footer">
+                                                            <div class="form-inline">
+                                                                <div class="form-group">
+                                                                    @if (item.SeenCount > 0)
                                                                     {
-                                                                        <small class="badge bg-blue">@item.FeedbackCount</small>
+                                                                        <button type="button" class="btn btn-success btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens","Modals", new { trackingId = item.TrackingId })">
+                                                                            <i class="fa fa-user-md"></i>
+                                                                            &nbsp;Seen
+                                                                            <small class="badge bg-green">@item.SeenCount</small>
+                                                                        </button>
                                                                     }
-                                                                </button>
+                                                                    <button type="button" class="btn btn-info btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
+                                                                        <i class="fa fa-comments"></i>
+                                                                        &nbsp;ReCo
+                                                                        @if (item.FeedbackCount > 0)
+                                                                        {
+                                                                            <small class="badge bg-blue">@item.FeedbackCount</small>
+                                                                        }
+                                                                    </button>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            break;
-                                        }
+                                                break;
+                                            }
+                                        case "transferred":
+                                            {
+                                                <div>
+                                                    <i class="fa fa-user-plus bg-olive"></i>
+                                                    <div class="timeline-item">
+                                                        <span class="time">
+                                                            <i class="fa fa-calendar">
+                                                                &nbsp;@dateAction
+                                                            </i>
+                                                        </span>
+                                                        <h3 class="timeline-header no-border">
+                                                            <small class="text-bold">@item.Code</small>
+                                                            <a href="#">@item.PatientName</a>
+                                                            was transferred by
+                                                            <span class="text-success">@item.ActionMd</span>'s
+                                                        </h3>
+                                                    </div>
+                                                </div>
+                                                break;
+                                            }
+                                        case "arrived":
+                                            {
+                                                <div>
+                                                    <i class="fa fa-user-plus bg-olive"></i>
+                                                    <div class="timeline-item">
+                                                        <span class="time">
+                                                            <i class="fa fa-calendar">
+                                                                &nbsp;@dateAction
+                                                            </i>
+                                                        </span>
+                                                        <h3 class="timeline-header no-border">
+                                                            <small class="text-bold">@item.Code</small>
+                                                            <a href="#">@item.PatientName</a>
+                                                            has arrived by
+                                                            <span class="text-success">@item.ActionMd</span>'s
+                                                            department
+                                                        </h3>
+                                                        <div class="timeline-footer">
+                                                            <div class="form-inline">
+                                                                <div class="form-group">
+                                                                    @if (item.SeenCount > 0)
+                                                                    {
+                                                                        <button type="button" class="btn btn-success btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens","Modals", new { trackingId = item.TrackingId })">
+                                                                            <i class="fa fa-user-md"></i>
+                                                                            &nbsp;Seen
+                                                                            <small class="badge bg-green">@item.SeenCount</small>
+                                                                        </button>
+                                                                    }
+                                                                    <button type="button" class="btn btn-info btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
+                                                                        <i class="fa fa-comments"></i>
+                                                                        &nbsp;ReCo
+                                                                        @if (item.FeedbackCount > 0)
+                                                                        {
+                                                                            <small class="badge bg-blue">@item.FeedbackCount</small>
+                                                                        }
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                break;
+                                            }
+                                        case "cancelled":
+                                            {
+                                                <div>
+                                                    <i class="fa fa-ban bg-danger"></i>
+                                                    <div class="timeline-item">
+                                                        <span class="time">
+                                                            <i class="fa fa-calendar">
+                                                                &nbsp;@dateAction
+                                                            </i>
+                                                        </span>
+                                                        <h3 class="timeline-header no-border">
+                                                            <small class="text-bold">@item.Code</small>
+                                                            <a href="#">@item.PatientName</a>
+                                                            was
+                                                            <span class="badge badge-danger">
+                                                                cancelled
+                                                            </span>
+                                                            by
+                                                            <span class="text-success">@item.ActionMd</span>
+                                                        </h3>
+                                                        <div class="timeline-footer">
+                                                            <div class="form-inline">
+                                                                <div class="form-group">
+                                                                    @if (item.SeenCount > 0)
+                                                                    {
+                                                                        <button type="button" class="btn btn-success btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens","Modals", new { trackingId = item.TrackingId })">
+                                                                            <i class="fa fa-user-md"></i>
+                                                                            &nbsp;Seen
+                                                                            <small class="badge bg-green">@item.SeenCount</small>
+                                                                        </button>
+                                                                    }
+                                                                    <button type="button" class="btn btn-info btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
+                                                                        <i class="fa fa-comments"></i>
+                                                                        &nbsp;ReCo
+                                                                        @if (item.FeedbackCount > 0)
+                                                                        {
+                                                                            <small class="badge bg-blue">@item.FeedbackCount</small>
+                                                                        }
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                break;
+                                            }
+                                        case "admitted":
+                                            {
+                                                <div>
+                                                    <i class="fa fa-user-plus bg-olive"></i>
+                                                    <div class="timeline-item">
+                                                        <span class="time">
+                                                            <i class="fa fa-calendar">
+                                                                &nbsp;@dateAction
+                                                            </i>
+                                                        </span>
+                                                        <h3 class="timeline-header no-border">
+                                                            <small class="text-bold">@item.Code</small>
+                                                            <a href="#">@item.PatientName</a>
+                                                            was admitted by
+                                                            <span class="text-success">@item.ActionMd</span>
+                                                        </h3>
+                                                        <div class="timeline-footer">
+                                                            <div class="form-inline">
+                                                                <div class="form-group">
+                                                                    @if (item.SeenCount > 0)
+                                                                    {
+                                                                        <button type="button" class="btn btn-success btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens","Modals", new { trackingId = item.TrackingId })">
+                                                                            <i class="fa fa-user-md"></i>
+                                                                            &nbsp;Seen
+                                                                            <small class="badge bg-green">@item.SeenCount</small>
+                                                                        </button>
+                                                                    }
+                                                                    <button type="button" class="btn btn-info btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
+                                                                        <i class="fa fa-comments"></i>
+                                                                        &nbsp;ReCo
+                                                                        @if (item.FeedbackCount > 0)
+                                                                        {
+                                                                            <small class="badge bg-blue">@item.FeedbackCount</small>
+                                                                        }
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                break;
+                                            }
+                                        case "rejected":
+                                            {
+                                                <div>
+                                                    <i class="fa fa-user-plus bg-olive"></i>
+                                                    <div class="timeline-item">
+                                                        <span class="time">
+                                                            <i class="fa fa-calendar">
+                                                                &nbsp;@dateAction
+                                                            </i>
+                                                        </span>
+                                                        <h3 class="timeline-header no-border">
+                                                            <small class="text-bold">@item.Code</small>
+                                                            <a href="#">@item.PatientName</a>
+                                                            was admitted by
+                                                            <span class="text-success">@item.ActionMd</span>
+                                                        </h3>
+                                                        <div class="timeline-footer">
+                                                            <div class="form-inline">
+                                                                <div class="form-group">
+                                                                    @if (item.SeenCount > 0)
+                                                                    {
+                                                                        <button type="button" class="btn btn-success btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens","Modals", new { trackingId = item.TrackingId })">
+                                                                            <i class="fa fa-user-md"></i>
+                                                                            &nbsp;Seen
+                                                                            <small class="badge bg-green">@item.SeenCount</small>
+                                                                        </button>
+                                                                    }
+                                                                    <button type="button" class="btn btn-info btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
+                                                                        <i class="fa fa-comments"></i>
+                                                                        &nbsp;ReCo
+                                                                        @if (item.FeedbackCount > 0)
+                                                                        {
+                                                                            <small class="badge bg-blue">@item.FeedbackCount</small>
+                                                                        }
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                break;
+                                            }
+                                        case "referred":
+                                            {
+                                                <div>
+                                                    <i class="fa fa-ambulance bg-gradient-blue"></i>
+                                                    <div class="timeline-item">
+                                                        <span class="time">
+                                                            <i class="fa fa-calendar">
+                                                                &nbsp;@dateAction
+                                                            </i>
+                                                        </span>
+                                                        <h3 class="timeline-header no-border">
+                                                            <small class="text-bold">@item.Code</small>
+                                                            <a href="#">@item.PatientName</a>
+                                                            <small class="text-muted">[@item.PatientSex, @item.PatientAge]</small>
+                                                            was <span class="badge bg-blue">referred</span> to
+                                                            <span class="text-danger">@item.Department</span>
+                                                            by
+                                                            <span class="text-success">@item.ReferringMd</span>
+                                                            of
+                                                            <span class="text-warning">@item.ReferredFrom</span>
+                                                        </h3>
+                                                        <div class="timeline-footer">
+                                                            <div class="form-inline">
+                                                                <div class="form-group">
+                                                                    @if (currentUserFacility == item.ReferredToId && currentUserDepartment == item.DepartmentId)
+                                                                    {
+
+                                                                        <button type="button" class="btn btn-warning btn-xs" data-toggle="ajax-modal" data-target="#patient-form-modal" data-url="@Url.Action("PatientForm","ViewForms",new {code = item.Code })">
+                                                                            <i class="fa fa-user-md"></i>
+                                                                            &nbsp;View Form
+                                                                        </button>
+                                                                    }
+                                                                    @if (item.SeenCount > 0)
+                                                                    {
+                                                                        <button type="button" class="btn btn-success btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens","Modals", new { trackingId = item.TrackingId })">
+                                                                            <i class="fa fa-user-md"></i>
+                                                                            &nbsp;Seen
+                                                                            <small class="badge bg-green">@item.SeenCount</small>
+                                                                        </button>
+                                                                    }
+                                                                    <button type="button" class="btn btn-info btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
+                                                                        <i class="fa fa-comments"></i>
+                                                                        &nbsp;ReCo
+                                                                        @if (item.FeedbackCount > 0)
+                                                                        {
+                                                                            <small class="badge bg-blue">@item.FeedbackCount</small>
+                                                                        }
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                break;
+                                            }
+                                        case "discharged":
+                                            {
+                                                <div>
+                                                    <i class="fa fa-user-plus bg-olive"></i>
+                                                    <div class="timeline-item">
+                                                        <span class="time">
+                                                            <i class="fa fa-calendar">
+                                                                &nbsp;@dateAction
+                                                            </i>
+                                                        </span>
+                                                        <h3 class="timeline-header no-border">
+                                                            <small class="text-bold">@item.Code</small>
+                                                            <a href="#">@item.PatientName</a>
+                                                            was
+                                                            <span class="badge badge-success">
+                                                                discharged
+                                                            </span>
+                                                            by
+                                                            <span class="text-success">@item.ActionMd</span>
+                                                        </h3>
+                                                        <div class="timeline-footer">
+                                                            <div class="form-inline">
+                                                                <div class="form-group">
+                                                                    @if (item.SeenCount > 0)
+                                                                    {
+                                                                        <button type="button" class="btn btn-success btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens","Modals", new { trackingId = item.TrackingId })">
+                                                                            <i class="fa fa-user-md"></i>
+                                                                            &nbsp;Seen
+                                                                            <small class="badge bg-green">@item.SeenCount</small>
+                                                                        </button>
+                                                                    }
+                                                                    <button type="button" class="btn btn-info btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
+                                                                        <i class="fa fa-comments"></i>
+                                                                        &nbsp;ReCo
+                                                                        @if (item.FeedbackCount > 0)
+                                                                        {
+                                                                            <small class="badge bg-blue">@item.FeedbackCount</small>
+                                                                        }
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                break;
+                                            }
+                                    }
                                 }
+                            }
+                            else
+                            {
+                                <div class="alert alert-warning">
+                                    <span class="text-warning">
+                                        <i class="fa fa-exclamation-triangle"></i> No referrals!
+                                        <ul>
+                                            <li>Filer List:</li>
+                                            <ul>
+                                                <li>Date range - @startDate - @endDate</li>
+                                            </ul>
+                                        </ul>
+                                    </span>
+                                </div>
                             }
                         </div>
                     </div>

@@ -2,6 +2,7 @@
 
 @{
     var dateReferred = DateTime.Now.DayOfWeek + " " + DateTime.Now.ToString("MMMM d, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+    var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
 }
 <!-- REFER BODY -->
@@ -11,8 +12,8 @@
     <br />
     <small class="justify-content-center">Clinical Referral Form</small>
 </div>
-<form asp-action="Refer" method="post">
-    <input type="hidden" asp-for="PatientId" value="@Model.PatientId" />
+<form asp-action="Walkin" method="post" id="walkin-form">
+    <input type="hidden" asp-for="PatientId" value="@ViewBag.Patient.Id" />
     <div class="modal-body">
         <table class="table table-striped">
             <tbody>
@@ -20,9 +21,10 @@
                 <tr>
                     <td colspan="6">
                         Name of Referring Facility:
-                        <select id="facilityFilter" asp-for="ReferringFacility" asp-items="ViewBag.ReferringFacility" class="form-control facilityFilter">
-                            <option>Select Facility...</option>
+                        <select class="form-control form-control-sm facilityFilter" id="facilityFilter" asp-for="ReferringFacility" asp-items="ViewBag.ReferringFacility" >
+                            <option value="0">Select Facility...</option>
                         </select>
+                        <span class="text-danger" asp-validation-for="ReferringFacility"></span>
                     </td>
                 </tr>
                 <!-- FACILITY ADDRESS -->
@@ -35,22 +37,22 @@
                 <tr>
                     <!-- REFERRED TO -->
                     <td colspan="3">
-                        Referred to:&nbsp;&nbsp;&nbsp;
-                        <span class="form-control text-success">@Model.ReferredTo</span>
+                        Referred to: <span class="text-success">@ViewBag.Facility</span>
                     </td>
                     <!-- DEPARTMENT -->
                     <td colspan="3">
                         Department:
-                        <select id="departmentFilter" asp-for="Department" class="form-control">
-                            <option>Select Department...</option>
+                        <select class="form-control form-control-sm" id="departmentFilter" asp-for="Department" asp-items="ViewBag.Departments">
+                            <option value="0">Select Department...</option>
                         </select>
+                        <span class="text-danger" asp-validation-for="Department"></span>
                     </td>
                 </tr>
                 <!-- ADDRESS OF REFERRED HOSPITAL -->
                 <tr>
                     <td colspan="6">
                         Address:
-                        <span  class="text-info">@Model.ReferredToAddress</span>
+                        <span class="text-info">@ViewBag.FacilityAddress</span>
                     </td>
                 </tr>
                 <tr>
@@ -68,40 +70,40 @@
                     <!-- NAME OF PATIENT -->
                     <td colspan="3">
                         Name of Patient:
-                        <span class="text-danger">@Model.PatientName</span>
+                        <span class="text-danger">@ViewBag.Patient.Name</span>
                     </td>
                     <!-- AGE -->
                     <td>
-                        Age:&nbsp;<span class="text-danger">@Model.PatientAge</span>
+                        Age:&nbsp;<span class="text-danger">@ViewBag.Patient.Age</span>
                     </td>
 
                     <!-- SEX -->
                     <td>
-                        Sex:&nbsp;<span class="text-danger">@Model.PatientSex</span>
+                        Sex:&nbsp;<span class="text-danger">@ViewBag.Patient.Sex</span>
                     </td>
 
                     <!-- STATUS -->
                     <td>
-                        Status:&nbsp;<span class="text-danger">@Model.PatientCivilStatus</span>
+                        Status:&nbsp;<span class="text-danger">@ViewBag.Patient.CivilStatus</span>
                     </td>
                 </tr>
                 <!-- ADDRESS OF PATIENT -->
                 <tr>
                     <td colspan="6">
                         Address:
-                        <span class="text-danger">@Model.PatientAddress</span>
+                        <span class="text-danger">@ViewBag.Patient.Address</span>
                     </td>
                 </tr>
                 <tr>
                     <!-- PHILHEALTH STATUS -->
                     <td colspan="3">
                         PhilHealth:
-                        <span class="text-danger">@Model.PatientPhicStatus</span>
+                        <span class="text-danger">@ViewBag.Patient.PhicStatus</span>
                     </td>
                     <!-- PHILHEALTH NUMBER -->
                     <td colspan="3">
                         PhilHealth#:
-                        <span class="text-danger">@Model.PatientPhicId</span>
+                        <span class="text-danger">@ViewBag.Patient.PhicId</span>
                     </td>
                 </tr>
                 <!-- CASE SUMMARY -->
@@ -136,13 +138,6 @@
                         <span asp-validation-for="Reason" class="text-danger"></span>
                     </td>
                 </tr>
-                <!-- NAME OF REFERRING -->
-                <tr>
-                    <td colspan="6">
-                        Name of Referring MD/HCW:
-                        <span class="form-control text-danger">@ViewBag.ReferringMd</span>
-                    </td>
-                </tr>
                 <!-- NAME OF REFERRED -->
                 <tr>
                     <td colspan="6">
@@ -150,8 +145,8 @@
                             Name of Referred MD/HCW - Mobile Contact Number (ReCo):
                         </div>
                         <div class="col-md-7">
-                            <select id="doctorFiltered" asp-for="ReferredToMd" class="form-control">
-                                <option value="any">Any...</option>
+                            <select id="doctorFiltered" name="ReferredToMd" class="form-control form-control-sm">
+                                <option value="0">Any...</option>
                             </select>
                             <span class="" dir="ltr" style="width:100%;">
                             </span>
@@ -165,42 +160,21 @@
     <div class="modal-footer justify-content-end">
 
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-success" data-save>Submit</button>
+        <button type="submit" class="btn btn-success">Submit</button>
     </div>
 </form>
 
-
 <script>
+    $.validator.unobtrusive.parse("#walkin-form");
+
     var facilityId = 0;
     var departmentId = 0;
     $('#facilityFilter').change(function () {
         facilityId = $('#facilityFilter').val();
-
-        $.when(getDepartmentFiltered()).done(function (output) {
-
-            $('#facilityAdress').text(output.address);
-
-            $('#departmentFilter').empty()
-                .append($('<option>', {
-                    value: '',
-                    text: 'Select Department...'
-                }));
-
-            $('#doctorFiltered').empty()
-                .append($('<option>', {
-                    value: '',
-                    text: 'Any'
-                }));
-
-            jQuery.each(output.departments, function (i, item) {
-                $('#departmentFilter').append($('<option>', {
-                    value: item.departmentId,
-                    text: item.departmentName
-                }))
-            });
+        $.when(getFacilityAddress(facilityId)).done(function (output) {
+            $('#facilityAdress').text(output);
         });
     });
-
 
     $('#departmentFilter').change(function () {
         if (facilityId == '0') {
@@ -208,7 +182,8 @@
         }
         departmentId = $('#departmentFilter').val();
 
-        $.when(getMdFiltered()).done(function (output) {
+        $.when(getMdFiltered(facilityId,departmentId)).done(function (output) {
+            console.log(output);
             $('#doctorFiltered').empty()
                 .append($('<option>', {
                     value: '',
@@ -224,9 +199,17 @@
         });
     });
 
+    function getFacilityAddress(id) {
+        var url = "/NoReload/GetFaciliyAddress?id=" + id;
+        return $.ajax({
+            url: url,
+            type: 'get',
+            async: true
+        });
+    }
 
-    function getDepartmentFiltered() {
-        var urls = "/NoReload/FilterDepartment?facilityId=" + facilityId;
+    function getDepartmentFiltered(id) {
+        var urls = "/NoReload/FilterDepartment?facilityId=" + id;
         return $.ajax({
             url: urls,
             type: 'get',
@@ -234,10 +217,8 @@
         });
     }
 
-
-
-    function getMdFiltered() {
-        var urls = "/NoReload/FilterUser?facilityId=" + facilityId + "&departmentId=" + departmentId;
+    function getMdFiltered(departmentID) {
+        var urls = "/NoReload/FilterUsers?departmentId=" + departmentID;
         return $.ajax({
             url: urls,
             type: 'get',
@@ -245,5 +226,3 @@
         });
     }
 </script>
-
-

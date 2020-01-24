@@ -1,0 +1,42 @@
+﻿@model Issue
+@{
+    int x = 0;
+}
+
+<div class="modal-header">
+    <h4>
+        <i class="fa fa-exclamation-triangle"></i>
+        &nbsp;Issue and concern
+    </h4>
+</div>
+<form asp-action="Issue" method="post">
+    <div class="modal-body">
+        <input asp-for="TrackingId" value="@ViewBag.TrackingId" hidden />
+        <input asp-for="Status" value="Outgoing" hidden />
+        <div class="form-group issue-body">
+            <input class="form-control" name="issue[@x]" placeholder="Enter the issue here.." required=""><br>
+        </div>
+        <a href="#" onclick="addIssue();" class="fa-pull-right"><i class="fa fa-plus"></i> Add</a><br><br>
+        <div class="clearfix"></div>
+    </div>
+    <div class="modal-footer">
+        <div class="pull-right">
+            <button type="button" data-dismiss="modal" class="btn btn-default btn-sm">
+                <i class="fa fa-times"></i> Close
+            </button>
+            <button type="submit" class="btn btn-success btn-sm" data-save="modal">
+                <i class="fa fa-check"></i> Submit
+            </button>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+</form>
+
+<script>
+    var x = 0;
+    function addIssue() {
+        x = x + 1;
+        $(".issue-body").append('<input class="form-control" name="issue['+x+']" placeholder="Type the issue here.." required><br>');
+        event.preventDefault();
+    }
+</script>

@@ -18,6 +18,8 @@ $(function () {
         });
     }
 
+
+
     //---------------------- ADDRESS CHANGE -------------------------
 
     var muncitySelect = $('#muncityFilter');
@@ -25,7 +27,6 @@ $(function () {
     var muncityId = 0;
     muncitySelect.on('change', function () {
         muncityId = muncitySelect.val();
-        console.log(muncityId);
         if (muncityId != 'none') {
             $.when(GetBarangayFiltered(muncityId)).done(function (output) {
                 barangaySelect.empty()
@@ -65,7 +66,7 @@ $(function () {
 
     var smallModal = $('#small-modal');
     var smallContent = $('#small-content');
-    var largeModel = $('#large-modal')
+    var largeModal = $('#large-modal')
     var largeContent = $('#large-content')
 
     $('a[data-toggle="small-modal"]').click(function (event) {
@@ -86,7 +87,7 @@ $(function () {
 
     function CallLargeModel(url) {
         $.get(url).done(function (data) {
-            largeModel.modal('show');
+            largeModal.modal('show');
             largeContent.empty();
             largeContent.html(data);
         });
@@ -117,6 +118,40 @@ $(function () {
             placeholderElement.find('.modal').modal('show');
         });
     });
+    //small modal sumbit
+    smallModal.on('click', 'button[data-save="modal"]', function (event) {
+        event.preventDefault();
+        var form = smallModal.find('form');
+        var actionUrl = form.attr('action');
+        var dataToSend = form.serialize();
+        $.post(actionUrl, dataToSend).done(function (data) {
+            var newBody = $(smallContent, data);
+            smallContent.replaceWith(newBody);
+            var validation = $('span.text-danger').text();
+            if (validation == '') {
+                //placeholderElement.find('.modal').modal('hide');
+                //location.reload();
+            }
+        });
+    });
+    //large modal submit
+    largeModal.on('click', 'button[data-save="modal"]', function (event) {
+        event.preventDefault();
+        console.log('here');
+        var form = largeModal.find('form');
+        var actionUrl = form.attr('action');
+        var dataToSend = form.serialize();
+        $.post(actionUrl, dataToSend).done(function (data) {
+            var newBody = $(largeContent, data);
+            largeContent.replaceWith(newBody);
+            var validation = $('span.text-danger').text();
+            if (validation == '') {
+                placeholderElement.find('.modal').modal('hide');
+                //location.reload();
+            }
+        });
+    });
+
 
     placeholderElement.on('click', 'button[data-save="modal"]', function (event) {
         event.preventDefault();
@@ -129,7 +164,7 @@ $(function () {
             var validation = $('span.text-danger').text();
             if (validation == '') {
                 placeholderElement.find('.modal').modal('hide');
-                location.reload();
+                location.href = '/Home/Index';
             }
         });
     });
@@ -191,7 +226,6 @@ $(function () {
                     },
                 ]
             };
-            $('#notificationModal').modal('show');
             var barChartCanvas = bar_chart.get(0).getContext('2d');
             var barChartData = jQuery.extend(true, {}, areaChartData);
             var temp0 = areaChartData.datasets[0];
@@ -243,6 +277,26 @@ $(function () {
 
 
 //----------------------- FUNCTIONS --------------------------
+
+function getDepartmentFiltered() {
+    var urls = "/NoReload/FilterDepartment?facilityId=" + facilityId;
+    return $.ajax({
+        url: urls,
+        type: 'get',
+        async: true
+    });
+}
+
+
+
+function getMdFiltered() {
+    var urls = "/NoReload/FilterUser?facilityId=" + facilityId + "&departmentId=" + departmentId;
+    return $.ajax({
+        url: urls,
+        type: 'get',
+        async: true
+    });
+}
 
 function GetDashboardValues() {
     var urlss = "/NoReload/DashboardValues?level=" + "doctor";

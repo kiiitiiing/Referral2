@@ -1,22 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace Referral2.Models.ViewModels.Doctor
 {
-    public partial class WalkinPatientViewModel : PatientViewModel
+    public partial class WalkinPatientViewModel
     {
-        public string ReferredTo { get; set; }
-        public string ReferredToAddress { get; set; }
-
         //Send form
+        [Required]
+        public int PatientId { get; set; }
+        [Required]
         public int ReferringFacility { get; set; }
+        [Required]
         public int Department { get; set; }
+        [Required]
         public string CaseSummary { get; set; }
+        [Required]
         public string SummaryReco { get; set; }
+        [Required]
         public string Diagnosis { get; set; }
+        [Required]
         public string Reason { get; set; }
-        public int ReferredToMd { get; set; }
+        public int? ReferredToMd { get; set; }
     }
 }

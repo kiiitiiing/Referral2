@@ -8,6 +8,7 @@
     var arrived = "disabled";
     var admitted = "disabled";
     var discharged = "disabled";
+    var transpo = ListContainer.TranspoMode;
 }
 
 <div class="content">
@@ -22,7 +23,7 @@
                         <h3 class="card-title">Track Patient</h3>
                     </div>
                     <!-- CARD DANGER BODY -->
-                    <form asp-action="Track" method="get">
+                    <form asp-action="Track" method="post">
                         <div class="card-body">
                             <!-- SEARCH -->
                             <div class="form-group">
@@ -45,9 +46,8 @@
             <div class="col-md-9">
                 @if (Model != null)
                 {
-                    var seenCount = Model.SeenCount > 0;
-                    var callerCount = Model.CallerCount > 0;
-                    var travelCount = Model.TravelCount > 0;
+                    var seenCount = Model.SeenCount;
+                    var callerCount = Model.CallerCount;
                     var recoCount = Model.ReCoCount;
                     
                     switch (Model.Status)
@@ -198,7 +198,7 @@
 
                                                 switch (item.Status)
                                                 {
-                                                    case "referred":
+                                                    case "travel":
                                                         {
                                                             <tr>
                                                                 <td class="table-date">
@@ -206,13 +206,37 @@
                                                                 </td>
                                                                 <td>
                                                                     <span class="patient-color">@patientName</span>
-                                                                    was referred by
-                                                                    <span class="md-color">@referringMd</span>
-                                                                    of
-                                                                    <span class="hospital-color">@referredFrom</span>
-                                                                    to
-                                                                    <span class="hospital-color">@referredTo</span>
+                                                                    has departed by
+                                                                    <span class="md-color">@transpo[int.Parse(remarks) + 1]</span>
                                                                 </td>
+                                                            </tr>
+                                                            break;
+                                                        }
+                                                    case "referred":
+                                                        {
+                                                            <tr>
+                                                                <td class="table-date">
+                                                                    <span class="text-muted">@dateReferred</span>
+                                                                </td>
+                                                                @if (!Model.Walkin)
+                                                                {
+                                                                    <td>
+                                                                        <span class="patient-color">@patientName</span>
+                                                                        was referred by
+                                                                        <span class="md-color">@referringMd</span>
+                                                                        of
+                                                                        <span class="hospital-color">@referredFrom</span>
+                                                                        to
+                                                                        <span class="hospital-color">@referredTo</span>
+                                                                    </td>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <td>
+                                                                        <strong>Walk-In Patient: </strong>
+                                                                        <span class="patient-color">@patientName</span>
+                                                                    </td>
+                                                                }
                                                             </tr>
                                                             break;
                                                         }
@@ -312,16 +336,23 @@
                                 <i class="fa fa-folder"></i>
                                 &nbsp;View Form
                             </button>
-                            @if (seenCount)
+                            @if (seenCount > 0)
                             {
-                                <button class="btn btn-xs bg-gradient-success">
+                                <button type="button" class="btn btn-success btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens", "Modals", new { trackingId = Model.TrackingId })">
                                     <i class="fa fa-user-md"></i>
                                     &nbsp;Seen
                                     <small class="badge bg-green">@seenCount</small>
 
                                 </button>
                             }
-                            @if (callerCount)
+                            @if (Model.Status.Equals("accepted") && Model.Travel)
+                            {
+                                <button type="button" class="btn btn-success btn-xs" data-toggle="small-modal" data-target="#small-modal" data-url="@Url.Action("Travel", "Remarks", new { id = Model.TrackingId })">
+                                    <i class="fa fa-ambulance"></i>
+                                    &nbsp;Travel
+                                </button>
+                            }
+                            @if (callerCount > 0)
                             {
                                 <button class="btn btn-xs bg-gradient-primary">
                                     <i class="fa fa-phone"></i>
@@ -331,14 +362,8 @@
 
                                 </button>
                             }
-                            @if (Model.Status.Equals("accepted"))
-                            {
-                                <button class="btn btn-xs bg-gradient-success">
-                                    <i class="fa fa-ambulance"></i>
-                                    &nbsp;Travel
-                                </button>
-                            }
-                            <button class="btn btn-xs bg-gradient-info">
+
+                            <button type="button" class="btn btn-info btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = Model.Code })">
                                 <i class="fa fa-comments"></i>
                                 &nbsp;ReCo
                                 @if (recoCount > 0)

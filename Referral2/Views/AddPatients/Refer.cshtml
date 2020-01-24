@@ -1,46 +1,49 @@
 ﻿@model ReferPatientViewModel
 
 @{
-    var dateReferred = DateTime.Now.DayOfWeek + " " + DateTime.Now.ToString("MMMM d, yyyy hh:mm tt",System.Globalization.CultureInfo.InvariantCulture);
+    var dateReferred = DateTime.Now.DayOfWeek + " " + DateTime.Now.ToString("MMMM d, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+    var referringMd = "Dr. " + User.FindFirstValue(ClaimTypes.GivenName) + " " + User.FindFirstValue(ClaimTypes.Surname);
 }
-            <!-- REFER BODY -->
-
+<!-- REFER BODY -->
 <div class="modal-header">
     <span class="justify-content-center">CENTRAL VISAYAS HEALTH REFERRAL SYSTEM</span>
     <br />
     <small class="justify-content-center">Clinical Referral Form</small>
 </div>
-<form asp-action="Refer" method="post">
-    <input type="hidden" asp-for="PatientId" value="@Model.PatientId" />
+
+<form asp-action="Refer" method="post" id="refer-form">
     <div class="modal-body">
+        <input type="hidden" asp-for="PatientId" value="@ViewBag.Patient.Id" />
         <table class="table table-striped">
             <tbody>
                 <!-- FACILITY NAME-->
                 <tr>
                     <td colspan="6">
-                        Name of Referring Facility: <span class="text-danger">@Model.ReferringFacility</span>
+                        Name of Referring Facility: <span class="text-danger">@ViewBag.Facility</span>
                     </td>
                 </tr>
                 <!-- FACILITY ADDRESS -->
                 <tr>
                     <td colspan="6">
-                        Address: <span class="text-success">@Model.ReferringFacilityAddress</span>
+                        Address: <span class="text-success">@ViewBag.FacilityAddress</span>
                     </td>
                 </tr>
                 <tr>
                     <!-- REFERRED TO -->
                     <td colspan="3">
                         Referred to:&nbsp;&nbsp;&nbsp;
-                        <select id="facilityFilter" asp-for="ReferredTo" asp-items="ViewBag.ReferredTo" class="form-control facilityFilter" required>
-                            <option>Select Facility...</option>
+                        <select class="form-control form-control-sm facilityFilter" id="facilityFilter" asp-for="ReferredTo" asp-items="ViewBag.ReferredTo" required>
+                            <option value="0">Select Facility...</option>
                         </select>
+                        <span class="text-danger" asp-validation-for="ReferredTo"></span>
                     </td>
                     <!-- DEPARTMENT -->
                     <td colspan="3">
                         Department:
-                        <select id="departmentFilter" asp-for="Department" class="form-control" required>
-                            <option>Select Department...</option>
+                        <select class="form-control form-control-sm" id="departmentFilter" asp-for="Department" required>
+                            <option value="0">Select Department...</option>
                         </select>
+                        <span class="text-danger" asp-validation-for="Department"></span>
                     </td>
                 </tr>
                 <!-- ADDRESS OF REFERRED HOSPITAL -->
@@ -65,47 +68,47 @@
                     <!-- NAME OF PATIENT -->
                     <td colspan="3">
                         Name of Patient:
-                        <span class="text-danger">@Model.PatientName</span>
+                        <span class="text-danger">@ViewBag.Patient.Name</span>
                     </td>
                     <!-- AGE -->
                     <td>
-                        Age:&nbsp;<span class="text-danger">@Model.PatientAge</span>
+                        Age:&nbsp;<span class="text-danger">@ViewBag.Patient.Age</span>
                     </td>
 
                     <!-- SEX -->
                     <td>
-                        Sex:&nbsp;<span class="text-danger">@Model.PatientSex</span>
+                        Sex:&nbsp;<span class="text-danger">@ViewBag.Patient.Sex</span>
                     </td>
 
                     <!-- STATUS -->
                     <td>
-                        Status:&nbsp;<span class="text-danger">@Model.PatientCivilStatus</span>
+                        Status:&nbsp;<span class="text-danger">@ViewBag.Patient.CivilStatus</span>
                     </td>
                 </tr>
                 <!-- ADDRESS OF PATIENT -->
                 <tr>
                     <td colspan="6">
                         Address:
-                        <span class="text-danger">@Model.PatientAddress</span>
+                        <span class="text-danger">@ViewBag.Patient.Address</span>
                     </td>
                 </tr>
                 <tr>
                     <!-- PHILHEALTH STATUS -->
                     <td colspan="3">
                         PhilHealth:
-                        <span class="text-danger">@Model.PatientPhicStatus</span>
+                        <span class="text-danger">@ViewBag.Patient.PhicStatus</span>
                     </td>
                     <!-- PHILHEALTH NUMBER -->
                     <td colspan="3">
                         PhilHealth#:
-                        <span class="text-danger">@Model.PatientPhicId</span>
+                        <span class="text-danger">@ViewBag.Patient.PhicId</span>
                     </td>
                 </tr>
                 <!-- CASE SUMMARY -->
                 <tr>
                     <td colspan="6">
                         Case Summary (pertinent Hx/PE, including meds, labs, course etc.):<br />
-                        <textarea asp-for="CaseSummary" class="form-control" rows="7"></textarea>
+                        <textarea asp-for="CaseSummary" class="form-control" rows="5" required></textarea>
                         <span asp-validation-for="CaseSummary" class="text-danger"></span>
                     </td>
                 </tr>
@@ -113,7 +116,7 @@
                 <tr>
                     <td colspan="6">
                         Summary of ReCo (Please refer to ReCo Guide in Referring Patients Checklist):
-                        <textarea asp-for="SummaryReco" class="form-control" rows="7"></textarea>
+                        <textarea asp-for="SummaryReco" class="form-control" rows="5" required></textarea>
                         <span asp-validation-for="SummaryReco" class="text-danger"></span>
                     </td>
                 </tr>
@@ -121,7 +124,7 @@
                 <tr>
                     <td colspan="6">
                         Diagnosis/Impression:
-                        <textarea asp-for="Diagnosis" class="form-control" rows="7"></textarea>
+                        <textarea asp-for="Diagnosis" class="form-control" rows="5" required></textarea>
                         <span asp-validation-for="Diagnosis" class="text-danger"></span>
                     </td>
                 </tr>
@@ -129,7 +132,7 @@
                 <tr>
                     <td colspan="6">
                         Reason for referral:
-                        <textarea asp-for="Reason" class="form-control" rows="7"></textarea>
+                        <textarea asp-for="Reason" class="form-control" rows="5" required></textarea>
                         <span asp-validation-for="Reason" class="text-danger"></span>
                     </td>
                 </tr>
@@ -137,7 +140,7 @@
                 <tr>
                     <td colspan="6">
                         Name of Referring MD/HCW:
-                        <span class="form-control text-danger">@Model.ReferringMd</span>
+                        <span class="form-control text-danger">@referringMd</span>
                     </td>
                 </tr>
                 <!-- NAME OF REFERRED -->
@@ -148,10 +151,9 @@
                         </div>
                         <div class="col-md-7">
                             <select id="doctorFiltered" asp-for="ReferredToMd" class="form-control">
-                                <option value="any">Any...</option>
+                                <option value="0">Any...</option>
                             </select>
-                            <span class="" dir="ltr" style="width:100%;">
-                            </span>
+                            <span class="text-danger" asp-validation-for="ReferredToMd"></span>
                         </div>
                     </td>
                 </tr>
@@ -162,12 +164,15 @@
     <div class="modal-footer justify-content-end">
 
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-success" data-save>Submit</button>
+        <button type="submit" class="btn btn-success">Submit</button>
     </div>
 </form>
-
-
 <script>
+    var form = $('form#refer-form');
+    form.removeData('validator');
+    form.removeData('unobtrusiveValidation');
+    $.validator.unobtrusive.parse(form);
+
     var facilityId = 0;
     var departmentId = 0;
     $('#facilityFilter').change(function () {
@@ -179,13 +184,13 @@
 
             $('#departmentFilter').empty()
                 .append($('<option>', {
-                    value: '',
+                    value: 'none',
                     text: 'Select Department...'
                 }));
 
             $('#doctorFiltered').empty()
                 .append($('<option>', {
-                    value: '',
+                    value: '0',
                     text: 'Any'
                 }));
 
@@ -199,6 +204,7 @@
     });
 
 
+
     $('#departmentFilter').change(function () {
         if (facilityId == '0') {
             facilityId == '24';
@@ -208,7 +214,7 @@
         $.when(getMdFiltered()).done(function (output) {
             $('#doctorFiltered').empty()
                 .append($('<option>', {
-                    value: '',
+                    value: '0',
                     text: 'Any'
                 }));
 
@@ -220,6 +226,8 @@
             });
         });
     });
+
+
 
 
     function getDepartmentFiltered() {
@@ -242,5 +250,3 @@
         });
     }
 </script>
-
-

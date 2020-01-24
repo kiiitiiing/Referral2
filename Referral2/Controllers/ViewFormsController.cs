@@ -10,6 +10,7 @@ using Referral2.Data;
 using Referral2.Helpers;
 using Referral2.Models;
 using Referral2.Models.ViewModels;
+using Referral2.Models.ViewModels.Forms;
 
 namespace Referral2.Controllers
 {
@@ -43,7 +44,9 @@ namespace Referral2.Controllers
                 activity.Status = _status.Value.REFERRED;
 
             tracking.DateSeen = DateTime.Now;
+            activity.DateSeen = DateTime.Now;
             _context.Update(tracking);
+            _context.Update(activity);
 
             var seen = new Seen();
             seen.FacilityId = UserFacility();
@@ -52,6 +55,37 @@ namespace Referral2.Controllers
             seen.CreatedAt = DateTime.Now;
             seen.UserMd = UserId();
             _context.Add(seen);
+            await _context.SaveChangesAsync();
+            return PartialView(patientForm);
+        }
+        public async Task<IActionResult> PregnantForm(string code)
+        {
+            var patientForm = await _context.PregnantForm.SingleAsync(x => x.Code.Equals(code));
+
+            if (patientForm == null)
+                return NotFound();
+
+            var tracking = _context.Tracking.Single(x => x.Code.Equals(code));
+            var activity = _context.Activity.Single(x => x.Code.Equals(code) && x.Status.Equals(_status.Value.REFERRED));
+
+            if (!activity.Status.Equals(_status.Value.REFERRED))
+                activity.Status = _status.Value.REFERRED;
+
+            tracking.DateSeen = DateTime.Now;
+            activity.DateSeen = DateTime.Now;
+            _context.Update(tracking);
+            _context.Update(activity);
+
+            var seen = new Seen
+            {
+                FacilityId = UserFacility(),
+                TrackingId = _context.Tracking.Single(x => x.Code.Equals(patientForm.Code)).Id,
+                UpdatedAt = DateTime.Now,
+                CreatedAt = DateTime.Now,
+                UserMd = UserId()
+            };
+
+            await _context.AddAsync(seen);
             await _context.SaveChangesAsync();
             return PartialView(patientForm);
         }
@@ -67,7 +101,11 @@ namespace Referral2.Controllers
         {
             var form = await _context.PregnantForm.SingleOrDefaultAsync(x => x.Code.Equals(code));
 
-            return PartialView(form);
+            var baby = await _context.Baby.SingleOrDefaultAsync(x => x.BabyId.Equals(form.PatientBabyId));
+
+            var pregnantForm = new PregnantViewModel(form, baby);
+
+            return PartialView(pregnantForm);
         }
 
         #region HELPERS

@@ -76,7 +76,7 @@ namespace Referral2.Controllers
             }
             ViewData["Status"] = "failed";
 
-            return PartialView("~/Views/Users/ChangePassword.cshtml",model);
+            return PartialView("~/Views/Users/ChangePassword.cshtml", model);
         }
 
         #region HELPERS

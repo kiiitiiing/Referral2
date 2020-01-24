@@ -40,7 +40,11 @@
                         {
                             <tr>
                                 <td>
-                                    <a class="text-warning" data-toggle="ajax-modal" data-target="#update-doctor-modal" data-url="@Url.Action("UpdateUser", new { id = item.Id })">Dr. @item.DoctorName</a>
+                                    <strong>
+                                        <a href="#" class="text-warning" data-toggle="ajax-modal" data-target="#update-doctor-modal" data-url="@Url.Action("UpdateUser", new { id = item.Id })">
+                                            Dr. @item.DoctorName
+                                        </a>
+                                    </strong>
                                 </td>
                                 <td>@item.DepartmentName</td>
                                 <td>

@@ -21,7 +21,7 @@
                         <div class="card-body">
                             <!-- SEARCH -->
                             <div class="form-group">
-                                <input class="form-control form-control-sm" type="text" placeholder="Seach Keyword..." name="SearchString" value="@ViewBag.CurrentFilter" autocomplete="off" required />
+                                <input class="form-control form-control-sm" type="text" placeholder="Seach Keyword..." name="name" value="@ViewBag.CurrentFilter" autocomplete="off" required />
                             </div>
                             <!-- MUNICIPALITY -->
                             <div class="form-group">
@@ -31,19 +31,19 @@
                             </div>
                             <!-- BARANGAY -->
                             <div class="form-group">
-                                <select class="form-control form-control-sm" id="barangay" name="barangayId" required>
+                                <select class="form-control form-control-sm" id="barangay" asp-items="ViewBag.Barangays" name="barangayId" required>
                                     <option value="">Select Barangay...</option>
                                 </select>
                             </div>
                             <!-- BUTTONS -->
                             <div class="form-group">
                                 <!-- FILTER -->
-                                <button class="btn btn-block btn-sm btn-success" type="submit" value="Filter">
+                                <button class="btn btn-block btn-sm bg-gradient-success" type="submit" value="Filter">
                                     <i class="fa fa-search"></i>
                                     &nbsp;Filter
                                 </button>
                                 <!-- ADD PATIENT -->
-                                <a class="btn btn-block btn-sm btn-warning" asp-controller="AddPatients" asp-action="Add">
+                                <a class="btn btn-block btn-sm bg-gradient-warning" asp-controller="AddPatients" asp-action="Add">
                                     <i class="fa fa-user-plus">
                                         &nbsp;Add Patient
                                     </i>
@@ -157,18 +157,20 @@
                 </h4>
             </div>
             <div class="modal-body clearfix">
-                <!-- NON-PREGNENT WALKIN -->
-                <button class="btn btn-warning col-xs-7" type="button" data-backdrop="static" data-toggle="modal" data-target="#walkin_modal">
-                    <img src="~/assets/dist/img/female.png" width="100" />
-                    <br />
-                    Non-Pregnant
-                </button>
-                <!-- PREGNANT WALKIN -->
-                <button class="btn btn-info col-xs-7" type="button" data-backdrop="static" data-target="#pregnant_walkin_modal" data-toggle="modal">
-                    <img src="~/assets/dist/img/pregnant.png" width="100" />
-                    <br />
-                    Pregnant
-                </button>
+                <div class="preg-btn">
+                    <!-- NON-PREGNENT WALKIN -->
+                    <button class="btn btn-warning col-xs-7" type="button" data-backdrop="static" data-toggle="modal" data-target="#walkin_modal">
+                        <img src="~/assets/dist/img/female.png" width="100" />
+                        <br />
+                        Non-Pregnant
+                    </button>
+                    <!-- PREGNANT WALKIN -->
+                    <button class="btn btn-info col-xs-7" type="button" data-backdrop="static" data-target="#pregnant_walkin_modal" data-toggle="modal">
+                        <img src="~/assets/dist/img/pregnant.png" width="100" />
+                        <br />
+                        Pregnant
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -184,18 +186,20 @@
                 </h4>
             </div>
             <div class="modal-body clearfix">
-                <!-- NON-PREGNANT REFER -->
-                <button type="button" class="btn btn-warning col-xs-7" data-backdrop="static" data-toggle="modal" data-target="#refer_modal">
-                    <img src="~/assets/dist/img/female.png" width="100" />
-                    <br />
-                    Non-Pregnant
-                </button>
-                <!-- PREGNENT REFER -->
-                <button type="button" class="btn btn-info col-xs-7" data-backdrop="static" data-toggle="modal" data-target="#pregnant_refer_modal">
-                    <img src="~/assets/dist/img/pregnant.png" width="100" />
-                    <br />
-                    Pregnant
-                </button>
+                <div class="preg-btn">
+                    <!-- NON-PREGNANT REFER -->
+                    <button type="button" class="btn btn-warning col-xs-7" data-backdrop="static" data-toggle="modal" data-target="#refer_modal">
+                        <img src="~/assets/dist/img/female.png" width="100" />
+                        <br />
+                        Non-Pregnant
+                    </button>
+                    <!-- PREGNENT REFER -->
+                    <button type="button" class="btn btn-info col-xs-7" data-backdrop="static" data-toggle="modal" data-target="#pregnant_refer_modal">
+                        <img src="~/assets/dist/img/pregnant.png" width="100" />
+                        <br />
+                        Pregnant
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -272,6 +276,27 @@
         $.get(url).done(function (data) {
             $('#pregnant-walkin-content').empty();
             $('#pregnant-walkin-content').html(data);
+        });
+    });
+
+    var currentModal = $('#refer_modal');
+    var currentContent = $('#normal-refer-content');
+
+    currentModal.on('click', 'button[data-save="modal"]', function (event) {
+        event.preventDefault();
+        var form = currentModal.find('form');
+        var actionUrl = form.attr('action');
+        console.log(actionUrl);
+        var dataToSend = form.serialize();
+        $.post(actionUrl, dataToSend).done(function (data) {
+            currentContent.empty();
+            currentContent.html(data);
+            //currentContent.find('.modal-body').replaceWith(newBody);
+            var validation = $('span.text-danger').text();
+            if (validation == '') {
+                //placeholderElement.find('.modal').modal('hide');
+                //location.reload();
+            }
         });
     });
 </script>

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Referral2.Models.ViewModels
+namespace Referral2.Models.ViewModels.Account
 {
     public partial class LoginViewModel
     {

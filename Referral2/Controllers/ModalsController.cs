@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Referral2.Data;
@@ -26,6 +28,8 @@ namespace Referral2.Controllers
             _status = status;
         }
 
+        
+        // Get Seens
         public async Task<IActionResult> ViewSeens(int trackingId)
         {
             var seens = _context.Seen
@@ -40,6 +44,7 @@ namespace Referral2.Controllers
             return PartialView(await seens.AsNoTracking().ToListAsync());
         }
 
+        // Get calls
         public async Task<IActionResult> ViewCalls(string code)
         {
             var calls = _context.Activity
@@ -54,6 +59,7 @@ namespace Referral2.Controllers
             return PartialView(await calls.AsNoTracking().ToListAsync());
         }
 
+        // Get Feedback
         public IActionResult ViewReco(string code)
         {
             var feedbacks = _context.Feedback
@@ -71,6 +77,7 @@ namespace Referral2.Controllers
             return PartialView("~/Views/Modals/ViewReco.cshtml", feedbacks.AsNoTracking().ToList());
         }
 
+        // POST Feedback
         [HttpPost]
         public void ViewReco([Bind] FeedbackViewModel model)
         {

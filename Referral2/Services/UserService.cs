@@ -18,9 +18,11 @@ namespace Referral2.Services
 {
     public interface IUserService
     {
-        Task<(bool, User)> ValidateUserCredentialsAsync(string Username, string Password);
+        Task<(bool, User)> ValidateUserCredentialsAsync(string username, string password);
+        Task<(bool, User)> SwitchUserAsync(int id, string password);
 
         bool ChangePasswordAsync(User user, string newPassword);
+
 
         Task<bool> RegisterDoctorAsync(AddSupportViewModel model);
 
@@ -43,22 +45,22 @@ namespace Referral2.Services
             _roles = roles;
         }
 
-        public Task<(bool, User)> ValidateUserCredentialsAsync(string Username, string Password)
+        public Task<(bool, User)> ValidateUserCredentialsAsync(string username, string password)
         {
             User user = null;
-            if (string.IsNullOrEmpty(Username) || string.IsNullOrEmpty(Password))
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
                 return Task.FromResult((false, user));
 
             try
             {
-                user = _context.User.Single(x => x.Username.Equals(Username));
+                user = _context.User.Single(x => x.Username.Equals(username));
             }catch(InvalidOperationException e)
             { }
 
             if (user == null)
                 return Task.FromResult((false, user));
 
-            var result = _hashPassword.VerifyHashedPassword(user, user.Password, Password);
+            var result = _hashPassword.VerifyHashedPassword(user, user.Password, password);
 
 
             if (result.Equals(PasswordVerificationResult.Success))
@@ -162,6 +164,31 @@ namespace Referral2.Services
                 _context.SaveChanges();
                 return Task.FromResult(true);
             }
+        }
+
+        Task<(bool, User)> IUserService.SwitchUserAsync(int id, string password)
+        {
+            var user = _context.User.Find(id);
+            if (user == null)
+            {
+                return Task.FromResult((false, user));
+            }
+
+            var result = _hashPassword.VerifyHashedPassword(user, user.Password, password);
+
+
+            if (result.Equals(PasswordVerificationResult.Success))
+            {
+                user.LoginStatus = "login";
+                user.LastLogin = DateTime.Now;
+                user.UpdatedAt = DateTime.Now;
+                user.Status = "active";
+                _context.Update(user);
+                return Task.FromResult((true, user));
+            }
+
+            else
+                return Task.FromResult((false, user));
         }
     }
 }

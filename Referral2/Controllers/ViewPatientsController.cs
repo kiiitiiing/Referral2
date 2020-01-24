@@ -16,7 +16,6 @@ using Referral2.Models;
 using Referral2.Models.ViewModels;
 using Referral2.Models.ViewModels.ViewPatients;
 using Microsoft.Extensions.Options;
-using static Referral2.Controllers.NoReloadController;
 using Referral2.Models.ViewModels.Doctor;
 
 namespace Referral2.Controllers
@@ -25,14 +24,12 @@ namespace Referral2.Controllers
     public class ViewPatientsController : Controller
     {
         private readonly ReferralDbContext _context;
-        private readonly ICompute _compute;
         private readonly IOptions<ReferralRoles> _roles;
         private readonly IOptions<ReferralStatus> _status;
 
-        public ViewPatientsController(ReferralDbContext context, ICompute compute, IOptions<ReferralRoles> roles, IOptions<ReferralStatus> status)
+        public ViewPatientsController(ReferralDbContext context, IOptions<ReferralRoles> roles, IOptions<ReferralStatus> status)
         {
             _context = context;
-            _compute = compute;
             _roles = roles;
             _status = status;
         }
@@ -42,16 +39,26 @@ namespace Referral2.Controllers
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
 
-        //GET: Patients
-        public async Task<IActionResult> ListPatients(string currentFilter, string searchString, int? muncityId, int? barangayId, int? pageNumber)
+        //GET: List Patients
+        public async Task<IActionResult> ListPatients(string currentFilter, string name, int? muncityId, int? barangayId, int? pageNumber)
         {
-            if (searchString != null)
+            if (name != null)
                 pageNumber = 1;
             else
-                searchString = currentFilter;
+                name = currentFilter;
 
-            ViewBag.Muncities = new SelectList(_context.Muncity.Where(x => x.ProvinceId.Equals(UserProvince())), "Id", "Description");
-            ViewBag.CurrentFilter = searchString;
+            var muncities = _context.Muncity.Where(x => x.ProvinceId.Equals(UserProvince()));
+
+            if (muncityId == null)
+                ViewBag.Muncities = new SelectList(muncities, "Id", "Description");
+            else
+            {
+                var barangays = _context.Barangay.Where(x => x.MuncityId.Equals(muncityId));
+                ViewBag.Muncities = new SelectList(muncities, "Id", "Description", muncityId);
+                ViewBag.Barangays = new SelectList(barangays, "Id", "Description", barangayId);
+            }
+                
+            ViewBag.CurrentFilter = name;
 
 
             var patients = _context.Patient
@@ -68,7 +75,9 @@ namespace Referral2.Controllers
                 Barangay = x.Barangay == null ? "" : x.Barangay.Description,
                 CreatedAt = (DateTime)x.CreatedAt
             })
-            .Where(x => x.PatientName.Contains(searchString) && x.MuncityId.Equals(muncityId) && x.BarangayId.Equals(barangayId));
+            .Where(x => x.PatientName.ToUpper().Contains(name) &&
+            x.MuncityId.Equals(muncityId) && 
+            x.BarangayId.Equals(barangayId));
 
 
             int pageSize = 5;
@@ -328,6 +337,7 @@ namespace Referral2.Controllers
                 .Where(x => x.Code.Equals(code))
                 .Select(t => new ReferredViewModel
                 {
+                    TrackingId = t.Id,
                     PatientName = t.Patient.FirstName + " " + t.Patient.MiddleName + " " + t.Patient.LastName,
                     PatientSex = t.Patient.Sex,
                     PatientAge = GlobalFunctions.ComputeAge(t.Patient.DateOfBirth),
@@ -337,8 +347,10 @@ namespace Referral2.Controllers
                     SeenCount = _context.Seen.Where(x => x.TrackingId.Equals(t.Id)).Count(),
                     CallerCount = activities == null ? 0 : activities.Where(x => x.Status.Equals(_status.Value.CALLING)).Count(),
                     ReCoCount = feedbacks == null ? 0 : feedbacks.Count(),
+                    Travel = string.IsNullOrEmpty(t.Transportation),
                     Code = t.Code,
                     Status = t.Status,
+                    Walkin = t.WalkIn.Equals("yes"),
                     Activities = activities.OrderByDescending(x => x.CreatedAt),
                     UpdatedAt = t.UpdatedAt
                 })
@@ -382,6 +394,7 @@ namespace Referral2.Controllers
             ViewBag.StartDate = StartDate.Date.ToString("yyyy/MM/dd");
             ViewBag.EndDate = EndDate.Date.ToString("yyyy/MM/dd");
 
+
             var incoming = from t in _context.Tracking.Where(f => f.ReferredTo == UserFacility())
                            join a in _context.Activity
                            on new
@@ -405,7 +418,7 @@ namespace Referral2.Controllers
                                PatientAge = GlobalFunctions.ComputeAge(t.Patient.DateOfBirth),
                                Status = t.Status,
                                ReferringMd = GlobalFunctions.GetMDFullName(t.ReferringMdNavigation),
-                               ActionMd = GlobalFunctions.GetMDFullName(t.ActionMdNavigation),
+                               ActionMd = GlobalFunctions.GetMDFullName(c.ActionMdNavigation),
                                SeenCount = _context.Seen.Where(x => x.TrackingId.Equals(t.Id)).Count(),
                                CallCount = _context.Activity.Where(x=>x.Code.Equals(t.Code) && x.Status.Equals(_status.Value.CALLING)).Count(),
                                FeedbackCount = _context.Feedback.Where(x=>x.Code.Equals(t.Code)).Count(),
@@ -449,7 +462,7 @@ namespace Referral2.Controllers
 
             return View(await PaginatedList<IncomingViewModel>.CreateAsync(incoming.OrderByDescending(d => d.DateAction).AsNoTracking(), pageNumber ?? 1, pageSize));
         }
-
+        // GET: Referred
         public async Task<IActionResult> Referred(string searchString, string currentFilter, int? pageNumber)
         {
             if (searchString != null)
@@ -475,12 +488,14 @@ namespace Referral2.Controllers
                                                 SeenCount = _context.Seen.Where(x => x.TrackingId.Equals(t.Id)).Count(),
                                                 CallerCount = activities.Where(x => x.Status.Equals(_status.Value.CALLING)).Count(),
                                                 ReCoCount = feedbacks.Where(x => x.Code.Equals(t.Code)).Count(),
+                                                Travel = string.IsNullOrEmpty(t.Transportation),
                                                 Code = t.Code,
                                                 Status = t.Status,
-                                                Activities = activities.Where(x=>x.Code.Equals(t.Code)).OrderByDescending(x=>x.CreatedAt),
+                                                Pregnant = t.Type.Equals("pregnant"),
+                                                Walkin = t.WalkIn.Equals("yes"),
+                                                Activities = activities.Where(x => x.Code.Equals(t.Code)).OrderByDescending(x => x.CreatedAt),
                                                 UpdatedAt = t.UpdatedAt
-                                            });
-
+                                            }); ;
 
             ViewBag.Total = referred.Count();
             ViewBag.Facilities = new SelectList(_context.Facility.Where(x => x.Id != UserFacility()), "Id", "Name");
