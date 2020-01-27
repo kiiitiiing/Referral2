@@ -107,7 +107,7 @@
                                             <td>
                                                 <div class="form-group">
                                                     <select id="muncityFilter" asp-for="MuncityId" class="form-control" asp-items="ViewBag.MuncityId" required>
-                                                        <option value="none">Select City/Municipality...</option>
+                                                        <option value="">Select City/Municipality...</option>
                                                     </select>
                                                     <span asp-validation-for="MuncityId" class="text-danger"></span>
                                                 </div>
@@ -118,7 +118,7 @@
                                             <td id="barangay-label">Barangay:</td>
                                             <td>
                                                 <select id="barangay" asp-for="BarangayId" class="form-control" required>
-                                                    <option value="none">Select Barangay...</option>
+                                                    <option value="">Select Barangay...</option>
                                                 </select>
                                                 <span asp-validation-for="BarangayId" class="text-danger"></span>
                                             </td>

@@ -40,7 +40,7 @@ namespace Referral2.Controllers
         {
             var activities = _context.Activity.Where(x=>x.DateReferred.Year.Equals(DateTime.Now.Year));
             var totalDoctors = _context.User.Where(x => x.Level.Equals("doctor")).Count();
-            var onlineDoctors = _context.User.Where(x => x.Login.Equals("login")).Count();
+            var onlineDoctors = _context.User.Where(x => x.LoginStatus.Contains("login") ).Count();
             var activeFacility = _context.Facility.Count();
             var referredPatients = _context.Tracking.Where(x => x.DateReferred != default || x.DateAccepted != default || x.DateArrived != default).Count();
 
@@ -104,38 +104,52 @@ namespace Referral2.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddFacility([Bind] Facility model)
+        public async Task<IActionResult> AddFacility([Bind] FacilityViewModel model)
         {
-            model.Status = "1";
-            model.Picture = null;
-            model.CreatedAt = DateTime.Now;
-            model.UpdatedAt = DateTime.Now;
             if(ModelState.IsValid)
             {
-                await _context.AddAsync(model);
+                var faciliy = await SetFacilityViewModelAsync(model);
+                await _context.AddAsync(faciliy);
                 await _context.SaveChangesAsync();
             }
+            else
+            {
+                if (model.Province == null)
+                    ModelState.AddModelError("Province", "Please select a province.");
+                if (model.Muncity == null)
+                    ModelState.AddModelError("Muncity", "Please select a municipality/city.");
+                if (model.Barangay == null)
+                    ModelState.AddModelError("Barangay", "Please select a barangay.");
+                if (model.Level == null)
+                    ModelState.AddModelError("Level", "Please select hospital level.");
+                if (model.Type == null)
+                    ModelState.AddModelError("Type", "Plase select hospital type.");
+            }
             var provinces = _context.Province;
-            ViewBag.Provinces = new SelectList(provinces, "Id", "Description",model.ProvinceId);
-            ViewBag.HospitalLevels = new SelectList(ListContainer.HospitalLevel,model.HospitalLevel);
-            ViewBag.HospitalTypes = new SelectList(ListContainer.HospitalType,model.HospitalType);
+            ViewBag.Provinces = new SelectList(provinces, "Id", "Description",model.Province);
             return PartialView(model);
         }
 
+        
+
         public async Task<IActionResult> UpdateFacility(int? id)
         {
-            var facility =await _context.Facility.FindAsync(id);
+            var facilityModel =await _context.Facility.FindAsync(id);
+
+            var facility = await SetFacilityModel(facilityModel);
 
             var province = _context.Province;
-            var muncity = _context.Muncity.Where(x => x.ProvinceId.Equals(facility.ProvinceId));
-            var barangay = _context.Barangay.Where(x => x.MuncityId.Equals(facility.BarangayId));
+            var muncity = _context.Muncity.Where(x => x.ProvinceId.Equals(facility.Province));
+            var barangay = _context.Barangay.Where(x => x.MuncityId.Equals(facility.Barangay));
 
-            ViewBag.Provices = new SelectList(province, "Id", "Description", facility.ProvinceId);
-            ViewBag.Muncities = new SelectList(muncity, "Id", "Description", facility.MuncityId);
-            ViewBag.Barangays = new SelectList(barangay, "Id", "Description", facility.BarangayId);
+            ViewBag.Provinces = new SelectList(province, "Id", "Description", facility.Province);
+            ViewBag.Muncities = new SelectList(muncity, "Id", "Description", facility.Muncity);
+            ViewBag.Barangays = new SelectList(barangay, "Id", "Description", facility.Barangay);
 
             return PartialView(facility);
         }
+
+        
 
         [HttpPost]
         public async Task<IActionResult> UpdateFacility([Bind] Facility model)
@@ -262,6 +276,47 @@ namespace Referral2.Controllers
 
 
         #region HELPERS
+        private Task<FacilityViewModel> SetFacilityModel(Facility facility)
+        {
+            var facilityModel = new FacilityViewModel
+            {
+                Id = facility.Id,
+                Name = facility.Name,
+                Abbrevation = facility.Abbrevation,
+                Province = facility.ProvinceId,
+                Muncity = facility.MuncityId,
+                Barangay = facility.BarangayId,
+                Address = facility.Address,
+                Contact = facility.Contact,
+                Email = facility.Email,
+                Chief = facility.ChiefHospital,
+                Level = facility.HospitalLevel,
+                Type = facility.HospitalType
+            };
+
+            return Task.FromResult(facilityModel);
+        }
+        private Task<Facility> SetFacilityViewModelAsync(FacilityViewModel model)
+        {
+            var facility = new Facility
+            {
+                Name = model.Name,
+                Abbrevation = model.Abbrevation,
+                Address = model.Address,
+                BarangayId = model.Barangay,
+                MuncityId = model.Muncity,
+                ProvinceId = (int)model.Province,
+                Contact = model.Contact,
+                Email = model.Email,
+                Status = 1,
+                Picture = "",
+                ChiefHospital = model.Chief,
+                HospitalLevel = (int)model.Level,
+                HospitalType = model.Type
+            };
+
+            return Task.FromResult(facility);
+        }
         private UpdateSupportViewModel ReturnSupportInfo(User currentSupport)
         {
             var support = new UpdateSupportViewModel

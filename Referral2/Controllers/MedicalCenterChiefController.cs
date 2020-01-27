@@ -37,7 +37,7 @@ namespace Referral2.Controllers
         public IActionResult MccDashboard()
         {
             var activities = _context.Activity.Where(x => x.DateReferred.Year.Equals(DateTime.Now.Year));
-            var totalDoctors = _context.User.Where(x => x.Level.Equals(_roles.Value.DOCTOR) && x.FacilityId.Equals(UserId())).Count();
+            var totalDoctors = _context.User.Where(x => x.Level.Equals(_roles.Value.DOCTOR) && x.FacilityId.Equals(UserFacility())).Count();
             var onlineDoctors = _context.User.Where(x => x.LoginStatus.Equals("login") && x.Level.Equals(_roles.Value.DOCTOR)).Count();
             var referredPatients = _context.Tracking
                 .Where(x => x.DateReferred != default || x.DateAccepted != default || x.DateArrived != default)

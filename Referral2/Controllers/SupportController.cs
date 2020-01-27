@@ -198,7 +198,7 @@ namespace Referral2.Controllers
         public async Task<IActionResult> UpdateUser([Bind] UpdateDoctorViewModel model)
         {
             var departments = _context.Department;
-            var doctor = SetDoctorViewModel(model);
+            var doctor = await SetDoctorViewModel(model);
             if (ModelState.IsValid)
             {
                 if(!string.IsNullOrEmpty(model.Password))
@@ -244,7 +244,7 @@ namespace Referral2.Controllers
                 Address = facility.Address,
                 Contact = facility.Contact,
                 Email = facility.Email,
-                Status = facility.Status
+                Status = facility.Status == 1 ? "active" : "inactive"
             };
             int provinceFacility = UserProvince();
             int muncityFacility = UserMuncity();
@@ -283,9 +283,9 @@ namespace Referral2.Controllers
 
         #region HELPERS
 
-        private User SetDoctorViewModel(UpdateDoctorViewModel model)
+        private async Task<User> SetDoctorViewModel(UpdateDoctorViewModel model)
         {
-            var doctor = _context.User.First(x => x.Username.Equals(model.Username));
+            var doctor = await _context.User.FindAsync(model.Id);
 
             doctor.Firstname = model.Firstname;
             doctor.Middlename = model.Middlename;
@@ -306,6 +306,7 @@ namespace Referral2.Controllers
         {
             var returnDoctor = new UpdateDoctorViewModel
             {
+                Id = doctor.Id,
                 Firstname = doctor.Firstname,
                 Middlename = doctor.Middlename,
                 Lastname = doctor.Lastname,
@@ -332,7 +333,7 @@ namespace Referral2.Controllers
             facility.Address = model.Address;
             facility.Contact = model.Contact;
             facility.Email = model.Email;
-            facility.Status = model.Status;
+            facility.Status = 1;
 
             return facility;
         }

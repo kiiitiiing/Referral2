@@ -36,7 +36,7 @@ namespace Referral2.Models
         public string Contact { get; set; }
         [StringLength(255)]
         public string Email { get; set; }
-        public string Status { get; set; }
+        public int? Status { get; set; }
         [StringLength(255)]
         public string Picture { get; set; }
         [StringLength(100)]

@@ -31,13 +31,13 @@ namespace Referral2.Controllers
             _status = status;
         }
 
-        public class SelectMuncity
+        public partial class SelectAddress
         {
             public int Id { get; set; }
             public string Description { get; set; }
         }
 
-        public class SelectAddressDepartment
+        public partial class SelectAddressDepartment
         {
             public SelectAddressDepartment(string address, IEnumerable<SelectDepartment> departments)
             {
@@ -48,10 +48,10 @@ namespace Referral2.Controllers
             public IEnumerable<SelectDepartment> Departments { get; set; }
         }
 
-
+       
         
 
-        public class SelectUser
+        public partial class SelectUser
         {
             public int MdId { get; set; }
             public string DoctorName { get; set; }
@@ -77,10 +77,10 @@ namespace Referral2.Controllers
 
 
         [HttpGet]
-        public List<SelectMuncity> FilteredBarangay(int? muncityId)
+        public List<SelectAddress> FilteredBarangay(int? muncityId)
         {
             var filteredBarangay =  _context.Barangay.Where(x => x.MuncityId.Equals(muncityId))
-                                                     .Select(y => new SelectMuncity
+                                                     .Select(y => new SelectAddress
                                                      {
                                                          Id = y.Id,
                                                          Description = y.Description
@@ -148,6 +148,33 @@ namespace Referral2.Controllers
             return address;
         }
 
+        public async Task<List<SelectAddress>> GetMuncities(int? id)
+        {
+            var muncities = await _context.Muncity
+                .Where(x => x.ProvinceId.Equals(id))
+                .Select(x => new SelectAddress
+                {
+                    Id = x.Id,
+                    Description = x.Description
+                })
+                .ToListAsync();
+
+            return muncities;
+        }
+
+        public async Task<List<SelectAddress>> GetBarangays(int? id)
+        {
+            var barangays = await _context.Barangay
+                .Where(x => x.MuncityId.Equals(id))
+                .Select(x => new SelectAddress
+                {
+                    Id = x.Id,
+                    Description = x.Description
+                })
+                .ToListAsync();
+
+            return barangays;
+        }
 
         public List<SelectUser> FilterUser(int facilityId, int departmentId)
         {

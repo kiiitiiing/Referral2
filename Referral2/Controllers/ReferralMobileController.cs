@@ -68,14 +68,14 @@ namespace Referral2.Controllers
             return null;
         }
 
-        public async Task<NotificationModel> Notification(string code)
+        public async Task<NotificationModel> Notification(int? id)
         {
             var activity = await _context.Activity
-                .SingleOrDefaultAsync(x => x.Code.Equals(code));
+                .FindAsync(id);
 
             var notification = new NotificationModel
             {
-                PatientCode = code,
+                PatientCode = activity.Code,
                 PatientName = GlobalFunctions.GetFullName(activity.Patient),
                 ReferringDoctor = GlobalFunctions.GetMDFullName(activity.ActionMdNavigation),
                 TrackStatus = activity.Status,

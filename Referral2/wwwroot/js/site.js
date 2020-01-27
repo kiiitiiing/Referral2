@@ -8,6 +8,14 @@
 // Write your JavaScript code.
 
 $(function () {
+    //---------------------- NOTIF ---------------------------------
+    $.ready(function () {
+        toastr.success('hellow');
+    });
+
+
+    //--------------------------------------------------------------
+
 
     var numberOfNotif = $('span.numberNotif');
     var bodey = $('body');
@@ -18,7 +26,9 @@ $(function () {
         });
     }
 
+    //----------------------- TRY-----------------------------------
 
+    
 
     //---------------------- ADDRESS CHANGE -------------------------
 
@@ -27,11 +37,11 @@ $(function () {
     var muncityId = 0;
     muncitySelect.on('change', function () {
         muncityId = muncitySelect.val();
-        if (muncityId != 'none') {
+        if (muncityId != '') {
             $.when(GetBarangayFiltered(muncityId)).done(function (output) {
                 barangaySelect.empty()
                     .append($('<option>', {
-                        value: 'none',
+                        value: '',
                         text: 'Select Barangay...'
                     }));
                 jQuery.each(output, function (i, item) {
@@ -45,7 +55,7 @@ $(function () {
         else {
             barangaySelect.empty()
                 .append($('<option>', {
-                    value: 'none',
+                    value: '',
                     text: 'Select Barangay...'
                 }));
         }
@@ -63,6 +73,7 @@ $(function () {
     //---------------------- MODALS ---------------------------------
 
     var placeholderElement = $('#modal-placeholders');
+
 
     var smallModal = $('#small-modal');
     var smallContent = $('#small-content');
@@ -156,6 +167,8 @@ $(function () {
     placeholderElement.on('click', 'button[data-save="modal"]', function (event) {
         event.preventDefault();
         var form = placeholderElement.find('.modal').find('form');
+        var formId = placeholderElement.find('.modal').attr('id');
+        console.log(formId);
         var actionUrl = form.attr('action');
         var dataToSend = form.serialize();
         $.post(actionUrl, dataToSend).done(function (data) {
@@ -164,7 +177,13 @@ $(function () {
             var validation = $('span.text-danger').text();
             if (validation == '') {
                 placeholderElement.find('.modal').modal('hide');
-                location.href = '/Home/Index';
+                //location.href = '/Home/Index';
+                if (formId == 'update-doctor-modal') {
+                    location.href = '/Support/ManageUsers'
+                }
+                else if (formId == 'change-password-modal') {
+                    location.reload();
+                }
             }
         });
     });

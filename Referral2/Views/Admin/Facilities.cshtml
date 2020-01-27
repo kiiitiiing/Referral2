@@ -12,7 +12,7 @@
                                 <i class="fa fa-search"></i>
                                 &nbsp;Search
                             </button>
-                            <button type="button" class="btn btn-sm btn-primary" data-toggle="small-modal" data-target="#small-modal" data-url="@Url.Action("AddFacility")">
+                            <button type="button" class="btn btn-sm btn-primary" data-toggle="ajax-modal" data-target="#add-facility-modal" data-url="@Url.Action("AddFacility")">
                                 <i class="fa fa-hospital"></i>
                                 &nbsp;Add Facility
                             </button>
@@ -37,7 +37,7 @@
                             {
                                 <tr>
                                     <td>
-                                        <a href="#" data-toggle="small-modal" data-target="#small-modal" data-url="@Url.Action("UpdateFacility", "Admin", new { id = item.Id })">
+                                        <a href="#" data-toggle="ajax-modal" data-target="#update-facility-modal" data-url="@Url.Action("UpdateFacility", "Admin", new { id = item.Id })">
                                             @item.Facility
                                         </a>
                                         <br />
