@@ -114,6 +114,8 @@ namespace Referral2.Controllers
         public SelectAddressDepartment FilterDepartment(int? facilityId)
         {
             var facility = _context.Facility.Find(facilityId);
+            if (facility == null)
+                return null;
             string facilityAddress = facility.Address.Equals("none") ? "" : facility.Address + ", ";
             string barangay = facility.Barangay == null ? "" : facility.Barangay.Description + ", ";
             string muncity = facility.Muncity == null ? "" : facility.Muncity.Description + ", ";
@@ -142,8 +144,7 @@ namespace Referral2.Controllers
         public async Task<string> GetFaciliyAddress(int? id)
         {
             var facility = await _context.Facility
-                .Where(x=>x.ProvinceId.Equals(UserProvince()))
-                .FirstOrDefaultAsync(x=>x.Id.Equals(id));
+                .FindAsync(id);
             var address = GlobalFunctions.GetAddress(facility);
             return address;
         }
@@ -188,9 +189,9 @@ namespace Referral2.Controllers
             return getUser.ToList();
         }
 
-        public List<SelectUser> FilterUsers(int? departmentId)
+        public List<SelectUser> FilterUsersWalkin(int? departmentId)
         {
-            var getUser = _context.User.Where(x => x.FacilityId.Equals(UserFacility()) && x.DepartmentId.Equals(departmentId) && x.Level.Equals(_roles.Value.DOCTOR) && x.Id != UserId())
+            var getUser = _context.User.Where(x => x.FacilityId.Equals(UserFacility()) && x.DepartmentId.Equals(departmentId) && x.Level.Equals(_roles.Value.DOCTOR))
                                         .Select(y => new SelectUser
                                         {
                                             MdId = y.Id,

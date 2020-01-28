@@ -41,10 +41,12 @@
                     </td>
                     <!-- DEPARTMENT -->
                     <td colspan="3">
-                        Department:
-                        <select class="form-control form-control-sm" id="departmentFilter" asp-for="Department" asp-items="ViewBag.Departments">
-                            <option value="0">Select Department...</option>
-                        </select>
+                        <div class="d-inline-flex">
+                            Department:&nbsp;&nbsp;
+                            <select class="form-control form-control-sm" id="departmentFilter" asp-for="Department" asp-items="ViewBag.Departments">
+                                <option value="0">Select Department...</option>
+                            </select>
+                        </div>
                         <span class="text-danger" asp-validation-for="Department"></span>
                     </td>
                 </tr>
@@ -179,6 +181,7 @@
     var departmentId = 0;
     $('#facilityFilter').change(function () {
         facilityId = $('#facilityFilter').val();
+        console.log(facilityId);
         $.when(getFacilityAddress(facilityId)).done(function (output) {
             $('#facilityAdress').text(output);
         });
@@ -189,9 +192,7 @@
             facilityId == '24';
         }
         departmentId = $('#departmentFilter').val();
-
-        $.when(getMdFiltered(facilityId,departmentId)).done(function (output) {
-            console.log(output);
+        $.when(getMdFiltered(departmentId)).done(function (output) {
             $('#doctorFiltered').empty()
                 .append($('<option>', {
                     value: '',
@@ -226,7 +227,8 @@
     }
 
     function getMdFiltered(departmentID) {
-        var urls = "/NoReload/FilterUsers?departmentId=" + departmentID;
+        var urls = "/NoReload/FilterUsersWalkin?departmentId=" + departmentID;
+        console.log(urls);
         return $.ajax({
             url: urls,
             type: 'get',
