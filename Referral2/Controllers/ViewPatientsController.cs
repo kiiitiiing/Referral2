@@ -411,6 +411,7 @@ namespace Referral2.Controllers
                            from c in tact.DefaultIfEmpty()
                            select new IncomingViewModel()
                            {
+                               Pregnant = t.Type.Equals("pregnant"),
                                TrackingId = t.Id,
                                Code = t.Code,
                                PatientName = GlobalFunctions.GetFullName(t.Patient),

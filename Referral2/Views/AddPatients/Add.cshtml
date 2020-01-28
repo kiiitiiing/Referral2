@@ -27,17 +27,15 @@
                                     <tbody>
                                         <!-- PHILHEALTH STATUS -->
                                         <tr>
-                                            <td>PhilHealth Status:</td>
+                                            <td class="table-add">PhilHealth Status:</td>
                                             <td>
-                                                <div class="form-group">
-                                                    <select id="phicStatus" asp-for="PhicStatus" class="form-control" asp-items="ViewBag.PhicStatus" name="PhicStatus" required>
-                                                    </select>
-                                                </div>
+                                                <select id="phicStatus" asp-for="PhicStatus" class="form-control" asp-items="ViewBag.PhicStatus" name="PhicStatus" required>
+                                                </select>
                                             </td>
                                         </tr>
                                         <!-- PHILHEALTH ID -->
                                         <tr>
-                                            <td>
+                                            <td class="table-add">
                                                 PhilHealth ID:<br />
                                                 <small class="text-info">
                                                     <em>(If applicable)</em>
@@ -49,7 +47,7 @@
                                         </tr>
                                         <!-- FIRST NAME -->
                                         <tr>
-                                            <td>First Name:</td>
+                                            <td class="table-add">First Name:</td>
                                             <td>
                                                 <input asp-for="FirstName" type="text" class="form-control" required autocomplete="off" />
                                                 <span asp-validation-for="FirstName" class="text-danger"></span>
@@ -57,7 +55,7 @@
                                         </tr>
                                         <!-- MIDDLE NAME -->
                                         <tr>
-                                            <td>Middle Name:</td>
+                                            <td class="table-add">Middle Name:</td>
                                             <td>
                                                 <input asp-for="MiddleName" type="text" class="form-control" required autocomplete="off" />
                                                 <span asp-validation-for="MiddleName" class="text-danger"></span>
@@ -65,7 +63,7 @@
                                         </tr>
                                         <!-- LAST NAME -->
                                         <tr>
-                                            <td>Last Name:</td>
+                                            <td class="table-add">Last Name:</td>
                                             <td>
                                                 <input asp-for="LastName" type="text" class="form-control" required autocomplete="off" />
                                                 <span asp-validation-for="LastName" class="text-danger"></span>
@@ -73,7 +71,7 @@
                                         </tr>
                                         <!-- BIRTHDATE NAME -->
                                         <tr>
-                                            <td>Birthdate:</td>
+                                            <td class="table-add">Birthdate:</td>
                                             <td>
                                                 <input asp-for="DateOfBirth" type="date" class="form-control" required autocomplete="off" />
                                                 <span asp-validation-for="DateOfBirth" class="text-danger"></span>
@@ -81,41 +79,37 @@
                                         </tr>
                                         <!-- GENDER -->
                                         <tr>
-                                            <td>Sex:</td>
+                                            <td class="table-add">Sex:</td>
                                             <td>
                                                 <div>
-                                                    <input asp-for="Sex" type="radio" value="Male" required autocomplete="off" />&nbsp;Male<br />
+                                                    <input asp-for="Sex" type="radio" value="Male" id="man" required autocomplete="off" />&nbsp;Male<br />
                                                 </div>
                                                 <div>
-                                                    <input asp-for="Sex" type="radio" value="Female" required autocomplete="off" />&nbsp;Female<br />
+                                                    <input asp-for="Sex" type="radio" value="Female" id="woman" required autocomplete="off" />&nbsp;Female<br />
                                                 </div>
                                             </td>
                                         </tr>
                                         <!-- CIVIL STATUS -->
                                         <tr>
-                                            <td>Civil Status:</td>
+                                            <td class="table-add">Civil Status:</td>
                                             <td>
-                                                <div class="form-group">
-                                                    <select asp-for="CivilStatus" class="form-control" asp-items="ViewBag.CivilStatus" required></select>
-                                                    <span asp-validation-for="CivilStatus" class="text-danger"></span>
-                                                </div>
+                                                <select asp-for="CivilStatus" class="form-control" asp-items="ViewBag.CivilStatus" required></select>
+                                                <span asp-validation-for="CivilStatus" class="text-danger"></span>
                                             </td>
                                         </tr>
                                         <!--MUNICIPALITY/CITY -->
                                         <tr>
-                                            <td>Municipality/City:</td>
+                                            <td class="table-add">Municipality/City:</td>
                                             <td>
-                                                <div class="form-group">
-                                                    <select id="muncityFilter" asp-for="MuncityId" class="form-control" asp-items="ViewBag.MuncityId" required>
-                                                        <option value="">Select City/Municipality...</option>
-                                                    </select>
-                                                    <span asp-validation-for="MuncityId" class="text-danger"></span>
-                                                </div>
+                                                <select id="muncityFilter" asp-for="MuncityId" class="form-control" asp-items="ViewBag.MuncityId" required>
+                                                    <option value="">Select City/Municipality...</option>
+                                                </select>
+                                                <span asp-validation-for="MuncityId" class="text-danger"></span>
                                             </td>
                                         </tr>
                                         <!--  BARANGAY -->
                                         <tr>
-                                            <td id="barangay-label">Barangay:</td>
+                                            <td class="table-add" id="barangay-label">Barangay:</td>
                                             <td>
                                                 <select id="barangay" asp-for="BarangayId" class="form-control" required>
                                                     <option value="">Select Barangay...</option>
@@ -140,7 +134,7 @@
                                 </a>
                                 <!-- SUMBIT BUTTON-->
                                 <button type="submit" class="btn btn-sm btn-success">
-                                    <i class="fa fa-send"></i>
+                                    <i class="far fa-paper-plane"></i>
                                     &nbsp;Submit
                                 </button>
                             </div>

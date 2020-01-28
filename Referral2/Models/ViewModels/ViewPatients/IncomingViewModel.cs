@@ -7,6 +7,7 @@ namespace Referral2.Models.ViewModels.ViewPatients
 {
     public partial class IncomingViewModel
     {
+        public bool Pregnant { get; set; }
         public int TrackingId { get; set; }
         public string Code { get; set; }
         public string PatientName { get; set; }

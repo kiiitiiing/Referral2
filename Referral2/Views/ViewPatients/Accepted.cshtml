@@ -72,9 +72,18 @@
                                 </td>
                                 <!-- PATIENT NAME -->
                                 <td>
-                                    <a href="#" data-toggle="large-modal" data-target="large-modal" data-url="@Url.Action("PrintableNormalForm","ViewForms", new { code = item.PatientCode })">
-                                        @item.PatientName
-                                    </a>
+                                    @if(item.Type.Equals("normal"))
+                                    {
+                                        <a href="#" data-toggle="large-modal" data-target="large-modal" data-url="@Url.Action("PrintableNormalForm","ViewForms", new { code = item.PatientCode })">
+                                            @item.PatientName
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a href="#" data-toggle="large-modal" data-target="large-modal" data-url="@Url.Action("PrintablePregnantForm","ViewForms", new { code = item.PatientCode })">
+                                            @item.PatientName
+                                        </a>
+                                    }
                                     <p class="small text-muted">
                                         @item.PatientCode
                                     </p>
@@ -103,9 +112,9 @@
                                             <i class="fa fa-wheelchair"></i>
                                         </button>
                                         //reco  
-                                        <button class="btn btn-sm btn-info" value="O">
-                                            <i class="fa fa-comments"></i>
-                                        </button>
+                                <button type="button" class="btn btn-sm btn-primary" data-toggle="ajax-modal" data-target="#arrived-modal" data-url="@Url.Action("ViewReco","Modals",new { code = item.PatientCode})">
+                                    <i class="fa fa-comments"></i>
+                                </button>
                                     }
                                     else if (status.Equals("arrived"))
                                     {

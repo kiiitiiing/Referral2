@@ -409,7 +409,7 @@
                         </div>
                     </div>
                     @{ 
-                        var dataTarget = item.Pregnant ? "pregnant-form-modal" : "normal-form-modal";
+                        var dataTarget = item.Pregnant ? "print-pregnant-form-modal" : "normal-form-modal";
                         var dataUrl = item.Pregnant ? Url.Action("PrintablePregnantForm","ViewForms", new { code = item.Code }) : Url.Action("PrintableNormalForm", "ViewForms", new { code = item.Code });
                     }
                     <div class="card-footer card-custom-bg">
@@ -419,7 +419,7 @@
                         </button>
                         @if (seenCount > 0)
                         {
-                            <button type="button" class="btn btn-success btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens", "Modals", new { trackingId = item.TrackingId })">
+                            <button type="button" class="btn btn-success btn-xs" data-toggle="ajax-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens", "Modals", new { trackingId = item.TrackingId })">
                                 <i class="fa fa-user-md"></i>
                                 &nbsp;Seen
 
@@ -429,7 +429,7 @@
                         }
                         @if (item.Status.Equals("accepted") && item.Travel)
                         {
-                            <button type="button" class="btn btn-success btn-xs" data-toggle="small-modal" data-target="#small-modal" data-url="@Url.Action("Travel", "Remarks", new { id = item.TrackingId })">
+                            <button type="button" class="btn btn-success btn-xs" data-toggle="ajax-modal" data-target="#travel-modal" data-url="@Url.Action("Travel", "Remarks", new { id = item.TrackingId })">
                                 <i class="fa fa-ambulance"></i>
                                 &nbsp;Travel
                             </button>
@@ -444,7 +444,7 @@
 
                             </button>
                         }
-                        <button type="button" class="btn btn-info btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
+                        <button type="button" class="btn btn-info btn-xs" data-toggle="ajax-modal" data-target="#reco-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
                             <i class="fa fa-comments"></i>
                             &nbsp;ReCo
                             @if (recoCount > 0)
@@ -452,13 +452,13 @@
                                 <small class="badge bg-blue">@recoCount</small>
                             }
                         </button>
-                        <button type="button" class="btn btn-xs bg-gradient-danger" data-toggle="small-modal" data-target="#small-modal" data-url="@Url.Action("Issues","Remarks", new { code = item.TrackingId })">
+                        <button type="button" class="btn btn-xs bg-gradient-danger" data-toggle="ajax-modal" data-target="#issues-modal" data-url="@Url.Action("Issues","Remarks", new { code = item.TrackingId })">
                             <i class="fa fa-exclamation-triangle"></i>
                             &nbsp;Issue and Concern
                         </button>
                         @if (!item.Status.Equals("cancelled") && !item.Status.Equals("discharged"))
                         {
-                            <button type="button" class="btn btn-xs btn-default" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("CancelRemark","Remarks", new { code = item.Code })">
+                            <button type="button" class="btn btn-xs btn-default" data-toggle="ajax-modal" data-target="#cancel-modal" data-url="@Url.Action("CancelRemark","Remarks", new { code = item.Code })">
                                 <i class="fa fa-times"></i>
                                 &nbsp;Cancel
                             </button>

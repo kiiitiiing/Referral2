@@ -213,7 +213,7 @@ namespace Referral2.Controllers
             var facilities = _context.Facility
                 .Where(x => x.Id != UserFacility() && x.ProvinceId == UserProvince());
             ViewBag.Patient = patient;
-            ViewBag.Facility = _context.Facility.Find(UserId()).Name;
+            ViewBag.Facility = _context.Facility.Find(UserFacility()).Name;
             ViewBag.Facilities = new SelectList(facilities, "Id", "Name");
             return PartialView();
         }
@@ -226,9 +226,9 @@ namespace Referral2.Controllers
                 .Where(x => x.Id != UserFacility() && x.ProvinceId == UserProvince());
             if (ModelState.IsValid)
             {
-                var pregnantForm = await SetPregnantForm(model);
-                var tracking = await PregnantTracking(pregnantForm);
-                var activity = await PregnantActivity(tracking);
+                var pregnantForm = await SetPregnantForm(model, _type.Value.REFER);
+                var tracking = await PregnantTracking(pregnantForm, _type.Value.REFER);
+                var activity = await PregnantActivity(tracking, _type.Value.REFER);
                 await _context.AddAsync(tracking);
                 await _context.AddAsync(activity);
                 await _context.SaveChangesAsync();
@@ -252,19 +252,73 @@ namespace Referral2.Controllers
         //GET: Pregnant Walkin
         public async Task<IActionResult> PregnantWalkin(int? id)
         {
+            var patient = await SetPatient(id);
+            var facility = _context.Facility.Find(UserFacility());
+            var facilityDepartment = await AvailableDepartments(UserFacility());
+            var facilities = _context.Facility
+                .Where(x => x.Id != UserFacility() && x.ProvinceId == UserProvince());
+            ViewBag.Patient = patient;
+            ViewBag.Facility = facility.Name;
+            ViewBag.FacilityAddress = GlobalFunctions.GetAddress(facility);
+            ViewBag.Facilities = new SelectList(facilities, "Id", "Name");
+            ViewBag.Departments = new SelectList(facilityDepartment, "DepartmentId", "DepartmentName");
             return PartialView();
         }
         //POST: Pregnant Walkin
         [HttpPost]
-        public async Task<IActionResult> PregnantWalkin()
+        public async Task<IActionResult> PregnantWalkin([Bind]PregnantReferViewModel model)
         {
+            var patient = await SetPatient(model.PatientId);
+            var facilities = _context.Facility
+                .Where(x => x.Id != UserFacility() && x.ProvinceId == UserProvince());
+            if (ModelState.IsValid)
+            {
+                var pregnantForm = await SetPregnantForm(model,_type.Value.WALKIN);
+                var tracking = await PregnantTracking(pregnantForm, _type.Value.WALKIN);
+                var activity = await PregnantActivity(tracking, _type.Value.WALKIN);
+                await _context.AddAsync(tracking);
+                await _context.AddAsync(activity);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("ListPatients", "ViewPatients");
+            }
+            else
+            {
+                ModelState.AddModelError("ReferredTo", "Please select a Facility.");
+                ModelState.AddModelError("Department", "Please select a Department.");
+                ModelState.AddModelError("WomanMajorFindings", "This field is required.");
+                ModelState.AddModelError("WomanInformationGiven", "This field is required.");
+            }
+            ViewBag.Patient = patient;
+            ViewBag.Facility = _context.Facility.Find(UserId()).Name;
+            ViewBag.Facilities = new SelectList(facilities, "Id", "Name");
             return PartialView();
         }
         #endregion
 
         #region Helpers
-        private Task<Activity> PregnantActivity(Tracking model)
+        private async Task<Activity> PregnantActivity(Tracking model, string type)
         {
+            var walkin = type.Equals(_type.Value.WALKIN);
+            if(walkin)
+            {
+                var referredActivity = new Activity
+                {
+                    Code = model.Code,
+                    PatientId = model.PatientId,
+                    DateReferred = model.DateReferred,
+                    DateSeen = model.DateSeen,
+                    ReferredFrom = model.ReferredFrom,
+                    ReferredTo = model.ReferredTo,
+                    DepartmentId = model.DepartmentId,
+                    ReferringMd = model.ReferringMd,
+                    ActionMd = null,
+                    Status = _status.Value.REFERRED,
+                    Remarks = model.Remarks,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
+                };
+                await _context.AddAsync(referredActivity);
+            }
             var activity = new Activity
             {
                 Code = model.Code,
@@ -277,13 +331,15 @@ namespace Referral2.Controllers
                 ReferringMd = model.ReferringMd,
                 ActionMd = model.ActionMd,
                 Status = model.Status,
+                Remarks = walkin? "Walk-In Patient" : model.Remarks,
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now
             };
-            return Task.FromResult(activity);
+            return activity;
         }
-        private Task<Tracking> PregnantTracking(PregnantForm model)
+        private Task<Tracking> PregnantTracking(PregnantForm model, string type)
         {
+            var walkin = type.Equals(_type.Value.WALKIN);
             var tracking = new Tracking
             {
                 Code = model.Code,
@@ -298,9 +354,9 @@ namespace Referral2.Controllers
                 DepartmentId = model.DepartmentId,
                 ReferringMd = model.ReferredBy,
                 ActionMd = null,
-                Status = _status.Value.REFERRED,
+                Status = walkin? _status.Value.ACCEPTED : _status.Value.REFERRED,
                 Type = _type.Value.PREGNANT,
-                WalkIn = "no",
+                WalkIn = walkin ? "yes" : "no",
                 FormId = model.Id,
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now
@@ -333,8 +389,9 @@ namespace Referral2.Controllers
             await _context.SaveChangesAsync();
             return baby;
         }
-        private async Task<PregnantForm> SetPregnantForm(PregnantReferViewModel model)
+        private async Task<PregnantForm> SetPregnantForm(PregnantReferViewModel model, string type)
         {
+            var walkin = type.Equals(_type.Value.WALKIN);
             Patient mother = _context.Patient.Find(model.PatientId);
             Patient baby = null;
             if(!string.IsNullOrEmpty(model.BabyFirstName))
@@ -345,11 +402,11 @@ namespace Referral2.Controllers
             {
                 UniqueId = model.PatientId + "-" + UserFacility() + "-" + DateTime.Now.ToString("yyMMddhh"),
                 Code = DateTime.Now.ToString("yyMMdd") + "-" + UserFacility().ToString().PadLeft(3, '0') + "-" + DateTime.Now.ToString("hhmmss"),
-                ReferringFacility = UserFacility(),
+                ReferringFacility = walkin? model.ReferredTo : UserFacility(),
+                ReferredTo = walkin? UserFacility() : model.ReferredTo,
                 ReferredBy = UserId(),
                 RecordNo = model.RecordNumber?? "",
                 ReferredDate = DateTime.Now,
-                ReferredTo = model.ReferredTo,
                 DepartmentId = model.Department,
                 ArrivalDate = default,
                 HealthWorker = model.HealthWorker?? "",

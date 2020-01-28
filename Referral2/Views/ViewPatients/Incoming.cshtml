@@ -97,7 +97,11 @@
                                                         <h3 class="timeline-header no-border">
                                                             <small class="text-bold">@item.Code</small>
                                                             <a href="#">@item.PatientName</a>
-                                                            was accepted by
+                                                            was 
+                                                            <span class="badge badge-success">
+                                                                accepted
+                                                            </span>
+                                                            by
                                                             <span class="text-success">@item.ActionMd</span>
                                                         </h3>
                                                         <div class="timeline-footer">
@@ -105,13 +109,13 @@
                                                                 <div class="form-group">
                                                                     @if (item.SeenCount > 0)
                                                                     {
-                                                                        <button type="button" class="btn btn-success btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens","Modals", new { trackingId = item.TrackingId })">
+                                                                        <button type="button" class="btn btn-success btn-xs" data-toggle="ajax-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens","Modals", new { trackingId = item.TrackingId })">
                                                                             <i class="fa fa-user-md"></i>
                                                                             &nbsp;Seen
                                                                             <small class="badge bg-green">@item.SeenCount</small>
                                                                         </button>
                                                                     }
-                                                                    <button type="button" class="btn btn-info btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
+                                                                    <button type="button" class="btn btn-info btn-xs" data-toggle="ajax-modal" data-target="#reco-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
                                                                         <i class="fa fa-comments"></i>
                                                                         &nbsp;ReCo
                                                                         @if (item.FeedbackCount > 0)
@@ -345,21 +349,31 @@
                                                                 <div class="form-group">
                                                                     @if (currentUserFacility == item.ReferredToId && currentUserDepartment == item.DepartmentId)
                                                                     {
+                                                                        if (item.Pregnant)
+                                                                        {
+                                                                            <button type="button" class="btn btn-warning btn-xs" data-toggle="ajax-modal" data-target="#pregnant-form-modal" data-url="@Url.Action("PregnantForm", "ViewForms", new { code = item.Code })">
+                                                                                <i class="fa fa-user-md"></i>
+                                                                                &nbsp;View Form
+                                                                            </button>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <button type="button" class="btn btn-warning btn-xs" data-toggle="ajax-modal" data-target="#patient-form-modal" data-url="@Url.Action("PatientForm", "ViewForms", new { code = item.Code })">
+                                                                                <i class="fa fa-user-md"></i>
+                                                                                &nbsp;View Form
+                                                                            </button>
+                                                                        }
 
-                                                                        <button type="button" class="btn btn-warning btn-xs" data-toggle="ajax-modal" data-target="#patient-form-modal" data-url="@Url.Action("PatientForm","ViewForms",new {code = item.Code })">
-                                                                            <i class="fa fa-user-md"></i>
-                                                                            &nbsp;View Form
-                                                                        </button>
                                                                     }
                                                                     @if (item.SeenCount > 0)
                                                                     {
-                                                                        <button type="button" class="btn btn-success btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens","Modals", new { trackingId = item.TrackingId })">
+                                                                        <button type="button" class="btn btn-success btn-xs" data-toggle="ajax-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens","Modals", new { trackingId = item.TrackingId })">
                                                                             <i class="fa fa-user-md"></i>
                                                                             &nbsp;Seen
                                                                             <small class="badge bg-green">@item.SeenCount</small>
                                                                         </button>
                                                                     }
-                                                                    <button type="button" class="btn btn-info btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
+                                                                    <button type="button" class="btn btn-info btn-xs" data-toggle="ajax-modal" data-target="#reco-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
                                                                         <i class="fa fa-comments"></i>
                                                                         &nbsp;ReCo
                                                                         @if (item.FeedbackCount > 0)

@@ -338,7 +338,7 @@
                             </button>
                             @if (seenCount > 0)
                             {
-                                <button type="button" class="btn btn-success btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens", "Modals", new { trackingId = Model.TrackingId })">
+                                <button type="button" class="btn btn-success btn-xs" data-toggle="ajax-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens", "Modals", new { trackingId = Model.TrackingId })">
                                     <i class="fa fa-user-md"></i>
                                     &nbsp;Seen
                                     <small class="badge bg-green">@seenCount</small>
@@ -347,7 +347,7 @@
                             }
                             @if (Model.Status.Equals("accepted") && Model.Travel)
                             {
-                                <button type="button" class="btn btn-success btn-xs" data-toggle="small-modal" data-target="#small-modal" data-url="@Url.Action("Travel", "Remarks", new { id = Model.TrackingId })">
+                                <button type="button" class="btn btn-success btn-xs" data-toggle="ajax-modal" data-target="#small-modal" data-url="@Url.Action("Travel", "Remarks", new { id = Model.TrackingId })">
                                     <i class="fa fa-ambulance"></i>
                                     &nbsp;Travel
                                 </button>
@@ -363,7 +363,7 @@
                                 </button>
                             }
 
-                            <button type="button" class="btn btn-info btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = Model.Code })">
+                            <button type="button" class="btn btn-info btn-xs" data-toggle="ajax-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = Model.Code })">
                                 <i class="fa fa-comments"></i>
                                 &nbsp;ReCo
                                 @if (recoCount > 0)

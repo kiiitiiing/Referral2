@@ -7,10 +7,10 @@
 }
 <!-- REFER BODY -->
 
-<div class="modal-header">
-    <span class="justify-content-center">CENTRAL VISAYAS HEALTH REFERRAL SYSTEM</span>
+<div class="title-form">
+    CENTRAL VISAYAS HEALTH REFERRAL SYSTEM
     <br />
-    <small class="justify-content-center">Clinical Referral Form</small>
+    <small>Clinical Referral Form</small>
 </div>
 <form asp-action="Walkin" method="post" id="walkin-form">
     <input type="hidden" asp-for="PatientId" value="@ViewBag.Patient.Id" />
@@ -158,14 +158,22 @@
     </div>
     <!-- REFER FOOTER -->
     <div class="modal-footer justify-content-end">
-
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-success">Submit</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">
+            <i class="fa fa-times"></i>
+            &nbsp;Close
+        </button>
+        <button type="submit" class="btn btn-success">
+            <i class="far fa-paper-plane"></i>
+            &nbsp;Submit
+        </button>
     </div>
 </form>
 
 <script>
-    $.validator.unobtrusive.parse("#walkin-form");
+    var form = $('#walkin-form');
+    form.removeData('validator');
+    form.removeData('unobtrusiveValidation');
+    $.validator.unobtrusive.parse(form);
 
     var facilityId = 0;
     var departmentId = 0;

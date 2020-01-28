@@ -6,7 +6,13 @@ body {
     background: #d2d6de;
 }
 
-
+.table-add{
+    text-align:right;
+    vertical-align:middle!important;
+    font-size: 14px;
+    font-weight:bold;
+    background-color: #F5F5F5;
+}
 
 .modal-body{
     padding: 12px!important;

@@ -2,69 +2,76 @@
 @{ 
     var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 }
-<div class="card card-success card-outline with-border direct-chat direct-chat-primary">
-    <div class="card-header with-border">
-        <h3 class="card-title">
-            <span class="feedback_code">@ViewBag.Code</span>
-        </h3>
 
-        <div class="fa-pull-right">
-            <button type="button" class="btn btn-box-tool" onclick="reloadMessage()">
-                <i class="fa fa-refresh"></i>
-            </button>
-            <button type="button" data-dismiss="modal" class="btn" data-widget="remove">
-                <i class="fa fa-times"></i>
-            </button>
-        </div>
-    </div>
-    <div class="card-body">
-        <div class="direct-chat-messages" id="@ViewBag.Code">
-            <div class="reco-body">
-                @foreach (var item in Model)
-                {
-                    if (item.MdId.Equals(int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier))))
-                    {
-                        <div class="direct-chat-msg right">
-                            <div class="direct-chat-info clearfix">
-                                <span class="direct-chat-name pull-right">@item.MdName</span>
-                                <span class="direct-chat-timestamp pull-left">10 Jan 12:01 pm</span>
-                            </div>
-                            <!-- /.direct-chat-info -->
-                            <img class="direct-chat-img" title="Talisay District Hospital" src="~/assets/dist/img/MDFemale.jpg" alt="Message User Image"><!-- /.direct-chat-img -->
-                            <div class="direct-chat-text">
-                                @item.Message
-                            </div>
-                            <!-- /.direct-chat-text -->
+<div class="modal fade" id="reco-modal">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="card card-success card-outline with-border direct-chat direct-chat-primary">
+                <div class="card-header with-border">
+                    <h3 class="card-title">
+                        <span class="feedback_code">@ViewBag.Code</span>
+                    </h3>
+
+                    <div class="fa-pull-right">
+                        <button type="button" class="btn btn-box-tool" onclick="reloadMessage()">
+                            <i class="fa fa-refresh"></i>
+                        </button>
+                        <button type="button" data-dismiss="modal" class="btn" data-widget="remove">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="direct-chat-messages" id="@ViewBag.Code">
+                        <div class="reco-body">
+                            @foreach (var item in Model)
+                            {
+                                if (item.MdId.Equals(int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier))))
+                                {
+                                    <div class="direct-chat-msg right">
+                                        <div class="direct-chat-info clearfix">
+                                            <span class="direct-chat-name pull-right">@item.MdName</span>
+                                            <span class="direct-chat-timestamp pull-left">10 Jan 12:01 pm</span>
+                                        </div>
+                                        <!-- /.direct-chat-info -->
+                                        <img class="direct-chat-img" title="Talisay District Hospital" src="~/assets/dist/img/MDFemale.jpg" alt="Message User Image"><!-- /.direct-chat-img -->
+                                        <div class="direct-chat-text">
+                                            @item.Message
+                                        </div>
+                                        <!-- /.direct-chat-text -->
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="direct-chat-msg left">
+                                        <div class="direct-chat-info clearfix">
+                                            <span class="direct-chat-name pull-left">@item.MdName</span>
+                                            <span class="direct-chat-timestamp pull-right">08 Jan 05:01 pm</span>
+                                        </div>
+                                        <!-- /.direct-chat-info -->
+                                        <img class="direct-chat-img" title="Vicente Sotto Memorial Medical Center" src="~/assets/dist/img/MDFemale.jpg" alt="Message User Image"><!-- /.direct-chat-img -->
+                                        <div class="direct-chat-text">
+                                            @item.Message
+                                        </div>
+                                    </div>
+                                }
+                            }
                         </div>
-                    }
-                    else
-                    {
-                        <div class="direct-chat-msg left">
-                            <div class="direct-chat-info clearfix">
-                                <span class="direct-chat-name pull-left">@item.MdName</span>
-                                <span class="direct-chat-timestamp pull-right">08 Jan 05:01 pm</span>
-                            </div>
-                            <!-- /.direct-chat-info -->
-                            <img class="direct-chat-img" title="Vicente Sotto Memorial Medical Center" src="~/assets/dist/img/MDFemale.jpg" alt="Message User Image"><!-- /.direct-chat-img -->
-                            <div class="direct-chat-text">
-                                @item.Message
-                            </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <form asp-controller="Modals" asp-action="ViewReco" method="post" id="feedback-form">
+                        <input type="hidden" name="MdId" value="@userId" autocomplete="off">
+                        <input class="code" type="hidden" name="Code" id="code" autocomplete="off" value="@ViewBag.Code">
+                        <div class="input-group">
+                            <input type="text" name="Message" required placeholder="Type Message..." class="form-control message" autocomplete="off">
+                            <span class="input-group-btn">
+                                <button class="btn btn-success btn-flat" data-save="modal">Send</button>
+                            </span>
                         </div>
-                    }
-                }
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="modal-footer">
-        <form asp-action="ViewReco" method="post" id="feedbackForm">
-            <input type="hidden" name="MdId" value="@userId" autocomplete="off">
-            <input type="hidden" name="Code" autocomplete="off" value="@ViewBag.Code">
-            <div class="input-group">
-                <input type="text" name="Message" required placeholder="Type Message..." class="form-control message" autocomplete="off">
-                <span class="input-group-btn">
-                    <button type="submit" class="btn btn-success btn-flat">Send</button>
-                </span>
-            </div>
-        </form>
     </div>
 </div>

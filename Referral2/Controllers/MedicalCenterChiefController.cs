@@ -90,7 +90,7 @@ namespace Referral2.Controllers
             var idleCount = 0;
             var noAction = 0;
 
-            var facilities = _context.Facility
+            var facilities = await _context.Facility
                 .Where(x => x.Id != UserFacility() && x.Status.Equals("1"))
                 .Select(x => new MccIncomingViewModel
                 (

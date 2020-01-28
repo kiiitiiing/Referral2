@@ -1,22 +1,28 @@
 ﻿@model RemarksViewModel
 
-<form asp-action="CancelRemark">
-    <div class="modal-header">
-        <h4>
-            Admit Patient
-        </h4>
-    </div>
-    <div class="modal-body">
-        <div class="">
-            <input type="hidden" asp-for="Code" />
+<div class="modal fade" id="cancel-modal" ">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <form asp-action="CancelRemark" method="post" id="cancel-form">
+                <div class="modal-header">
+                    <h4>
+                        Admit Patient
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <div class="">
+                        <input type="hidden" asp-for="Code" />
+                    </div>
+                    <div class="">
+                        <textarea asp-for="Remarks" placeholder="Reason for Cancellation" class="form-control" rows="5" required></textarea>
+                        <span asp-validation-for="Remarks" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-end">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success">Submit</button>
+                </div>
+            </form>
         </div>
-        <div class="">
-            <textarea asp-for="Remarks" placeholder="Reason for Cancellation" class="form-control" rows="7"></textarea>
-            <span asp-validation-for="Remarks" class="text-danger"></span>
-        </div>
     </div>
-    <div class="modal-footer justify-content-end">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-success">Submit</button>
-    </div>
-</form>
+</div>

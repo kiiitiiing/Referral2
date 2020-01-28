@@ -1,158 +1,51 @@
-﻿@model PregnantForm
+﻿@model PregnantViewModel
 
-@{ 
-    var dateReferred = Model.ReferredDate.ToString("MMMM d, yyyy h:mm tt", System.Globalization.CultureInfo.InvariantCulture);
-}
-
-<div class="modal fade" id="switch-user-modal" tabindex="-1" role="dialog" aria-labelledby="addContactLabel" aria-hidden="true">
-    <div class="modal-dialog modal-sm" role="document">
+<div class="modal fade" id="pregnant-form-modal">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="title-form">BEmONC/ CEmONC REFERRAL FORM</div>
-            <table class="table table-striped">
-                <tbody>
-                    <tr>
-                        <th colspan="4">REFERRAL RECORD</th>
-                    </tr>
-                    <tr>
-                        <td>Who is Referring</td>
-                        <td>Record Number: <span class="record_no">@Model.RecordNo</span></td>
-                        <td colspan="2">Referred Date: <span class="referred_date">@dateReferred</span></td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">Name: <span class="md_referring">@GlobalFunctions.GetMDFullName(Model.ReferredByNavigation)</span></td>
-                        <td colspan="2">Arrival Date: </td>
-                    </tr>
-                    <tr>
-                        <td colspan="4">Contact # of referring MD/HCW: <span class="referring_md_contact">@Model.ReferredByNavigation.Contact</span></td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">Facility: <span class="referring_facility">@Model.ReferringFacilityNavigation.Name</span></td>
-                        <td colspan="2">Department: <span class="department_name">@Model.Department.Description</span></td>
-                    </tr>
-                    <tr>
-                        <td colspan="4">Facility Contact #: <span class="referring_contact">@Model.ReferringFacilityNavigation.Contact</span></td>
-                    </tr>
-                    <tr>
-                        <td colspan="4">Accompanied by the Health Worker: <span class="health_worker">@Model.HealthWorker</span></td>
-                    </tr>
-                    <tr>
-                        <td colspan="4">Referred To: <span>@Model.ReferredToNavigation.Name</span></td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="col-sm-6">
-                <table class="table bg-warning">
-                    <tbody>
-                        <tr class="bg-gray">
-                            <th colspan="4">WOMAN</th>
-                        </tr>
-                        <tr>
-                            <td colspan="3">Name: <span class="woman_name">@GlobalFunctions.GetFullName(Model.PatientWoman)</span></td>
-                            <td>Age: <span class="woman_age">@GlobalFunctions.ComputeAge(Model.PatientWoman.DateOfBirth)</span></td>
-                        </tr>
-                        <tr>
-                            <td colspan="4">Address: <span class="woman_address">@GlobalFunctions.GetAddress(Model.PatientWoman)</span></td>
-                        </tr>
-                        <tr>
-                            <td colspan="4">
-                                Main Reason for Referral: <span class="woman_reason">@Model.WomanReason</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="4">
-                                Major Findings (Clinica and BP,Temp,Lab)
-                                <br>
-                                <span class="woman_major_findings">@Model.WomanMajorFindings</span>
-                            </td>
-                        </tr>
-                        <tr class="bg-gray">
-                            <td colspan="4">Treatments Give Time</td>
-                        </tr>
-                        <tr>
-                            <td colspan="4">
-                                Before Referral: 
-                                <span class="woman_before_treatment">
-                                    @Model.WomanBeforeTreatment
-                                </span>
-                                 - 
-                                <span class="woman_before_given_time">
-                                    @Model.WomanBeforeGivenTime
-                                </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="4">
-                                During Transport: 
-                                <span class="woman_during_transport">
-                                    @Model.WomanDuringTransport
-                                </span>
-                                - 
-                                <span class="woman_transport_given_time">
-                                    @Model.WomanTransportGivenTime
-                                </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="4">
-                                Information Given to the Woman and Companion About the Reason for Referral
-                                <br>
-                                <span class="woman_information_given">
-                                    @Model.WomanInformationGiven
-                                </span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="modal-body">
+                @await Html.PartialAsync("~/Views/Shared/_pregnantForm.cshtml", Model)
             </div>
-
-            <div class="col-sm-6">
-                <table class="table bg-warning">
-                    <tbody>
-                        <tr class="bg-gray">
-                            <th colspan="4">BABY</th>
-                        </tr>
-                        <tr>
-                            <td colspan="2">Name: <span class="baby_name">@GlobalFunctions.GetFullName(Model.PatientBaby)</span></td>
-                            <td>Date of Birth: <span class="baby_dob">@Model.PatientBaby.DateOfBirth</span></td>
-                        </tr>
-                        <tr>
-                            <td colspan="2">Birth Weight: <span class="weight"></span></td>
-                            <td>Gestational Age: <span class="gestational_age"></span></td>
-                        </tr>
-                        <tr>
-                            <td colspan="4">
-                                Main Reason for Referral: <span class="baby_reason"></span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="4">
-                                Major Findings (Clinica and BP,Temp,Lab)
-                                <br>
-                                <span class="baby_major_findings"></span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="4">Last (Breast) Feed (Time): <span class="baby_last_feed"></span></td>
-                        </tr>
-                        <tr class="bg-gray">
-                            <td colspan="4">Treatments Give Time</td>
-                        </tr>
-                        <tr>
-                            <td colspan="4">Before Referral: <span class="baby_before_treatment"></span> - <span class="baby_before_given_time"></span></td>
-                        </tr>
-                        <tr>
-                            <td colspan="4">During Transport: <span class="baby_during_transport"></span> - <span class="baby_transport_given_time"></span></td>
-                        </tr>
-                        <tr>
-                            <td colspan="4">
-                                Information Given to the Woman and Companion About the Reason for Referral
-                                <br>
-                                <span class="baby_information_given"></span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="modal-footer">
+                <button class="btn btn-default btn-flat fa-pull-left" data-dismiss="modal">
+                    <i class="fa fa-times"></i>
+                    &nbsp;Close
+                </button>
+                <div class="justify-content-end">
+                    <button class="btn btn-info" type="button" data-toggle="modal" data-target="#">
+                        <i class="fa fa-phone"></i>
+                        Call Request
+                    </button>
+                    <!-- RECOMMEND TO REDIRECT -->
+                    <button class="btn btn-danger" type="button" data-toggle="modal" data-target="#">
+                        <i class="fa fa-line-chart"></i>
+                        Recommend to Redirect
+                    </button>
+                    <!-- ACCEPT -->
+                    <button class="btn btn-success" id="accept-btn" value="@Model.Code" type="button" data-toggle="modal" data-target="#accept-modal">
+                        <i class="fa fa-check"></i>
+                        Accept
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+
+    var acceptBtn = $('#accept-btn');
+
+    acceptBtn.on('click', function () {
+        console.log('yow');
+        var patientCode = this.value;
+        var url = "/Remarks/AcceptedRemark?code=" + patientCode;
+        console.log(url);
+        $("#accept_content").html("Loading..............");
+        $.get(url, function (result) {
+            $("#accept_content").html(result);
+        })
+    });
+
+</script>

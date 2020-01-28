@@ -1,0 +1,135 @@
+﻿@model PregnantViewModel
+
+<table class="table table-striped">
+    <tbody>
+        <tr>
+            <th colspan="4">REFERRAL RECORD</th>
+        </tr>
+        <tr>
+            <td>Who is Referring</td>
+            <td>Record Number: <span class="record_no">@Model.RecordNumber</span></td>
+            <td colspan="2">Referred Date: <span class="referred_date">@Model.DateReferred</span></td>
+        </tr>
+        <tr>
+            <td colspan="2">Name of referring MD/HCW: <span class="md_referring">@Model.ReferringMd</span></td>
+            <td colspan="2">Arrival Date: <span class="arrival_date">@Model.DateArrived</span></td>
+        </tr>
+        <tr>
+            <td colspan="4">Contact # of referring MD/HCW: <span class="referring_md_contact">@Model.ReferringMdContact</span></td>
+        </tr>
+        <tr>
+            <td colspan="4">Facility: <span class="referring_facility">@Model.Facility</span></td>
+        </tr>
+        <tr>
+            <td colspan="4">Facility Contact #: <span class="referring_contact">@Model.FacilityContact</span></td>
+        </tr>
+        <tr>
+            <td colspan="4">Accompanied by the Health Worker: <span class="health_worker">@Model.HealthWorker</span></td>
+        </tr>
+        <tr>
+            <td colspan="2">Referred To: <span class="referred_name">@Model.ReferredTo</span></td>
+            <td colspan="2">Department: <span class="department_name">@Model.Department</span></td>
+        </tr>
+        <tr>
+            <td colspan="4">Address: <span class="referred_address">@Model.ReferredToAddress</span></td>
+        </tr>
+    </tbody>
+</table>
+<div class="row">
+    <div class="col-sm-6">
+        <table class="table pregnant-bg-warning">
+            <thead>
+                <tr class="bg-gray-light">
+                    <th colspan="4">WOMAN</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="3">Name: <span class="woman_name">@Model.WomanName</span></td>
+                    <td>Age: <span class="woman_age">@Model.WomanAge</span></td>
+                </tr>
+                <tr>
+                    <td colspan="4">Address: <span class="woman_address">@Model.WomanAddress</span></td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        Main Reason for Referral: <span class="woman_reason">@Model.WomanReason</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        Major Findings (Clinica and BP,Temp,Lab)
+                        <br>
+                        <span class="woman_major_findings">@Model.WomanFindings</span>
+                    </td>
+                </tr>
+                <tr class="bg-gray-light">
+                    <td colspan="4">Treatments Give Time</td>
+                </tr>
+                <tr>
+                    <td colspan="4">Before Referral: <span class="woman_before_treatment">@Model.WomanBeforeTreatment</span> - <span class="woman_before_given_time">@Model.WomanBeforeGivenTime</span></td>
+                </tr>
+                <tr>
+                    <td colspan="4">During Transport: <span class="woman_during_transport">@Model.WomanDuringTransport</span> - <span class="woman_transport_given_time">@Model.WomanDuringGivenTime</span></td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        Information Given to the Woman and Companion About the Reason for Referral
+                        <br>
+                        <span class="woman_information_given">@Model.WomanInformationGiven</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-sm-6">
+        <table class="table pregnant-bg-warning">
+            <thead>
+                <tr class="bg-gray-light">
+                    <th colspan="4">BABY</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="2">Name: <span class="baby_name">@Model.BabyName</span></td>
+                    <td>Date of Birth: <span class="baby_dob">@Model.BabyDob</span></td>
+                </tr>
+                <tr>
+                    <td colspan="2">Birth Weight: <span class="weight">@Model.BabyWeight</span></td>
+                    <td>Gestational Age: <span class="gestational_age">@Model.BabyGestationAge</span></td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        Main Reason for Referral: <span class="baby_reason">@Model.BabyReason</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        Major Findings (Clinica and BP,Temp,Lab)
+                        <br>
+                        <span class="baby_major_findings">@Model.BabyFindings</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4">Last (Breast) Feed (Time): <span class="baby_last_feed">@Model.BabyLastFeed</span></td>
+                </tr>
+                <tr class="bg-gray-light">
+                    <td colspan="4">Treatments Give Time</td>
+                </tr>
+                <tr>
+                    <td colspan="4">Before Referral: <span class="baby_before_treatment">@Model.BabyBeforeTreatment</span> - <span class="baby_before_given_time">@Model.BabyBeforeGivenTime</span></td>
+                </tr>
+                <tr>
+                    <td colspan="4">During Transport: <span class="baby_during_transport">@Model.BabyDuringTransport</span> - <span class="baby_transport_given_time">@Model.BabyDuringGivenTime</span></td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        Information Given to the Woman and Companion About the Reason for Referral
+                        <br>
+                        <span class="baby_information_given">@Model.BabyInformationGiven</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

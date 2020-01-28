@@ -60,10 +60,13 @@ namespace Referral2.Controllers
         }
         public async Task<IActionResult> PregnantForm(string code)
         {
-            var patientForm = await _context.PregnantForm.SingleAsync(x => x.Code.Equals(code));
+            var form = await _context.PregnantForm.SingleAsync(x => x.Code.Equals(code));
+            Baby baby = null;
 
-            if (patientForm == null)
-                return NotFound();
+            if (form.PatientBabyId != null)
+                baby = await _context.Baby.SingleOrDefaultAsync(x => x.BabyId.Equals(form.PatientBabyId));
+
+            var pregnantForm = new PregnantViewModel(form, baby);
 
             var tracking = _context.Tracking.Single(x => x.Code.Equals(code));
             var activity = _context.Activity.Single(x => x.Code.Equals(code) && x.Status.Equals(_status.Value.REFERRED));
@@ -79,7 +82,7 @@ namespace Referral2.Controllers
             var seen = new Seen
             {
                 FacilityId = UserFacility(),
-                TrackingId = _context.Tracking.Single(x => x.Code.Equals(patientForm.Code)).Id,
+                TrackingId = _context.Tracking.Single(x => x.Code.Equals(form.Code)).Id,
                 UpdatedAt = DateTime.Now,
                 CreatedAt = DateTime.Now,
                 UserMd = UserId()
@@ -87,7 +90,7 @@ namespace Referral2.Controllers
 
             await _context.AddAsync(seen);
             await _context.SaveChangesAsync();
-            return PartialView(patientForm);
+            return PartialView(pregnantForm);
         }
 
         public async Task<IActionResult> PrintableNormalForm(string code)
@@ -101,7 +104,10 @@ namespace Referral2.Controllers
         {
             var form = await _context.PregnantForm.SingleOrDefaultAsync(x => x.Code.Equals(code));
 
-            var baby = await _context.Baby.SingleOrDefaultAsync(x => x.BabyId.Equals(form.PatientBabyId));
+            Baby baby = null;
+
+            if(form.PatientBabyId != null)
+                baby = await _context.Baby.SingleOrDefaultAsync(x => x.BabyId.Equals(form.PatientBabyId));
 
             var pregnantForm = new PregnantViewModel(form, baby);
 

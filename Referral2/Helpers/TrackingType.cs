@@ -9,5 +9,7 @@ namespace Referral2.Helpers
     {
         public string PREGNANT { get; set; }
         public string NORMAL { get; set; }
+        public string WALKIN { get; set; }
+        public string REFER { get; set; }
     }
 }

@@ -9,9 +9,7 @@
 
 $(function () {
     //---------------------- NOTIF ---------------------------------
-    $.ready(function () {
-        toastr.success('hellow');
-    });
+    
 
 
     //--------------------------------------------------------------
@@ -114,6 +112,7 @@ $(function () {
 
     $('button[data-toggle="ajax-modal"]').click(function (event) {
         var url = $(this).data('url');
+        console.log(url);
         $.get(url).done(function (data) {
             placeholderElement.empty();
             placeholderElement.html(data);
@@ -170,19 +169,24 @@ $(function () {
         var formId = placeholderElement.find('.modal').attr('id');
         console.log(formId);
         var actionUrl = form.attr('action');
+        console.log(actionUrl);
         var dataToSend = form.serialize();
         $.post(actionUrl, dataToSend).done(function (data) {
             var newBody = $('.modal-body', data);
             placeholderElement.find('.modal-body').replaceWith(newBody);
             var validation = $('span.text-danger').text();
             if (validation == '') {
-                placeholderElement.find('.modal').modal('hide');
+                //placeholderElement.find('.modal').modal('hide');
                 //location.href = '/Home/Index';
                 if (formId == 'update-doctor-modal') {
                     location.href = '/Support/ManageUsers'
                 }
                 else if (formId == 'change-password-modal') {
                     location.reload();
+                }
+                else if (formId == 'reco-modal') {
+                    var input = placeholderElement.find('.modal-footer').find('form').find('.code').val();
+                    console.log(input);
                 }
             }
         });

@@ -6,6 +6,7 @@ namespace Referral2.Models.ViewModels.Forms
     {
         public PregnantViewModel(PregnantForm form, Baby baby)
         {
+            Code = form.Code;
             ReferringMd = GlobalFunctions.GetMDFullName(form.ReferredByNavigation);
             RecordNumber = form.RecordNo;
             DateReferred = form.ReferredDate.ToString("dd/MM/yyyy");
@@ -26,10 +27,10 @@ namespace Referral2.Models.ViewModels.Forms
             WomanDuringTransport = form.WomanDuringTransport;
             WomanDuringGivenTime = GlobalFunctions.GetDate((DateTime)form.WomanTransportGivenTime, "dd/MM/yyyy");
             WomanInformationGiven = form.WomanInformationGiven;
-            BabyName = GlobalFunctions.GetFullName(form.PatientBaby);
-            BabyDob = form.PatientBaby.DateOfBirth.ToString("dd/MM/yyyy");
-            BabyWeight = baby.Weight == 0 ? "" : baby.Weight.ToString();
-            BabyGestationAge = baby.GestationalAge == 0 ? "" : baby.GestationalAge.ToString();
+            BabyName = form.PatientBaby == null? "" : GlobalFunctions.GetFullName(form.PatientBaby);
+            BabyDob = form.PatientBaby == null ? "" : form.PatientBaby.DateOfBirth.ToString("dd/MM/yyyy");
+            BabyWeight = baby == null ? "" : baby.Weight == 0 ? "" : baby.Weight.ToString();
+            BabyGestationAge = baby == null? "" : baby.GestationalAge.ToString();
             BabyReason = form.BabyReason;
             BabyFindings = form.BabyMajorFindings;
             BabyLastFeed = GlobalFunctions.GetDate((DateTime)form.BabyLastFeed, "dd/MM/yyyy");
@@ -39,6 +40,7 @@ namespace Referral2.Models.ViewModels.Forms
             BabyDuringGivenTime = GlobalFunctions.GetDate((DateTime)form.BabyTransportGivenTime, "dd/MM/yyyy");
             BabyInformationGiven = form.BabyInformationGiven;
         }
+        public string Code { get; set; }
         public string ReferringMd { get; set; }
         public string RecordNumber { get; set; }
         public string DateReferred { get; set; }
