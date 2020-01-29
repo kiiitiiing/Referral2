@@ -9,7 +9,7 @@
 
 <div class="row">
     <div class="col-md-3">
-        <partial name="~/Views/Shared/PartialViews/_MccDateFilterPartial.cshtml" />
+        @await Html.PartialAsync("~/Views/Shared/PartialViews/_MccDateFilterPartial.cshtml", new SearchModel { Action = "OnlineUsersDepartment" })
         <partial name="~/Views/Shared/PartialViews/_OtherLinksPartial.cshtml" />
     </div>
     <div class="col-md-9">
@@ -38,7 +38,7 @@
                             {
                                 var department = string.IsNullOrEmpty(item.Department)? "No Department" : item.Department;
                                 <tr>
-                                    <td class="text-warning">
+                                    <td class="custom-warning">
                                         @department
                                     </td>
                                     <td class="text-success text-center"><strong>@item.OnDuty</strong></td>

@@ -337,6 +337,7 @@ namespace Referral2.Controllers
                 .Where(x => x.Code.Equals(code))
                 .Select(t => new ReferredViewModel
                 {
+                    Pregnant = t.Type.Equals("pregnant"),
                     TrackingId = t.Id,
                     PatientName = t.Patient.FirstName + " " + t.Patient.MiddleName + " " + t.Patient.LastName,
                     PatientSex = t.Patient.Sex,

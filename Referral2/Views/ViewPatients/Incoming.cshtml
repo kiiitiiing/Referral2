@@ -349,20 +349,13 @@
                                                                 <div class="form-group">
                                                                     @if (currentUserFacility == item.ReferredToId && currentUserDepartment == item.DepartmentId)
                                                                     {
-                                                                        if (item.Pregnant)
-                                                                        {
-                                                                            <button type="button" class="btn btn-warning btn-xs" data-toggle="ajax-modal" data-target="#pregnant-form-modal" data-url="@Url.Action("PregnantForm", "ViewForms", new { code = item.Code })">
-                                                                                <i class="fa fa-user-md"></i>
-                                                                                &nbsp;View Form
-                                                                            </button>
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            <button type="button" class="btn btn-warning btn-xs" data-toggle="ajax-modal" data-target="#patient-form-modal" data-url="@Url.Action("PatientForm", "ViewForms", new { code = item.Code })">
-                                                                                <i class="fa fa-user-md"></i>
-                                                                                &nbsp;View Form
-                                                                            </button>
-                                                                        }
+                                                                        var dataTarget = item.Pregnant ? "pregnant-form-modal" : "patient-form-modal";
+                                                                        var dataUrl = item.Pregnant ? Url.Action("PregnantForm", "ViewForms", new { code = item.Code }) : Url.Action("PatientForm", "ViewForms", new { code = item.Code });
+                                                                        
+                                                                        <button type="button" class="btn btn-warning btn-xs" data-toggle="ajax-modal" data-target="#@dataTarget" data-url="@dataUrl">
+                                                                            <i class="fa fa-user-md"></i>
+                                                                            &nbsp;View Form
+                                                                        </button>
 
                                                                     }
                                                                     @if (item.SeenCount > 0)

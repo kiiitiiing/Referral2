@@ -48,6 +48,12 @@ namespace Referral2.Controllers
             return View(adminDashboard);
         }
 
+        public async Task<IActionResult> ConsolidatedMcc(string dateRange)
+        {
+
+            return View();
+        }
+
 
         // ONLINE USERS PER DEPARTMENT
         public async Task<IActionResult> OnlineUsersDepartment(string dateRange)

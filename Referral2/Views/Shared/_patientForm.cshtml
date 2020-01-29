@@ -1,0 +1,160 @@
+﻿@model PatientForm
+@{
+    var dateReferred = Model.TimeReferred == default ? "" : Model.TimeReferred.ToString("MMMM dd, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+    var dateTransferred = Model.TimeTransferred == default ? "" : Model.TimeTransferred.ToString("MMMM dd, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+    var referringMd = Model.ReferringMdNavigation;
+    var referringMdName = referringMd == null ? "" : GlobalFunctions.GetMDFullName(referringMd);
+    var referringMdContact = referringMd == null ? "" : referringMd.Contact;
+    var actionMd = Model.ReferredMdNavigation == null ? "" : GlobalFunctions.GetMDFullName(Model.ReferredMdNavigation) + " - " + Model.ReferredToNavigation.Contact;
+}
+
+<div class="title-form">
+    CENTRAL VISAYAS HEALTH REFERRAL SYSTEM<br />
+    <small>
+        Clinical Referral Form
+    </small>
+</div>
+<div class="modal-body" id="normal-form-modal">
+    <table class="table table-striped">
+        <tbody>
+            <tr>
+                <td colspan="6">Name of Referring Facility: <span>@Model.ReferringFacility.Name</span></td>
+            </tr>
+            <tr>
+                <td colspan="6">Facility Contact #: <span>@Model.ReferringFacility.Contact</span></td>
+            </tr>
+            <tr>
+                <td colspan="6">Address: <span>@GlobalFunctions.GetAddress(Model.ReferringFacility)</span></td>
+            </tr>
+            <tr>
+                <td colspan="3">Referred to: <span>@Model.ReferredToNavigation.Name</span></td>
+                <td colspan="3">Department: <span>@Model.Department.Description</span></td>
+            </tr>
+            <tr>
+                <td colspan="6">Address: <span>@GlobalFunctions.GetAddress(Model.ReferredToNavigation)</span></td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    Date/Time Referred (ReCo):
+                    <span>
+                        @dateReferred
+                    </span>
+                </td>
+                <td colspan="3">
+                    Date/Time Transferred:
+                    <span>
+                        @dateTransferred
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    Name of Patient:
+                    <span>
+                        @GlobalFunctions.GetFullName(Model.Patient)
+                    </span>
+                </td>
+                <td>
+                    Age:
+                    <span>
+                        @GlobalFunctions.ComputeAge(Model.Patient.DateOfBirth)
+                    </span>
+                </td>
+                <td>
+                    Sex:
+                    <span>
+                        @Model.Patient.Sex
+                    </span>
+                </td>
+                <td>
+                    Status:
+                    <span>
+                        @Model.Patient.CivilStatus
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6">
+                    Address:
+                    <span>
+                        @GlobalFunctions.GetAddress(Model.Patient)
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    PhilHealth status:
+                    <span>
+                        @Model.Patient.PhicStatus
+                    </span>
+                </td>
+                <td colspan="3">
+                    PhilHealth #:
+                    <span>
+                        @Model.Patient.PhicId
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6">
+                    Case Summary (pertinent Hx/PE, including meds, labs, course etc.):
+                    <br>
+                    <span>
+                        @Model.CaseSummary
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6">
+                    Summary of ReCo (pls. refer to ReCo Guide in Referring Patients Checklist):
+                    <br>
+                    <span>
+                        @Model.RecommendSummary
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6">
+                    Diagnosis/Impression:
+                    <br>
+                    <span>
+                        @Model.Diagnosis
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6">
+                    Reason for referral:
+                    <br>
+                    <span>
+                        @Model.Reason
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6">
+                    Name of referring MD/HCW:
+                    <span>
+                        @referringMdName
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6">
+                    Contact # of referring MD/HCW:
+                    <span>
+                        @referringMdContact
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6">
+                    Name of referred MD/HCW- Mobile Contact # (ReCo):
+                    <span>
+                        @actionMd
+                    </span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

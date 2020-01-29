@@ -6,6 +6,18 @@ body {
     background: #d2d6de;
 }
 
+.custom-warning {
+    color: #8a6d3b;
+}
+
+.container-fluid-important{
+    width: 100vw !important;
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+    margin-right: auto !important;
+    margin-left: auto !important;
+}
+
 .table-add{
     text-align:right;
     vertical-align:middle!important;

@@ -207,7 +207,7 @@
                                                                 <td>
                                                                     <span class="patient-color">@patientName</span>
                                                                     has departed by
-                                                                    <span class="md-color">@transpo[int.Parse(remarks) + 1]</span>
+                                                                    <span class="md-color">@transpo[(int.Parse(remarks)-1)]</span>
                                                                 </td>
                                                             </tr>
                                                             break;
@@ -331,8 +331,12 @@
                                 </div>
                             </div>
                         </div>
+                        @{ 
+                            var dataTarget = Model.Pregnant ? "print-pregnant-form-modal" : "normal-form-modal";
+                            var dataUrl = Model.Pregnant ? Url.Action("PrintablePregnantForm","ViewForms", new { code = Model.Code }) : Url.Action("PrintableNormalForm", "ViewForms", new { code = Model.Code });
+                        }
                         <div class="card-footer">
-                            <button class="btn btn-xs bg-gradient-warning">
+                            <button class="btn btn-xs bg-gradient-warning" data-target="#@dataTarget" data-toggle="ajax-modal" data-url="@dataUrl">
                                 <i class="fa fa-folder"></i>
                                 &nbsp;View Form
                             </button>

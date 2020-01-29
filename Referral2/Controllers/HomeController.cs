@@ -27,6 +27,8 @@ namespace Referral2.Controllers
         private readonly IOptions<ReferralRoles> _roles;
         private readonly IOptions<ReferralStatus> _status;
 
+
+        public HomeController() { }
         public HomeController(ILogger<HomeController> logger, ReferralDbContext context, IOptions<ReferralRoles> roles, IOptions<ReferralStatus> status)
         {
             _logger = logger;

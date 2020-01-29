@@ -11,7 +11,7 @@
     <small>Clinical Referral Form</small>
 </div>
 
-<form asp-action="Refer" method="post" id="refer-form">
+<form asp-action="Refer" method="post" id="normal-refer-form">
     <div class="modal-body">
         <input type="hidden" asp-for="PatientId" value="@ViewBag.Patient.Id" />
         <table class="table table-striped">
@@ -33,7 +33,7 @@
                     <td colspan="3">
                         Referred to:&nbsp;&nbsp;&nbsp;
                         <select class="form-control form-control-sm facilityFilter" id="facilityFilter" asp-for="ReferredTo" asp-items="ViewBag.ReferredTo" required>
-                            <option value="0">Select Facility...</option>
+                            <option value="">Select Facility...</option>
                         </select>
                         <span class="text-danger" asp-validation-for="ReferredTo"></span>
                     </td>
@@ -41,7 +41,7 @@
                     <td colspan="3">
                         Department:
                         <select class="form-control form-control-sm" id="departmentFilter" asp-for="Department" required>
-                            <option value="0">Select Department...</option>
+                            <option value="">Select Department...</option>
                         </select>
                         <span class="text-danger" asp-validation-for="Department"></span>
                     </td>
@@ -173,7 +173,7 @@
     </div>
 </form>
 <script>
-    var form = $('form#refer-form');
+    var form = $('#normal-refer-form');
     form.removeData('validator');
     form.removeData('unobtrusiveValidation');
     $.validator.unobtrusive.parse(form);
@@ -189,13 +189,13 @@
 
             $('#departmentFilter').empty()
                 .append($('<option>', {
-                    value: 'none',
+                    value: '',
                     text: 'Select Department...'
                 }));
 
             $('#doctorFiltered').empty()
                 .append($('<option>', {
-                    value: '0',
+                    value: '',
                     text: 'Any'
                 }));
 
@@ -219,7 +219,7 @@
         $.when(getMdFiltered()).done(function (output) {
             $('#doctorFiltered').empty()
                 .append($('<option>', {
-                    value: '0',
+                    value: '',
                     text: 'Any'
                 }));
 

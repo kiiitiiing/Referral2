@@ -1,0 +1,387 @@
+﻿
+@{
+    ViewData["Title"] = "INCOMING REFERRAL CONSOLIDATION TABLE  (Within Province Wide Health System)";
+
+}
+    <div class="row" style="margin-top: -0.5%;margin-bottom: 1%">
+        <div class="col-md-4">
+            <input type="text" class="form-control" name="date_range" value="01/01/2020 - 01/31/2020" placeholder="Filter your daterange here..." id="reservation" autocomplete="off">
+        </div>
+        <div class="col-md-6">
+            <div class="input-group-btn">
+                <button type="submit" class="btn btn-info btn-flat">Filter</button>
+                <a href="http://203.177.67.126/doh/referral/excel/incoming" type="button" name="from_the_start" class="btn btn-warning btn-flat"><i class="fa fa-file-excel-o"></i> Incoming (Excel)</a>
+                <a href="http://203.177.67.126/doh/referral/excel/outgoing" type="button" name="from_the_start" class="btn btn-success btn-flat"><i class="fa fa-file-excel-o"></i> Outgoing (Excel)</a>
+                <a href="http://203.177.67.126/doh/referral/excel/all" type="button" name="from_the_start" class="btn btn-primary btn-flat"><i class="fa fa-file-excel-o"></i> All (Excel)</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card card-outline card-success">
+        <div class="card-body">
+            <ul class="nav nav-tabs" id="custom-content-above-tab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="custom-content-above-home-tab" data-toggle="pill" href="#incoming" role="tab" aria-controls="custom-content-above-home" aria-selected="true">
+                        Incoming
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="pill" href="#outgoing" role="tab" aria-controls="custom-content-above-profile" aria-selected="false">
+                        Outgoing
+                    </a>
+                </li>
+            </ul>
+            <div class="tab-content" >
+                <!-- INCOMING TAB -->
+                <div class="tab-pane fade show active" id="incoming" role="tabpanel" aria-labelledby="incoming">
+                    <div class="row">
+                        <!-- HOSPITAL SIDE -->
+                        <div class="col-md-4">
+                            <div class="title-form">
+                                <img class="img-circle profile-user-img" src="~/assets/dist/img/vsmc.png" />
+                                <br />
+                                Vicente Sotto Memorial Medical Center
+                            </div>
+                            <!-- TRANSACTION -->
+                            <strong>
+                                <i class="fa fa-random"></i>&nbsp;
+                                Transaction
+                            </strong>
+                            <p>
+                                <label class="badge badge-warning">Incoming <span class="badge bg-red">585</span></label>
+                                <label class="badge badge-warning">Accepted <span class="badge bg-red">480</span></label>
+                                <label class="badge badge-warning">Viewed Only <span class="badge bg-red">105</span></label>
+                                <br />
+                                <br />
+                            </p>
+                            <!-- TURNAROUND TIME -->
+                            <strong>
+                                <i class="far fa-clock"></i>&nbsp;
+                                Turnaround time
+                            </strong>
+                            <p>
+                                <label class="badge badge-primary">
+                                    Acceptance&nbsp;
+                                    <span class="badge bg-red">
+                                        <i class="far fa-clock"></i>&nbsp;
+                                        21.23 mins
+                                    </span>
+                                </label>
+                                <label class="badge badge-primary">
+                                    Arrival&nbsp;
+                                    <span class="badge bg-red">
+                                        <i class="fa fa-clock"></i>&nbsp;
+                                        21.23 mins
+                                    </span>
+                                </label>
+                                <br />
+                                <br />
+                            </p>
+                            <!-- HOSPITAL LEVEL -->
+                            <strong>
+                                <i class="fa fa-book"></i>&nbsp;
+                                Hospital Level
+                            </strong>
+                            <p>
+                                <label class="badge badge-success">Hospital <span class="badge bg-red">0</span></label>
+                                <label class="badge badge-success">Vertical <span class="badge bg-red">587</span></label>
+                            </p>
+                        </div>
+                        <!-- TABS SIDE -->
+                        <div class="col-md-8">
+                            <ul class="nav nav-tabs" id="custom-content-above-tab" role="tablist">
+                                <!-- REFERRING FACILITY -->
+                                <li class="nav-item">
+                                    <a class="nav-link active" data-toggle="pill" href="#common-source" role="tab" aria-selected="true">
+                                        <i class="text-success fa fa-ambulance"></i>
+                                        &nbsp;Referring Facility
+                                    </a>
+                                </li>
+                                <!-- REFERRING DOCTORS-->
+                                <li class="nav-item">
+                                    <a class="nav-link" data-toggle="pill" href="#common-referring" role="tab">
+                                        <i class="text-blue fa fa-ambulance"></i>
+                                        &nbsp;Referring Doctors <small class="text-muted">(Top 10)</small>
+                                    </a>
+                                </li>
+                                <!-- DIAGNOSES AND REASONS -->
+                                <li class="nav-item">
+                                    <a class="nav-link" data-toggle="pill" href="#diagnosis-reason" role="tab">
+                                        <i class="text-yellow fa fa-ambulance"></i>
+                                        &nbsp;Diagnoses & Reasons 
+                                        <small class="text-muted">(Top 10)</small>
+                                    </a>
+                                </li>
+                                <!-- COMMON TRANSPORTATION -->
+                                <li class="nav-item">
+                                    <a class="nav-link" data-toggle="pill" href="#transportation" role="tab">
+                                        <i class="text-red fa fa-ambulance"></i>
+                                        &nbsp;Common Transportation
+                                    </a>
+                                </li>
+                                <!-- DEPARTMENT -->
+                                <li class="nav-item">
+                                    <a class="nav-link" data-toggle="pill" href="#department" role="tab">
+                                        <i class="text-info fa fa-ambulance"></i>
+                                        &nbsp;Department
+                                    </a>
+                                </li>
+                                <!-- REMARKS -->
+                                <li class="nav-item">
+                                    <a class="nav-link" data-toggle="pill" href="#issues" role="tab">
+                                        <i class="text-orange fa fa-ambulance"></i>
+                                        &nbsp;Remarks
+                                    </a>
+                                </li>
+                            </ul>
+                            <!-- TAB CONTENT -->
+                            <div class="tab-content">
+                                <!-- REFERRING FACILITY -->
+                                <div class="tab-pane fade show active" id="common-source" role="tabpanel" aria-labelledby="common-source">
+                                    <label>Facilities</label>
+                                </div>
+                                <!-- REFERRING DOCTORS-->
+                                <div class="tab-pane fade" id="common-referring" role="tabpanel" aria-labelledby="common-referring">
+                                    <label>Doctors</label>
+                                </div>
+                                <!-- DIAGNOSES AND REASONS -->
+                                <div class="tab-pane fade" id="diagnosis-reason" role="tabpanel" aria-labelledby="diagnosis-reason">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label>Diagnosis</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label>Reason</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- COMMON TRANSPORTATION -->
+                                <div class="tab-pane fade" id="transportation" role="tabpanel" aria-labelledby="outgoing">
+                                    <label>Transportation</label>
+                                </div>
+                                <!-- DEPARTMENT -->
+                                <div class="tab-pane fade" id="department" role="tabpanel" aria-labelledby="department">
+                                    <label>Departments</label>
+                                </div>
+                                <!-- REMARKS -->
+                                <div class="tab-pane fade" id="issues" role="tabpanel" aria-labelledby="issues">
+                                    <label>Issues</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- OUTGOING TAB -->
+                <div class="tab-pane fade" id="outgoing" role="tabpanel" aria-labelledby="outgoing">
+                    <div class="row">
+                        <div class="col-md-4">
+
+                        </div>
+                        <div class="col-md--8">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+@*
+
+    <div class="container-fluid-important">
+        <div class="row" style="margin-top: -0.5%;margin-bottom: 1%">
+            <div class="col-md-4">
+                <input type="text" class="form-control" name="date_range" value="01/01/2020 - 01/31/2020" placeholder="Filter your daterange here..." id="reservation" autocomplete="off">
+            </div>
+            <div class="col-md-6">
+                <div class="input-group-btn">
+                    <button type="submit" class="btn btn-info btn-flat">Filter</button>
+                    <a href="http://203.177.67.126/doh/referral/excel/incoming" type="button" name="from_the_start" class="btn btn-warning btn-flat"><i class="fa fa-file-excel-o"></i> Incoming (Excel)</a>
+                    <a href="http://203.177.67.126/doh/referral/excel/outgoing" type="button" name="from_the_start" class="btn btn-success btn-flat"><i class="fa fa-file-excel-o"></i> Outgoing (Excel)</a>
+                    <a href="http://203.177.67.126/doh/referral/excel/all" type="button" name="from_the_start" class="btn btn-primary btn-flat"><i class="fa fa-file-excel-o"></i> All (Excel)</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card card-success">
+        <div class="card-body no-padding">
+            <div class="nav-tabs-custom">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a href="#incoming" data-toggle="pill">Incoming</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#outgoing" data-toggle="pill">
+                            Outgoing
+                        </a>
+                    </li>
+                    <li class="float-right">
+                        <strong class="text-info">
+                            January (2020)  to January (2020)
+                        </strong>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="incoming">
+                        <div class="row">
+                            <div class="col-md-4 ">
+                                <div class="card-body card-profile">
+                                    <img class="profile-user-img img-responsive img-circle" src="http://203.177.67.126/doh/referral/resources/hospital_logo/vicente_sotto.jpg" alt="User profile picture">
+
+                                    <h3 class="profile-username text-center">Vicente Sotto Memorial Medical Center</h3>
+                                    <strong><i class="fa fa-random margin-r-5"></i> Transaction</strong>
+                                    <p>
+                                        <span class="label label-warning">Incoming <span class="badge bg-red">583</span></span><span class="label label-warning">Accepted <span class="badge bg-red">478</span></span><span class="label label-warning">Viewed Only <span class="badge bg-red">105</span></span><br><br><br>
+                                    </p>
+
+                                    <strong><i class="fa fa-clock-o margin-r-5"></i> Turnaround time</strong>
+                                    <p>
+                                        <span class="label label-primary">Acceptance <span class="badge bg-red"><i class="fa fa-clock-o"></i> 21.38 mins</span></span>
+                                        <span class="label label-primary">Arrival <span class="badge bg-red"><i class="fa fa-clock-o"></i> 28.87mins</span></span>
+                                    </p><br><br>
+
+                                    <strong><i class="fa fa-book margin-r-5"></i> Hospital Level</strong>
+                                    <p>
+                                        <span class="label label-success">Horizontal <span class="badge bg-red">0</span></span>
+                                        <span class="label label-success">Vertical <span class="badge bg-red">583</span></span>
+                                    </p>
+
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="nav-tabs-custom">
+                                    <ul class="nav nav-tabs">
+                                        <li class="active"><a href="#common-sources" data-toggle="tab"><i class="fa fa-ambulance" style="color: green"></i> Referring Facility</a></li>
+                                        <li class=""><a href="#common-referring" data-toggle="tab"><i class="fa fa-ambulance" style="color: blue"></i> Referring Doctors <small>(Top 10)</small></a></li>
+                                        <li class=""><a href="#diagnosis-reason" data-toggle="tab"><i class="fa fa-ambulance" style="color: yellowgreen"></i> Diagnoses &amp; Reasons <small>(Top 10)</small></a></li>
+                                        <li class=""><a href="#transportation" data-toggle="tab"><i class="fa fa-ambulance" style="color: red"></i> Common Transportation</a></li>
+                                        <li class=""><a href="#department" data-toggle="tab"><i class="fa fa-ambulance" style="color: lightskyblue"></i> Department</a></li>
+                                        <li class=""><a href="#issue" data-toggle="tab"><i class="fa fa-ambulance" style="color: orange"></i> Remarks</a></li>
+                                    </ul>
+                                    <div class="tab-content">
+                                        <div class="tab-pane active in" id="common-sources">
+                                            <!-- Referring Facilities -->
+                                            <label><span class="badge bg-maroon">139</span> Cebu Provincial Hospital (Danao City)</label><br>
+                                        </div>
+                                        <div class="tab-pane fade" id="common-referring">
+                                            <!-- TOP DOCTORS -->
+                                            <label><span class="badge bg-maroon">22</span> DR. EDILBERTO - DOMINGUEZ</label><br>
+                                        </div>
+                                        <div class="tab-pane fade" id="diagnosis-reason">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <!-- DIAGNOSIS -->
+                                                    <h4>Diagnosis</h4>
+                                                    <label><span class="badge bg-maroon">12</span> Dengue Fever with Warning Signs</label><br>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <!-- REASONS -->
+                                                    <h4>Reasons</h4>
+                                                    <label><span class="badge bg-maroon">38</span> FOR FURTHER MANAGEMENT</label><br>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="transportation">
+                                            <!-- COMMON TRANSPO -->
+                                            <label><span class="badge bg-maroon">3</span> Ambulance (Level 1)</label><br>
+                                        </div>
+                                        <div class="tab-pane fade" id="department">
+                                            <!-- DEPARTMENTS -->
+                                            <label><span class="badge bg-maroon">524</span> ED Complex</label><br>
+                                        </div>
+                                        <div class="tab-pane fade" id="issue">
+                                            <!-- ISSUES -->
+                                            <label>called talisay district hosp then not accepted, prefer referral to your institution for hema specialist</label><br>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="outgoing">
+                        <div class="row">
+                            <div class="col-md-4 ">
+                                <div class="card-body card-profile">
+                                    <img class="profile-user-img img-responsive img-circle" src="http://203.177.67.126/doh/referral/resources/hospital_logo/vicente_sotto.jpg" alt="User profile picture">
+
+                                    <h3 class="profile-username text-center">Vicente Sotto Memorial Medical Center</h3>
+                                    <strong><i class="fa fa-random margin-r-5"></i> Transaction</strong>
+                                    <p>
+                                        <span class="label label-warning">Outgoing <span class="badge bg-red">1</span></span><span class="label label-warning">Accepted <span class="badge bg-red">1</span></span><span class="label label-warning">Viewed Only <span class="badge bg-red">0</span></span><span class="label label-warning">Redirected <span class="badge bg-red">0</span></span><span class="label label-warning">Archived <span class="badge bg-red">11</span></span><br><br><br><br><br>
+                                    </p>
+                                    <strong><i class="fa fa-clock-o margin-r-5"></i> Turnaround time</strong>
+                                    <p>
+                                        <span class="label label-primary">Viewed Only Acceptance<span class="badge bg-red"><i class="fa fa-clock-o"></i>  Under Development</span></span>
+                                        <span class="label label-primary">Viewed Only Redirection<span class="badge bg-red"><i class="fa fa-clock-o"></i>  Under Development</span></span>
+                                        <span class="label label-primary">Acceptance <span class="badge bg-red"><i class="fa fa-clock-o"></i> 0.00 mins</span></span>
+                                        <span class="label label-primary">Redirection <span class="badge bg-red"><i class="fa fa-clock-o"></i>  Under Development</span></span>
+                                    </p><br><br><br><br><br><br><br><br>
+
+                                    <strong><i class="fa fa-book margin-r-5"></i> Hospital Level</strong>
+                                    <p>
+                                        <span class="label label-success">Horizontal <span class="badge bg-red">Under Development</span></span>
+                                        <span class="label label-success">Vertical <span class="badge bg-red">Under Development</span></span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="nav-tabs-custom">
+                                    <ul class="nav nav-tabs">
+                                        <li class="active"><a href="#referral_hospitals_outgoing24" data-toggle="tab"><i class="fa fa-ambulance" style="color: green"></i> Referred Facility</a></li>
+                                        <li><a href="#referral_md_outgoing24" data-toggle="tab"><i class="fa fa-ambulance" style="color: blue"></i> Referred Doctor <small>(Top 10)</small></a></li>
+                                        <li><a href="#diagnosis_reason_outgoing24" data-toggle="tab"><i class="fa fa-ambulance" style="color: yellowgreen"></i> Diagnoses &amp; Reasons <small>(Top 10)</small></a></li>
+                                        <li><a href="#transportation_outgoing24" data-toggle="tab"><i class="fa fa-ambulance" style="color: red"></i> Common Transportation</a></li>
+                                        <li><a href="#department_outgoing24" data-toggle="tab"><i class="fa fa-ambulance" style="color: lightskyblue"></i> Department</a></li>
+                                        <li><a href="#issue_outgoing24" data-toggle="tab"><i class="fa fa-ambulance" style="color: orange"></i> Remarks</a></li>
+                                    </ul>
+                                    <div class="tab-content">
+                                        <div class="active tab-pane" id="referral_hospitals_outgoing24">
+                                            <label><span class="badge bg-maroon">1</span> Eversley Childs Sanitarium and General Hospital</label><br>
+                                        </div>
+                                        <div class="tab-pane fade" id="referral_md_outgoing24">
+                                        </div>
+                                        <div class="tab-pane fade" id="diagnosis_reason_outgoing24">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <h4>Diagnosis</h4>
+                                                    <label><span class="badge bg-maroon">12</span> Dengue Fever with Warning Signs</label><br>
+                                                    <label><span class="badge bg-maroon">7</span> T/C ACUTE APPENDICITIS</label><br>
+                                                    <label><span class="badge bg-maroon">6</span> CVD: ISCHEMIC VS HEMORRHAGIC</label><br>
+                                                    <label><span class="badge bg-maroon">4</span> Acute Appendicitis</label><br>
+                                                    <label><span class="badge bg-maroon">4</span> T/C CVD BLEED</label><br>
+                                                    <label><span class="badge bg-maroon">4</span> PCAP D</label><br>
+                                                    <label><span class="badge bg-maroon">2</span> Dengue Hemorrhagic Fever</label><br>
+                                                    <label><span class="badge bg-maroon">2</span> STROKE</label><br>
+                                                    <label><span class="badge bg-maroon">2</span> CVD BLEED, RIGHT MCA TERRITORY</label><br>
+                                                    <label><span class="badge bg-maroon">2</span> TRAUMATIC BRAIN INJURY SEVERE</label><br>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <h4>Reasons</h4>
+                                                    <h1>Empty Record!</h1>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="tab-pane fade" id="transportation_outgoing24">
+                                            <h1>Empty Record!</h1>
+                                        </div>
+                                        <div class="tab-pane fade" id="department_outgoing24">
+                                            <label><span class="badge bg-maroon">1</span> ER</label><br>
+                                        </div>
+                                        <div class="tab-pane fade" id="issue_outgoing24">
+                                            <h1>Empty Record!</h1>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+*@

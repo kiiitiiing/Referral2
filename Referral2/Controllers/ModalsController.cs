@@ -15,7 +15,7 @@ using Referral2.Models.ViewModels;
 
 namespace Referral2.Controllers
 {
-    public class ModalsController : Controller
+    public class ModalsController : SupportController
     {
         private readonly ReferralDbContext _context;
         private readonly IOptions<ReferralRoles> _roles;

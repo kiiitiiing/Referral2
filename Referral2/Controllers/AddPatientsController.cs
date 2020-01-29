@@ -17,17 +17,19 @@ using System.Security.Claims;
 using Referral2.Models.ViewModels.Doctor;
 using Microsoft.Extensions.Options;
 using Referral2.Models.ViewModels;
+using Microsoft.Extensions.Logging;
 
 namespace Referral2.Controllers
 {
-    [Authorize(Policy = "Doctor")]
-    public class AddPatientsController : Controller
+    //[Authorize(Policy = "Doctor")]
+    public class AddPatientsController : HomeController
     {
         const string SessionPatientId = "_patient_id";
         private readonly ReferralDbContext _context;
         private readonly IOptions<ReferralRoles> _roles;
         private readonly IOptions<ReferralStatus> _status;
         private readonly IOptions<TrackingType> _type;
+        //private readonly ILogger<HomeController> _logger;
 
         // Add Patient Constructor
         public AddPatientsController(ReferralDbContext context, IOptions<ReferralRoles> roles, IOptions<ReferralStatus> status, IOptions<TrackingType> type)
@@ -352,8 +354,8 @@ namespace Referral2.Controllers
                 ReferredFrom = model.ReferringFacility,
                 ReferredTo = model.ReferredTo,
                 DepartmentId = model.DepartmentId,
-                ReferringMd = model.ReferredBy,
-                ActionMd = null,
+                ReferringMd = walkin? null : (int?)model.ReferredBy,
+                ActionMd = walkin? (int?)UserId() : null,
                 Status = walkin? _status.Value.ACCEPTED : _status.Value.REFERRED,
                 Type = _type.Value.PREGNANT,
                 WalkIn = walkin ? "yes" : "no",

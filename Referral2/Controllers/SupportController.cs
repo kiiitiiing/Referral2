@@ -29,6 +29,12 @@ namespace Referral2.Controllers
         private readonly IOptions<ReferralRoles> _roles;
         private readonly IOptions<ReferralStatus> _status;
 
+
+
+        public SupportController()
+        {
+
+        }
         public SupportController(ReferralDbContext context, IUserService userService, IOptions<ReferralRoles> roles, IOptions<ReferralStatus> status)
         {
             _context = context;

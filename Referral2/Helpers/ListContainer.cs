@@ -82,11 +82,11 @@ namespace Referral2.Helpers
                 };
             }
         }
-        public static List<string> TranspoMode
+        public static string[] TranspoMode
         {
             get
             {
-                return new List<string>
+                return new string[]
                 {
                     "Ambulance (Level 1)",
                     "Ambulance (Level 2)",
