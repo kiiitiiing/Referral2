@@ -20,14 +20,15 @@ using Referral2.Models.ViewModels.Doctor;
 
 namespace Referral2.Controllers
 {
-    [Authorize(Policy = "Doctor")]
-    public class ViewPatientsController : Controller
+    //[Authorize(Policy = "Doctor")]
+    public class ViewPatientsController : HomeController
     {
         private readonly ReferralDbContext _context;
         private readonly IOptions<ReferralRoles> _roles;
         private readonly IOptions<ReferralStatus> _status;
 
         public ViewPatientsController(ReferralDbContext context, IOptions<ReferralRoles> roles, IOptions<ReferralStatus> status)
+            : base(context, status)
         {
             _context = context;
             _roles = roles;

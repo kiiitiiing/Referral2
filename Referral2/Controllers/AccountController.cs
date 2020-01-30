@@ -20,7 +20,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
-namespace Referral2.Controlers
+namespace Referral2.Controllers
 {
     public class AccountController : Controller
     {
@@ -85,7 +85,7 @@ namespace Referral2.Controlers
                     CreateLogin(user.Id);
 
                     await _context.SaveChangesAsync();
-                    if (user.Level.Equals(_roles.Value.ADMIN))
+                    /*if (user.Level.Equals(_roles.Value.ADMIN))
                         return RedirectToAction("AdminDashboard", "Admin");
                     else if (user.Level.Equals(_roles.Value.DOCTOR))
                     {
@@ -98,7 +98,7 @@ namespace Referral2.Controlers
                     else if (user.Level.Equals(_roles.Value.MCC))
                     {
                         return RedirectToAction("MccDashboard", "MedicalCenterChief");
-                    }
+                    }*/
                 }
                 else
                 {

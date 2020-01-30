@@ -29,10 +29,10 @@ namespace Referral2.Controllers
         private readonly IOptions<ReferralRoles> _roles;
         private readonly IOptions<ReferralStatus> _status;
         private readonly IOptions<TrackingType> _type;
-        //private readonly ILogger<HomeController> _logger;
 
         // Add Patient Constructor
-        public AddPatientsController(ReferralDbContext context, IOptions<ReferralRoles> roles, IOptions<ReferralStatus> status, IOptions<TrackingType> type)
+        public AddPatientsController( ReferralDbContext context, IOptions<ReferralRoles> roles, IOptions<ReferralStatus> status, IOptions<TrackingType> type)
+            : base(context, status)
         {
             _context = context;
             _roles = roles;

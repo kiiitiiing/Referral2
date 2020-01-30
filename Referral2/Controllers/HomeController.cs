@@ -22,20 +22,20 @@ namespace Referral2.Controllers
     [Authorize(Policy = "doctor")]
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-        private readonly ReferralDbContext _context;
-        private readonly IOptions<ReferralRoles> _roles;
+        public readonly ReferralDbContext _context;
         private readonly IOptions<ReferralStatus> _status;
 
 
-        public HomeController() { }
-        public HomeController(ILogger<HomeController> logger, ReferralDbContext context, IOptions<ReferralRoles> roles, IOptions<ReferralStatus> status)
+        public HomeController( ReferralDbContext context, IOptions<ReferralStatus> status)
         {
-            _logger = logger;
             _context = context;
-            _roles = roles;
             _status = status;
         }
+/*
+        public HomeController()
+        {
+
+        }*/
 
         public IActionResult Index()
         {

@@ -20,7 +20,7 @@ using Referral2.Models.ViewModels.Remarks;
 namespace Referral2.Controllers
 {
     [Authorize]
-    public class RemarksController : Controller
+    public class RemarksController : HomeController
     {
         private readonly ReferralDbContext _context;
         private readonly IOptions<ReferralRoles> _roles;
@@ -28,6 +28,7 @@ namespace Referral2.Controllers
 
 
         public RemarksController(ReferralDbContext context, IOptions<ReferralRoles> roles, IOptions<ReferralStatus> status)
+            :base(context,status)
         {
             _context = context;
             _roles = roles;

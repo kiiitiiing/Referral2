@@ -179,7 +179,7 @@ $(function () {
                 //placeholderElement.find('.modal').modal('hide');
                 //location.href = '/Home/Index';
                 if (formId == 'update-doctor-modal') {
-                    location.href = '/Support/ManageUsers'
+                    location.href = '/Support/ManageUsers';
                 }
                 else if (formId == 'change-password-modal') {
                     location.reload();
@@ -187,6 +187,9 @@ $(function () {
                 else if (formId == 'reco-modal') {
                     var input = placeholderElement.find('.modal-footer').find('form').find('.code').val();
                     console.log(input);
+                }
+                else if (formId == 'switch-user-modal') {
+                    location.href = '/Home/Index';
                 }
             }
         });
