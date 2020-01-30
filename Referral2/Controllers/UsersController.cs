@@ -12,19 +12,21 @@ using Microsoft.EntityFrameworkCore;
 using Referral2.Services;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
+using Microsoft.Extensions.Options;
 
 namespace Referral2.Controllers
 {
     public class UsersController : Controller
     {
         private readonly ReferralDbContext _context;
-
+        private readonly IOptions<ReferralRoles> _roles;
         private readonly IUserService _userService;
 
-        public UsersController(ReferralDbContext context, IUserService userService)
+        public UsersController(ReferralDbContext context, IUserService userService, IOptions<ReferralRoles> roles)
         {
             _context = context;
             _userService = userService;
+            _roles = roles;
         }
 
         [Authorize(Policy = "doctor")]
@@ -32,7 +34,9 @@ namespace Referral2.Controllers
         {
             ViewBag.CurrentSearch = nameSearch;
             ViewBag.Facilities = new SelectList(_context.Facility.Where(x => x.ProvinceId.Equals(UserProvince())),"Id","Name");
-            var onlineUsers = await _context.User.Where(x => x.LoginStatus.Contains("login") && x.LastLogin.Date.Equals(DateTime.Now.Date) && x.FacilityId.Equals(UserFacility())).ToListAsync();
+            var onlineUsers = await _context.User
+                .Where(x => x.LoginStatus.Contains("login") && x.Level.Equals(_roles.Value.DOCTOR) && x.LastLogin.Date.Equals(DateTime.Now.Date) && x.FacilityId.Equals(UserFacility()))
+                .ToListAsync();
 
             if(!string.IsNullOrEmpty(nameSearch))
             {
