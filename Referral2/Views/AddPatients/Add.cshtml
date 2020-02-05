@@ -181,15 +181,5 @@
 
         return this;
     };
-
-
-    function getBarangayFiltered() {
-        var urls = "/NoReload/FilteredBarangay?muncityId=" + muncityId;
-        return $.ajax({
-            url: urls,
-            type: 'get',
-            async: true
-        });
-    }
 </script>
 

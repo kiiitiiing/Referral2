@@ -5,7 +5,7 @@
     var referringMd = Model.ReferringMdNavigation;
     var referringMdName = referringMd == null ? "" : GlobalFunctions.GetMDFullName(referringMd);
     var referringMdContact = referringMd == null ? "" : referringMd.Contact;
-    var actionMd = Model.ReferredMdNavigation == null ? "" : GlobalFunctions.GetMDFullName(Model.ReferredMdNavigation) + " - " + Model.ReferredToNavigation.Contact;
+    var actionMd = Model.ReferredMdNavigation == null ? "" : GlobalFunctions.GetMDFullName(Model.ReferredMdNavigation) + " - " + Model.ReferredMdNavigation.Contact;
 }
 
 <div class="title-form">

@@ -339,6 +339,7 @@ namespace Referral2.Controllers
                 .Select(t => new ReferredViewModel
                 {
                     Pregnant = t.Type.Equals("pregnant"),
+                    Seen = t.DateSeen != default,
                     TrackingId = t.Id,
                     PatientName = t.Patient.FirstName + " " + t.Patient.MiddleName + " " + t.Patient.LastName,
                     PatientSex = t.Patient.Sex,
@@ -353,8 +354,20 @@ namespace Referral2.Controllers
                     Code = t.Code,
                     Status = t.Status,
                     Walkin = t.WalkIn.Equals("yes"),
-                    Activities = activities.OrderByDescending(x => x.CreatedAt),
-                    UpdatedAt = t.UpdatedAt
+                    UpdatedAt = t.UpdatedAt,
+                    Activities = activities.Where(x => x.Code == t.Code).OrderByDescending(x => x.CreatedAt)
+                        .Select(i => new ActivityLess
+                        {
+                            Status = i.Status,
+                            DateAction = i.DateReferred.ToString("MMM dd, yyyy hh:mm tt", CultureInfo.InvariantCulture),
+                            FacilityFrom = i.ReferredFromNavigation == null ? "" : i.ReferredFromNavigation.Name,
+                            FacilityFromContact = i.ReferredFromNavigation == null ? "" : i.ReferredFromNavigation.Contact,
+                            FacilityTo = i.ReferredToNavigation == null ? "" : i.ReferredToNavigation.Name,
+                            PatientName = GlobalFunctions.GetFullName(i.Patient),
+                            ActionMd = GlobalFunctions.GetMDFullName(i.ActionMdNavigation),
+                            ReferringMd = GlobalFunctions.GetMDFullName(i.ReferringMdNavigation),
+                            Remarks = i.Remarks
+                        })
                 })
                 .FirstOrDefaultAsync();
 
@@ -466,51 +479,85 @@ namespace Referral2.Controllers
             return View(await PaginatedList<IncomingViewModel>.CreateAsync(incoming.OrderByDescending(d => d.DateAction).AsNoTracking(), pageNumber ?? 1, pageSize));
         }
         // GET: Referred
-        public async Task<IActionResult> Referred(string searchString, string currentFilter, int? pageNumber)
+        public async Task<IActionResult> Referred(string search, string dateRange, int? facilityId, string status)
         {
-            if (searchString != null)
-                pageNumber = 1;
-            else
-                searchString = currentFilter;
+            StartDate = new DateTime(DateTime.Now.Year, 1, 1,0,0,0);
+            EndDate = new DateTime(DateTime.Now.Year, 12, 31,0,0,0);
 
-            ViewBag.CurrentFilter = searchString;
-
-            var activities = _context.Activity;
-            var feedbacks = _context.Feedback;
-
-            var referred = _context.Tracking.Where(x => x.ReferredFrom == UserFacility())
-                                            .Select(t => new ReferredViewModel
-                                            {
-                                                PatientName = GlobalFunctions.GetFullName(t.Patient),
-                                                PatientSex = t.Patient.Sex,
-                                                PatientAge = GlobalFunctions.ComputeAge(t.Patient.DateOfBirth),
-                                                PatientAddress = GlobalFunctions.GetAddress(t.Patient),
-                                                ReferredBy = GlobalFunctions.GetMDFullName(t.ReferringMdNavigation),
-                                                ReferredTo = GlobalFunctions.GetMDFullName(t.ActionMdNavigation),
-                                                TrackingId = t.Id,
-                                                SeenCount = _context.Seen.Where(x => x.TrackingId.Equals(t.Id)).Count(),
-                                                CallerCount = activities.Where(x => x.Status.Equals(_status.Value.CALLING)).Count(),
-                                                ReCoCount = feedbacks.Where(x => x.Code.Equals(t.Code)).Count(),
-                                                Travel = string.IsNullOrEmpty(t.Transportation),
-                                                Code = t.Code,
-                                                Status = t.Status,
-                                                Pregnant = t.Type.Equals("pregnant"),
-                                                Walkin = t.WalkIn.Equals("yes"),
-                                                Activities = activities.Where(x => x.Code.Equals(t.Code)).OrderByDescending(x => x.CreatedAt),
-                                                UpdatedAt = t.UpdatedAt
-                                            }); ;
-
-            ViewBag.Total = referred.Count();
-            ViewBag.Facilities = new SelectList(_context.Facility.Where(x => x.Id != UserFacility()), "Id", "Name");
-            ViewBag.Statuses = new SelectList(ListContainer.Status);
-
-            if (!string.IsNullOrEmpty(searchString))
+            if (!string.IsNullOrEmpty(dateRange))
             {
-                referred = referred.Where(s => s.Code.Contains(searchString));
-                ViewBag.Total = referred.Count();
+                StartDate = DateTime.Parse(dateRange.Substring(0, dateRange.IndexOf(" ") + 1).Trim());
+                EndDate = DateTime.Parse(dateRange.Substring(dateRange.LastIndexOf(" ")).Trim());
             }
 
-            int pageSize = 6;
+            ViewBag.StartDate = StartDate;
+            ViewBag.EndDate = EndDate;
+
+            var activities = _context.Activity.Where(x=>x.CreatedAt >= StartDate && x.CreatedAt <= EndDate);
+            var feedbacks = _context.Feedback.Where(x => x.CreatedAt >= StartDate && x.CreatedAt <= EndDate);
+            var facilities = _context.Facility.Where(x => x.Id != UserFacility());
+
+            var referred = _context.Tracking
+                .Where(x => x.ReferredFrom == UserFacility() && x.DateReferred >= StartDate && x.DateReferred <= EndDate)
+                .Select(t => new ReferredViewModel
+                {
+                    PatientName = t.Patient.FirstName+" "+ t.Patient.MiddleName+" "+ t.Patient.LastName,
+                    PatientSex = t.Patient.Sex,
+                    PatientAge = GlobalFunctions.ComputeAge(t.Patient.DateOfBirth),
+                    PatientAddress = GlobalFunctions.GetAddress(t.Patient),
+                    ReferredBy = GlobalFunctions.GetMDFullName(t.ReferringMdNavigation),
+                    ReferredTo = GlobalFunctions.GetMDFullName(t.ActionMdNavigation),
+                    ReferredFrom = t.ReferredFrom,
+                    TrackingId = t.Id,
+                    SeenCount = _context.Seen.Where(x => x.TrackingId.Equals(t.Id)).Count(),
+                    CallerCount = activities.Where(x => x.Status.Equals(_status.Value.CALLING)).Count(),
+                    ReCoCount = feedbacks.Where(x => x.Code.Equals(t.Code)).Count(),
+                    Travel = string.IsNullOrEmpty(t.Transportation),
+                    Code = t.Code,
+                    Status = t.Status == _status.Value.REFERRED && t.DateSeen != default? "seen" : t.Status,
+                    Pregnant = t.Type.Equals("pregnant"),
+                    Seen = t.DateSeen != default,
+                    Walkin = t.WalkIn.Equals("yes"),
+                    UpdatedAt = t.UpdatedAt,
+                    Activities = activities.Where(x => x.Code.Equals(t.Code)).OrderByDescending(x => x.CreatedAt)
+                        .Select(i => new ActivityLess
+                        {
+                            Status = i.Status,
+                            DateAction = i.DateReferred.ToString("MMM dd, yyyy hh:mm tt", CultureInfo.InvariantCulture),
+                            FacilityFrom = i.ReferredFromNavigation == null ? "" : i.ReferredFromNavigation.Name,
+                            FacilityFromContact = i.ReferredFromNavigation == null ? "" : i.ReferredFromNavigation.Contact,
+                            FacilityTo = i.ReferredToNavigation == null ? "" : i.ReferredToNavigation.Name,
+                            PatientName = i.Patient.FirstName + " " + i.Patient.MiddleName + " " + i.Patient.LastName,
+                            ActionMd = GlobalFunctions.GetMDFullName(i.ActionMdNavigation),
+                            ReferringMd = GlobalFunctions.GetMDFullName(i.ReferringMdNavigation),
+                            Remarks = i.Remarks
+                        })
+                });
+
+            ViewBag.Total = referred.Count();
+            ViewBag.Facilities = new SelectList(facilities, "Id", "Name");
+
+            if(!string.IsNullOrEmpty(search))
+            {
+                referred = referred.Where(x => x.Code == search || x.PatientName.Contains(search));
+                ViewBag.Total = referred.Count();
+                ViewBag.CurrentSearch = search;
+            }
+
+            if(!string.IsNullOrEmpty(status))
+            {
+                referred = referred.Where(x => x.Status == status);
+                ViewBag.Total = referred.Count();
+                ViewBag.Status = status;
+            }
+
+            if(facilityId != null)
+            {
+                referred = referred.Where(x => x.ReferredFrom == facilityId);
+                ViewBag.Total = referred.Count();
+                ViewBag.Facilities = new SelectList(facilities, "Id", "Name", facilityId);
+            }
+
 
             return View(await referred.OrderByDescending(x=>x.UpdatedAt).ToListAsync());
         }

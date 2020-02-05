@@ -1,0 +1,123 @@
+﻿@model IEnumerable<DailyReferralViewModel>
+
+@{
+    ViewData["Title"] = "Daily Referrals";
+    var firstDayOfMonth = ViewBag.StartDate;
+    var lastDayOfMonth = ViewBag.EndDate;
+    var startDate = firstDayOfMonth.ToString("dd/MM/yyyy");
+    var endDate = lastDayOfMonth.ToString("dd/MM/yyyy");
+    var dateRange = startDate + " - " + endDate;
+}
+
+<div class="content">
+    <div class="container">
+        <div class="row">
+            <!-- CARD DANGER -->
+            <div class="col-md-3">
+                <!-- SELECT DATE -->
+                <div class="card card-green">
+                    <!-- CARD DANGER HEADER -->
+                    <div class="card-header">
+                        Select Date
+                    </div>
+                    <form asp-action="DailyReferral" method="post">
+                        <!-- CARD DANGER BODY -->
+                        <div class="card-body">
+                            <input class="form-control form-control-sm" type="text" value="@dateRange" id="daterange" name="daterange" autocomplete="off">
+                        </div>
+                        <div class="card-footer">
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-block btn-sm bg-gradient-success">
+                                    <i class="fa fa-calendar-alt"></i>&nbsp;
+                                    Change Date
+                                </button>
+                            </div>
+                            <div class="form-group">
+                                <a class="btn btn-block btn-sm bg-gradient-orange">
+                                    <i class="far fa-file-excel"></i>&nbsp;
+                                    Export Data
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <partial name="~/Views/Shared/PartialViews/_LinksPartial.cshtml" />
+            </div>
+            <div class="col-md-9">
+                <!-- DAILY USERS -->
+                <div class="card card-outline">
+                    <!-- DAILY USERS HEADER -->
+                    <div class="card-header with-border">
+                        <h3>
+                            Daily Referral
+                            <br />
+                            <small class="text-success">
+                                @firstDayOfMonth.ToString("MMMM dd, yyyy") - @lastDayOfMonth.ToString("MMMM dd, yyyy")
+                            </small>
+                        </h3>
+                    </div>
+                    <!-- DAILY USERS BODY -->
+                    <div class="card-body cust-font-14">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover table-bordered">
+                                <thead>
+                                    <tr class="bg-black">
+                                        <th rowspan="2" style="vertical-align: middle;">Name of Hospital</th>
+                                        <th class="text-center" colspan="5">Number of Referrals To</th>
+                                        <th class="text-center" colspan="4">Number of Referrals From</th>
+                                    </tr>
+                                    <tr class="bg-black">
+                                        <th class="text-center">Accepted</th>
+                                        <th class="text-center">Redirected</th>
+                                        <th class="text-center">Seen</th>
+                                        <th class="text-center">Unseen</th>
+                                        <th class="text-center">TOTAL</th>
+                                        <th class="text-center">Accepted</th>
+                                        <th class="text-center">Redirected</th>
+                                        <th class="text-center">Seen</th>
+                                        <th class="text-center">TOTAL</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        var facility = item.Facility.Length > 25 ? new string(item.Facility.Take(25).ToArray()) + "..." : item.Facility;
+                                        var totalFrom = item.AcceptedFrom + item.RedirectedFrom + item.SeenFrom;
+                                        var totalTo = item.AcceptedTo + item.RedirectedTo + item.SeenTo + item.UnseenTo;
+                                        <tr>
+                                            <th style="text-align: left;white-space: nowrap;" title="@item.Facility">
+                                                @facility
+                                            </th>
+                                            <td class="text-center">@item.AcceptedTo</td>
+                                            <td class="text-center">@item.RedirectedTo</td>
+                                            <td class="text-center">@item.SeenTo</td>
+                                            <td class="text-center">@item.UnseenTo</td>
+                                            <td class="text-center">@totalTo</td>
+
+                                            <td class="text-center">@item.AcceptedFrom</td>
+                                            <td class="text-center">@item.RedirectedFrom</td>
+                                            <td class="text-center">@item.SeenFrom</td>
+                                            <td class="text-center">@totalFrom</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('input[name="daterange"]').daterangepicker({
+            format: 'DD/MM/YYYY',
+            startDate: '@startDate',
+            endDate: '@endDate',
+            opens: 'right'
+        });
+    });
+</script>

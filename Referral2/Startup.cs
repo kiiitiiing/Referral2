@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -55,6 +56,7 @@ namespace Referral2
                 options.LoginPath = "/Account/Login";
                 options.LogoutPath = "/Account/Logout";
                 options.AccessDeniedPath = "/Account/AccessDenied";
+                //options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
             });
 
             services.AddAuthorization(options =>

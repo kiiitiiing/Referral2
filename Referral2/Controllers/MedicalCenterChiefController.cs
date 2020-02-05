@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,9 +12,11 @@ using Microsoft.Extensions.Options;
 using Referral2.Data;
 using Referral2.Helpers;
 using Referral2.Models.ViewModels;
+using Referral2.Models.ViewModels.Consolidated;
 using Referral2.Models.ViewModels.Mcc;
 using Referral2.Models.ViewModels.Support;
 using Referral2.Models.ViewModels.ViewPatients;
+using Referral2.Models;
 
 namespace Referral2.Controllers
 {
@@ -50,8 +53,276 @@ namespace Referral2.Controllers
 
         public async Task<IActionResult> ConsolidatedMcc(string dateRange)
         {
+            var dateNow = DateTime.Now;
+            StartDate = new DateTime(dateNow.Year, dateNow.Month, 1);
+            EndDate = StartDate.AddMonths(1).AddDays(-1);
+            if (!string.IsNullOrEmpty(dateRange))
+            {
+                StartDate = DateTime.Parse(dateRange.Substring(0, dateRange.IndexOf(" ") + 1).Trim());
+                EndDate = DateTime.Parse(dateRange.Substring(dateRange.LastIndexOf(" ")).Trim());
+            }
+            ViewBag.StartDate = StartDate;
+            ViewBag.EndDate = EndDate;
 
-            return View();
+            // TABLES
+
+            var patientForms = _context.PatientForm
+                .Where(x => x.TimeReferred >= StartDate && x.TimeReferred <= EndDate);
+
+            var pregnantForms = _context.PregnantForm
+                .Where(x => x.ReferredDate >= StartDate && x.ReferredDate <= EndDate);
+
+            var facilities = _context.Facility;
+            
+            var trackings = _context.Tracking
+                .Where(x => x.DateReferred >= StartDate && x.DateReferred <= EndDate);
+
+            var activities = _context.Activity
+                .Where(x => x.DateReferred >= StartDate && x.DateReferred <= EndDate);
+
+            var trans = _context.Transportation;
+
+            var departments = _context.Department;
+
+            var doctors = _context.User;
+            // --------------------- INCOMING ---------------------
+            #region INCOMING
+            // INCOMING: INCOMING
+            var inIncoming = await trackings
+                .Where(x => x.ReferredTo.Equals(UserFacility()) && x.DateReferred >= StartDate && x.DateReferred <= EndDate).CountAsync();
+            // INCOMING: ACCEPTED
+            var inAccepted = await _context.Tracking
+                .Where(x=>x.ReferredTo == UserFacility() && x.DateAccepted != default && x.DateReferred >= StartDate && x.DateReferred <= EndDate)
+                .CountAsync();
+            // INCOMING: REFERRING FACILITY
+            var inReferringFac = await trackings
+                .Where(x => x.ReferredTo == UserFacility())
+                .GroupBy(x => x.ReferredFrom)
+                .Select(i => new ListItem
+                {
+                    NoItem = i.Count(),
+                    ItemName = facilities.SingleOrDefault(x => x.Id == i.Key).Name
+                })
+                .ToListAsync();
+            // INCOMING: REFERRING DOCTOS
+            var inReferringDoc = await trackings
+                .Where(x => x.ReferredTo == UserFacility())
+                .GroupBy(x => x.ReferringMd)
+                .Select(i => new ListItem
+                {
+                    NoItem = i.Count(),
+                    ItemName = i.Key == null? "" : GlobalFunctions.GetMDFullName(doctors.SingleOrDefault(x => x.Id == i.Key))
+                })
+                .Take(10)
+                .ToListAsync();
+
+
+            // INCOMING: DIAGNOSIS
+
+            var inDiagnosis = patientForms
+               .Where(p => p.ReferredTo == UserFacility())
+               .Select(p => p.Diagnosis)
+               .AsEnumerable()
+               .Concat(
+                  pregnantForms
+                     .Where(pf => pf.ReferredTo == UserFacility())
+                     .Select(pf => pf.WomanMajorFindings)
+               )
+               .GroupBy(u => u)
+               .Select(
+                  x =>
+                     new ListItem
+                     {
+                         NoItem = x.Count(),
+                         ItemName = x.Key
+                     })
+               .Take(10);
+               
+            // INCOMING: REASONS
+            var inReason = patientForms
+               .Where(p => p.ReferredTo == UserFacility())
+               .Select(p => p.Reason)
+               .AsEnumerable()
+               .Concat(
+                  pregnantForms
+                     .Where(pf => pf.ReferredTo == UserFacility())
+                     .Select(pf => pf.WomanReason)
+               )
+               .GroupBy(u => u)
+               .Select(
+                  x =>
+                     new ListItem
+                     {
+                         NoItem = x.Count(),
+                         ItemName = x.Key
+                     })
+               .Take(10);
+            // INCOMING: TRANSPORTATIONS
+            var inTransportation = await trackings
+                .Where(x => x.ReferredTo == UserFacility())
+                .GroupBy(x => x.Transportation)
+                .Select(i => new ListItem
+                {
+                    NoItem = i.Count(),
+                    ItemName = string.IsNullOrEmpty(i.Key) ? "" : i.Key
+                })
+               .ToListAsync();
+            // INCOMING: DEPARTMENT
+            var inDepartment = await trackings
+                .Where(x => x.ReferredTo == UserFacility())
+                .GroupBy(x => x.DepartmentId)
+                .Select(i => new ListItem
+                {
+                    NoItem = i.Count(),
+                    ItemName = departments.SingleOrDefault(x=>x.Id.Equals(i.Key)).Description
+                })
+               .ToListAsync();
+            #endregion
+
+            // --------------------- OUTGOING ---------------------
+            #region OUTGOING
+            // OUTGOING: OUTGOING
+            var outOutgoing= await trackings
+                .Where(x => x.ReferredTo.Equals(UserFacility()) && x.DateReferred >= StartDate && x.DateReferred <= EndDate).CountAsync();
+            // OUTGOING: ACCEPTED
+            var outAccepted = await trackings
+                .Where(x => x.ReferredTo == UserFacility() && x.DateAccepted != default)
+                .CountAsync();
+            // OUTGOING: REDIRECTED
+            var outRedirected = await activities
+                .Where(x => x.ReferredFrom.Equals(UserFacility()) && x.Status.Equals(_status.Value.REJECTED))
+                .CountAsync();
+            // OUTGOING: ARCHIVED
+            var outArchived = await trackings
+                .Where(x => x.ReferredFrom.Equals(UserFacility()))
+                .Where(x => x.Status.Equals(_status.Value.REFERRED) || x.Status.Equals(_status.Value.SEEN))
+                //.Where(x => GlobalFunctions.ArchivedTime(x.DateReferred) > 4320)
+                .CountAsync();
+            // OUTGOING: REFERRING FACILITY
+            var outReferringFac = await trackings
+                .Where(x => x.ReferredFrom == UserFacility())
+                .GroupBy(x => x.ReferredTo)
+                .Select(i => new ListItem
+                {
+                    NoItem = i.Count(),
+                    ItemName = facilities.SingleOrDefault(x => x.Id == i.Key).Name
+                })
+                .ToListAsync();
+            // OUTGOING: REFERRING DOCTOS
+            var outReferringDoc = await trackings
+                .Where(x => x.ReferredFrom == UserFacility())
+                .GroupBy(x => x.ReferringMd)
+                .Select(i => new ListItem
+                {
+                    NoItem = i.Count(),
+                    ItemName = i.Key == null ? "" : GlobalFunctions.GetMDFullName(doctors.SingleOrDefault(x => x.Id == i.Key))
+                })
+                .Take(10)
+                .ToListAsync();
+
+
+            // OUTGOING: DIAGNOSIS
+
+            var outDiagnosis = patientForms
+               .Where(p => p.ReferringFacilityId == UserFacility())
+               .Select(p => p.Diagnosis)
+               .AsEnumerable()
+               .Concat(
+                  pregnantForms
+                     .Where(pf => pf.ReferringFacility == UserFacility())
+                     .Select(pf => pf.WomanMajorFindings)
+               )
+               .GroupBy(u => u)
+               .Select(
+                  x =>
+                     new ListItem
+                     {
+                         NoItem = x.Count(),
+                         ItemName = x.Key
+                     })
+               .Take(10);
+
+            // OUTGOING: REASONS
+            var outReason = patientForms
+               .Where(p => p.ReferringFacilityId == UserFacility())
+               .Select(p => p.Reason)
+               .AsEnumerable()
+               .Concat(
+                  pregnantForms
+                     .Where(pf => pf.ReferringFacility == UserFacility())
+                     .Select(pf => pf.WomanReason)
+               )
+               .GroupBy(u => u)
+               .Select(
+                  x =>
+                     new ListItem
+                     {
+                         NoItem = x.Count(),
+                         ItemName = x.Key
+                     })
+               .Take(10);
+            // OUTGOING: TRANSPORTATIONS
+            var outTransportation = await trackings
+                .Where(x=>x.ReferredFrom == UserFacility())
+                .GroupBy(x => x.Transportation)
+                .Select(i => new ListItem
+                {
+                    NoItem = i.Count(),
+                    ItemName = string.IsNullOrEmpty(i.Key) ? "" : i.Key
+                })
+               .ToListAsync();
+            // OUTGOING: DEPARTMENT
+            var outDepartment = await trackings
+                .Where(x => x.ReferredFrom == UserFacility())
+                .GroupBy(x => x.DepartmentId)
+                .Select(i => new ListItem
+                {
+                    NoItem = i.Count(),
+                    ItemName = departments.SingleOrDefault(x => x.Id.Equals(i.Key)).Description
+                })
+               .ToListAsync();
+
+            #endregion
+
+            var consolidated = new ConsolidatedViewModel
+            {
+                InIncoming = inIncoming,
+                InAccepted = inAccepted,
+                InViewed = inIncoming - inAccepted,
+                InReferringFacilities = inReferringFac,
+                InReferringDoctors = inReferringDoc,
+                InDiagnosis = inDiagnosis.ToList(),
+                InReason = inReason.ToList(),
+                InTransportation = inTransportation,
+                InDepartment = inDepartment,
+                InRemarks = null,
+                InAcceptance = 0,
+                InArrival = 0,
+                InHorizontal = 0,
+                InVertical = inIncoming,
+                OutOutgoing = outOutgoing,
+                OutAccepted = outAccepted,
+                OutViewed = outOutgoing - outAccepted,
+                OutRedirected = outRedirected,
+                OutArchived = outArchived,
+                OutViewedAcceptance = 0,
+                OutViewedRedirection = 0,
+                OutAcceptance = 0,
+                OutRedirection = 0,
+                OutTransport = 0,
+                OutHorizontal = 0,
+                OutVertical = 0,
+                OutReferredFacility = outReferringFac,
+                OutReferredDoctor = outReferringDoc,
+                OutDiagnosis = outDiagnosis.ToList(), 
+                OutReason = outReason.ToList(),
+                OutTransportation = outTransportation,
+                OutDepartment = outDepartment,
+                OutRemarks = null
+
+            };
+
+            return View(consolidated);
         }
 
 
@@ -82,50 +353,128 @@ namespace Referral2.Controllers
 
 
         // INCOMING
-        public async Task<IActionResult> Incoming(string dateRange)
+        public async Task<IActionResult> MccIncoming(string dateRange)
         {
-            SetDates(dateRange);
-            ViewBag.StartDate = StartDate.ToString("yyyy/MM/dd");
-            ViewBag.EndDate = EndDate.ToString("yyyy/MM/dd");
+            var dateNow = DateTime.Now;
+            StartDate = new DateTime(dateNow.Year, dateNow.Month, 1);
+            EndDate = StartDate.AddMonths(1).AddDays(-1);
+            if (!string.IsNullOrEmpty(dateRange))
+            {
+                StartDate = DateTime.Parse(dateRange.Substring(0, dateRange.IndexOf(" ") + 1).Trim());
+                EndDate = DateTime.Parse(dateRange.Substring(dateRange.LastIndexOf(" ")).Trim());
+            }
+            ViewBag.StartDate = StartDate;
+            ViewBag.EndDate = EndDate;
 
             var trackings = _context.Tracking
-                .Where(x => x.ReferredTo.Equals(UserFacility()));
-
-            var acceptCount = trackings.Where(x => x.DateAccepted != default).Count();
-            var redirectCount = trackings.Where(x => x.DateTransferred != default).Count();
-            var idleCount = 0;
-            var noAction = 0;
+                .Where(x => x.ReferredTo.Equals(UserFacility()) && x.DateReferred >= StartDate && x.DateReferred <= EndDate);
+            var activities = _context.Activity
+                .Where(x => x.CreatedAt >= StartDate && x.CreatedAt <= EndDate);
 
             var facilities = await _context.Facility
-                .Where(x => x.Id != UserFacility() && x.Status.Equals("1"))
-                .Select(x => new MccIncomingViewModel
-                (
-                    x.Name, acceptCount, redirectCount, idleCount, noAction
-                ))
+                .Select(i => new MccIncomingViewModel
+                {
+                    Facility = i.Name,
+                    AcceptedCount = trackings
+                                    .Where(t => t.ReferredFrom == i.Id)
+                                    .Join(
+                                        activities,
+                                        t => t.Code,
+                                        a => a.Code,
+                                        (t, a) =>
+                                            new
+                                            {
+                                                t = t,
+                                                a = a
+                                            }
+                                    )
+                                    .Where(x => x.a.Status == _status.Value.ACCEPTED)
+                                    .Count(),
+                    RedirectedCount = trackings
+                                    .Where(t => t.ReferredFrom == i.Id)
+                                    .Join(
+                                        activities,
+                                        t => t.Code,
+                                        a => a.Code,
+                                        (t, a) =>
+                                            new
+                                            {
+                                                t = t,
+                                                a = a
+                                            }
+                                    )
+                                    .Where(x => x.a.Status == _status.Value.REJECTED)
+                                    .Count(),
+                    SeenCount = trackings
+                                    .Where(t => t.ReferredFrom == i.Id)
+                                    .Join(
+                                        activities,
+                                        t => t.Code,
+                                        a => a.Code,
+                                        (t, a) =>
+                                            new
+                                            {
+                                                t = t,
+                                                a = a
+                                            }
+                                    )
+                                    .Where(x => x.a.Status == _status.Value.SEEN)
+                                    .Count(),
+                    Total = trackings
+                                    .Where(x=>x.ReferredFrom == i.Id)
+                                    .Count(),
+                })
                 .AsNoTracking()
                 .ToListAsync();
 
             return View(facilities);
         }
 
+
         public async Task<IActionResult> TimeFrame(string dateRange)
         {
-            return View();
+            var dateNow = DateTime.Now;
+            StartDate = new DateTime(dateNow.Year, dateNow.Month, 1);
+            EndDate = StartDate.AddMonths(1).AddDays(-1);
+            if (!string.IsNullOrEmpty(dateRange))
+            {
+                StartDate = DateTime.Parse(dateRange.Substring(0, dateRange.IndexOf(" ") + 1).Trim());
+                EndDate = DateTime.Parse(dateRange.Substring(dateRange.LastIndexOf(" ")).Trim());
+            }
+            ViewBag.StartDate = StartDate;
+            ViewBag.EndDate = EndDate;
+
+            var timeFrame = await _context.Tracking
+                .Where(x => x.ReferredTo == UserFacility() && x.DateReferred >= StartDate && x.DateReferred <= EndDate)
+                .Select(x => new TimeFrameViewModel
+                {
+                    Code = x.Code,
+                    TimeReferred = x.DateReferred.ToString("MMM d, yyyy h:mm tt", CultureInfo.InvariantCulture),
+                    Seen = x.DateSeen == default ? 0 : x.DateSeen.Subtract(x.DateReferred).TotalMinutes,
+                    Accepted = x.DateAccepted == default ? 0 : x.DateAccepted.Subtract(x.DateSeen).TotalMinutes,
+                    Arrived = x.DateArrived == default ? 0 : x.DateArrived.Subtract(x.DateAccepted).TotalMinutes,
+                    Redirected = x.DateTransferred == default ? 0 : x.DateTransferred.Subtract(x.DateReferred).TotalMinutes
+                })
+                .ToListAsync();
+            return View(timeFrame);
 
         }
 
-        public IActionResult Track(string code)
+        public async Task<IActionResult> Track(string code)
         {
 
             ViewBag.CurrentCode = code;
             var activities = _context.Activity.Where(x => x.Code.Equals(code));
             var feedbacks = _context.Feedback.Where(x => x.Code.Equals(code));
 
-            var track = _context.Tracking
+            var track = await _context.Tracking
                 .Where(x => x.Code.Equals(code))
                 .Select(t => new ReferredViewModel
                 {
-                    PatientName = GlobalFunctions.GetFullName(t.Patient),
+                    Pregnant = t.Type.Equals("pregnant"),
+                    Seen = t.DateSeen != default,
+                    TrackingId = t.Id,
+                    PatientName = t.Patient.FirstName + " " + t.Patient.MiddleName + " " + t.Patient.LastName,
                     PatientSex = t.Patient.Sex,
                     PatientAge = GlobalFunctions.ComputeAge(t.Patient.DateOfBirth),
                     PatientAddress = GlobalFunctions.GetAddress(t.Patient),
@@ -134,21 +483,34 @@ namespace Referral2.Controllers
                     SeenCount = _context.Seen.Where(x => x.TrackingId.Equals(t.Id)).Count(),
                     CallerCount = activities == null ? 0 : activities.Where(x => x.Status.Equals(_status.Value.CALLING)).Count(),
                     ReCoCount = feedbacks == null ? 0 : feedbacks.Count(),
+                    Travel = string.IsNullOrEmpty(t.Transportation),
                     Code = t.Code,
                     Status = t.Status,
-                    Activities = activities.OrderByDescending(x => x.CreatedAt),
-                    UpdatedAt = t.UpdatedAt
-                });
+                    Walkin = t.WalkIn.Equals("yes"),
+                    UpdatedAt = t.UpdatedAt,
+                    Activities = activities.Where(x => x.Code == t.Code).OrderByDescending(x => x.CreatedAt)
+                        .Select(i => new ActivityLess
+                        {
+                            Status = i.Status,
+                            DateAction = i.DateReferred.ToString("MMM dd, yyyy hh:mm tt", CultureInfo.InvariantCulture),
+                            FacilityFrom = i.ReferredFromNavigation == null ? "" : i.ReferredFromNavigation.Name,
+                            FacilityFromContact = i.ReferredFromNavigation == null ? "" : i.ReferredFromNavigation.Contact,
+                            FacilityTo = i.ReferredToNavigation == null ? "" : i.ReferredToNavigation.Name,
+                            PatientName = GlobalFunctions.GetFullName(i.Patient),
+                            ActionMd = GlobalFunctions.GetMDFullName(i.ActionMdNavigation),
+                            ReferringMd = GlobalFunctions.GetMDFullName(i.ReferringMdNavigation),
+                            Remarks = i.Remarks
+                        })
+                })
+                .FirstOrDefaultAsync();
 
-            var tracking = track.FirstOrDefault();
-
-            if (tracking != null)
+            if (track != null)
             {
-                ViewBag.Code = tracking.Code;
+                ViewBag.Code = track.Code;
             }
 
 
-            return View(tracking);
+            return View(track);
         }
 
         public async Task<IActionResult> OnlineDoctors(string name, int? facility)

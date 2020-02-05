@@ -10,13 +10,10 @@
                         &nbsp;Mode of Transportation
                     </h4>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" id="travel-body">
                     <input type="hidden" name="TrackingId" value="@ViewBag.TrackingId" autocomplete="off">
-                    <div class="form-group transportation_body">
-                        <select class="form-control" asp-for="TranspoId" asp-items="ViewBag.Transpo">
-                        </select><br>
-                    </div>
-                    <div class="clearfix"></div>
+                    <select class="form-control" id="transpo" asp-for="TranspoId" asp-items="ViewBag.Transpo">
+                    </select><br>
                 </div>
                 <div class="modal-footer">
                     <div class="pull-right">
@@ -33,3 +30,15 @@
         </div>
     </div>
 </div>
+
+<script>
+    var other = $('#transpo').val();
+    $('#transpo').on('change', function () {
+        if ($('#transpo').val() == '5') {
+            $('#travel-body').append('<input class="form-control" id="other" name="Other" placeholder="Type the issue here.." required>');
+        }
+        else {
+            $('#other').remove();
+        }
+    })
+</script>

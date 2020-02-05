@@ -14,84 +14,112 @@
         </a>
         <ul class="dropdown-menu">
             <!-- IT SUPPORT -->
-            <li class="dropdown-item">
-                <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="SupportUsers">
+            <li>
+                <a class="dropdown-item nav-link" asp-area="" asp-controller="Admin" asp-action="SupportUsers">
                     <i class="fa fa-users"></i>
                     &nbsp;IT Support
                 </a>
             </li>
             <!-- FACILITIES -->
-            <li class="dropdown-item">
-                <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="Facilities">
+            <li >
+                <a class="dropdown-item nav-link" asp-area="" asp-controller="Admin" asp-action="Facilities">
                     <i class="fa fa-hospital"></i>
                     &nbsp;Facilities
                 </a>
             </li>
             <!-- REFERRAL -->
-            <li class="dropdown-item">
-                <a class="nav-link" asp-area="" asp-controller="sa" asp-action="sd">
+            <li >
+                <a class="dropdown-item nav-link" asp-area="" asp-controller="sa" asp-action="sd">
                     <i class="far fa-file"></i>
                     &nbsp;Referral
                 </a>
             </li>
         </ul>
     </li>
-    <!-- REPORT -->
+    <!-- REPORT(LAST) -->
     <li class="nav-item dropdown">
-        <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="fa fa-print"></i>
-            &nbsp;Report
+        <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">
+            <i class="fa fa-print"></i>&nbsp;
+            Report
         </a>
-        <ul class="dropdown-menu">
-            <!-- ONLINE USERS -->
-            <li class="dropdown-item">
-                <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="OnlineUsers">
-                    <i class="fa fa-ambulance"></i>
-                    &nbsp;Online Users
+        <ul class="dropdown-menu border-0 shadow">
+            <li>
+                <a class="dropdown-item nav-link" asp-controller="Admin" asp-action="OnlineUsers">
+                    <i class="fa fa-users"></i>&nbsp;
+                    Online Users
                 </a>
             </li>
-            <!-- REFERRAL STATUS -->
-            <li class="dropdown-item">
-                <a class="nav-link" asp-area="" asp-controller="ViewPatients" asp-action="Referred">
-                    <i class="fas fa-user"></i>
-                    &nbsp;Referral Status
+            <li>
+                <a class="dropdown-item  nav-link" asp-controller="Admin" asp-action="ReferralStatus">
+                    <i class="fa fa-chart-line"></i>&nbsp;
+                    Referral Status
                 </a>
             </li>
-            <!-- DIVIDER -->
+
             <li class="dropdown-divider"></li>
-            <!-- DAILY USERS -->
-            <li class="dropdown-item">
-                <a class="nav-link" asp-area="" asp-controller="Report" asp-action="IncomingReport">
-                    <i class="fas fa-users"></i>
-                    &nbsp;Daily Users
+
+            <li>
+                <a class="dropdown-item  nav-link" asp-controller="Admin" asp-action="DailyUsers">
+                    <i class="fa fa-users"></i>&nbsp;
+                    Daily Users
                 </a>
             </li>
-            <!-- DAILY REFERRAL -->
-            <li class="dropdown-item">
-                <a class="nav-link" asp-area="" asp-controller="Report" asp-action="OutgoingReport">
-                    <i class="fa fa-arrows-h"></i>
-                    &nbsp;Daily Referral
+
+            <!-- Level two dropdown-->
+            <li class="dropdown-submenu dropdown-hover">
+                <a href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle  nav-link">
+                    <i class="fas fa-arrows-alt-h"></i>&nbsp;
+                    Daily Referral
+                </a>
+                <ul class="dropdown-menu border-0 shadow">
+                    <li>
+                        <a tabindex="-1" class="dropdown-item nav-link" asp-controller="Admin" asp-action="DailyReferral">
+                            <i class="fa fa-hospital"></i>&nbsp;
+                            Hospital
+                        </a>
+                    </li>
+
+                    <!-- Level three dropdown-->
+                    <li class="dropdown-submenu">
+                        <a href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle nav-link">
+                            <i class="fa fa-user"></i>&nbsp;
+                            Patient
+                        </a>
+                        <ul aria-labelledby="dropdownSubMenu3" class="dropdown-menu border-0 shadow">
+                            <li>
+                                <a class="dropdown-item nav-link" asp-action="PatientIncoming">
+                                    <i class="nav-icon fa fa-sign-in-alt"></i>&nbsp;    
+                                    Incoming
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item nav-link">
+                                    <i class="nav-icon fa fa-sign-out-alt"></i>
+                                    Outgoing
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+
+            <li>
+                <a class="dropdown-item nav-link" asp-action="Consolidated">
+                    <i class="far fa-file-archive"></i>&nbsp;
+                    Consolidated
                 </a>
             </li>
-            <!-- CONSOLIDATED -->
-            <li class="dropdown-item">
-                <a class="nav-link" asp-area="" asp-controller="Report" asp-action="IncomingReport">
-                    <i class="fas fa-file-archive-o"></i>
-                    &nbsp;Consolidated
-                </a>
-            </li>
-            <!-- GRAPH -->
-            <li class="dropdown-item">
-                <a class="nav-link" asp-area="" asp-controller="Report" asp-action="OutgoingReport">
-                    <i class="fa fa-bar-chart-o"></i>
-                    &nbsp;Graph
+            <li>
+                <a class="dropdown-item  nav-link" asp-action="Graph">
+                    <i class="fa fa-chart-bar"></i>&nbsp;
+                    Graph
                 </a>
             </li>
         </ul>
     </li>
     <!-- LOGIN AS-->
     <li class="nav-item">
-        <a class="nav-link" asp-area="" asp-controller="Provinces" asp-action="Create">
+        <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="Login">
             <i class="nav-icon fa fa-sign-in-alt"></i>
             &nbsp;Login As
         </a>
@@ -104,15 +132,15 @@
         </a>
         <ul class="dropdown-menu">
             <!-- CHANGE PASSWORD -->
-            <li class="dropdown-item">
-                <a class=" nav-link" data-toggle="ajax-modal" data-target="#change-password-modal" data-url="@Url.Action("ChangePassword","Users")">
+            <li>
+                <a class="dropdown-item nav-link" data-toggle="ajax-modal" data-target="#change-password-modal" data-url="@Url.Action("ChangePassword","Users")">
                     <i class="fa fa-key"></i>
                     &nbsp;Change Password
                 </a>
             </li>
             <!-- LOGOUT -->
-            <li class="dropdown-item">
-                <a class=" nav-link" data-target="modal" asp-area="" asp-controller="Home" asp-action="loginas">
+            <li>
+                <a class="dropdown-item nav-link" data-target="modal" asp-area="" asp-controller="Home" asp-action="loginas">
                     <i class="fa fa-sign-out-alt"></i>
                     &nbsp;Logout
                 </a>

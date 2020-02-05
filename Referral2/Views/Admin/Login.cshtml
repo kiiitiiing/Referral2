@@ -1,0 +1,56 @@
+﻿
+@{
+    ViewData["Title"] = "Login As";
+}
+
+<div class="row">
+    <!-- ADMIN DASHBOARD -->
+    <div class="col-md-9">
+        <div class="card card-success card-outline">
+            <div class="card-header with-border">
+                <h3>Login As</h3>
+            </div>
+            <div class="card-body">
+                <form asp-controller="Admin" asp-action="Login" method="post">
+                    <table class="table table-input table-bordered table-hover" border="1">
+                        <tbody>
+                            <tr class="has-group">
+                                <td>Facility :</td>
+                                <td>
+                                    <select class="form-control" name="facility" asp-items="ViewBag.Facilities" required>
+                                        <option value="">Select Facility</option>
+                                    </select>
+                                </td>
+                            </tr>
+
+                            <tr class="has-group">
+                                <td>User Level :</td>
+                                <td>
+                                    <select class="form-control" name="level" required>
+                                        <option value="">Select Level...</option>
+                                        <option value="support">IT Support</option>
+                                        <option value="doctor">Doctor</option>
+                                        <option value="mcc">Medical Center Chief</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>
+                                    <button type="submit" class="btn btn-primary btn-sm">
+                                        <i class="fa fa-sign-in"></i> Login
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- LINKS -->
+    <div class="col-md-3">
+        <partial name="~/Views/Shared/PartialViews/_LinksPartial.cshtml" />
+    </div>
+    <!-- MONTHLY ACTIVITY -->
+</div>

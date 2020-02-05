@@ -21,9 +21,11 @@
                 <tr>
                     <td colspan="6">
                         Name of Referring Facility:
-                        <select class="form-control form-control-sm facilityFilter" id="facilityFilter" asp-for="ReferringFacility" asp-items="ViewBag.ReferringFacility" >
-                            <option value="0">Select Facility...</option>
-                        </select>
+                        <div class="" style="background-color:white !important;">
+                            <select class="form-control form-control-sm facilityFilter select2" id="facilityFilter" style="width:100%;" asp-for="ReferringFacility" asp-items="ViewBag.ReferringFacility">
+                                <option value="0">Select Facility...</option>
+                            </select>
+                        </div>
                         <span class="text-danger" asp-validation-for="ReferringFacility"></span>
                     </td>
                 </tr>
@@ -176,6 +178,10 @@
     form.removeData('validator');
     form.removeData('unobtrusiveValidation');
     $.validator.unobtrusive.parse(form);
+
+    $('.select2').select2({
+        theme: 'bootstrap4'
+    })
 
     var facilityId = 0;
     var departmentId = 0;

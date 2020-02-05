@@ -32,9 +32,11 @@
                     <!-- REFERRED TO -->
                     <td colspan="3">
                         Referred to:&nbsp;&nbsp;&nbsp;
-                        <select class="form-control form-control-sm facilityFilter" id="facilityFilter" asp-for="ReferredTo" asp-items="ViewBag.ReferredTo" required>
-                            <option value="">Select Facility...</option>
-                        </select>
+                        <div class="" style="background-color:white !important;">
+                            <select class="form-control form-control-sm facilityFilter select2 " id="facilityFilter" asp-for="ReferredTo" asp-items="ViewBag.ReferredTo" style="width: 100%" required>
+                                <option value="">Select Facility...</option>
+                            </select>
+                        </div>
                         <span class="text-danger" asp-validation-for="ReferredTo"></span>
                     </td>
                     <!-- DEPARTMENT -->
@@ -177,6 +179,8 @@
     form.removeData('validator');
     form.removeData('unobtrusiveValidation');
     $.validator.unobtrusive.parse(form);
+
+    
 
     var facilityId = 0;
     var departmentId = 0;

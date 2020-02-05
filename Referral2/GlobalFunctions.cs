@@ -26,6 +26,10 @@ namespace Referral2
 
             return age;
         }
+        public static double ArchivedTime(DateTime date)
+        {
+            return Convert.ToInt32(DateTime.Now.Subtract(date).TotalMinutes);
+        }
 
         public static string GetDate(DateTime date, string format)
         {
@@ -72,6 +76,13 @@ namespace Referral2
         {
             if (user != null)
                 return CheckName(user.Lastname) + ", " + CheckName(user.Firstname) + " " + CheckName(user.Middlename);
+            else
+                return "";
+        }
+        public static string GetFullLastName(Patient patient)
+        {
+            if (patient != null)
+                return CheckName(patient.LastName) + ", " + CheckName(patient.FirstName) + " " + CheckName(patient.MiddleName);
             else
                 return "";
         }

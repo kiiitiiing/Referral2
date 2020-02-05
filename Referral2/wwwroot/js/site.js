@@ -25,7 +25,6 @@ $(function () {
     }
 
     //----------------------- TRY-----------------------------------
-
     
 
     //---------------------- ADDRESS CHANGE -------------------------
@@ -335,6 +334,15 @@ function GetDashboardValues() {
 
 function SetLoginStatus(status) {
     var urlss = "/NoReload/ChangeLoginStatus?status=" + status;
+    $.ajax({
+        url: urlss,
+        tpye: 'get',
+        async: true
+    });
+}
+
+function CallRequest(code) {
+    var urlss = "/Remarks/RequestCall?code=" + code;
     $.ajax({
         url: urlss,
         tpye: 'get',

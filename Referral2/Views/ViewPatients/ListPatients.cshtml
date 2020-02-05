@@ -86,7 +86,12 @@
                                         {
                                             var dateOfBirth = item.DateofBirth.ToString("MMMM dd, yyyy");
                                         <tr>
-                                            <td>@item.PatientName</td><!-- NAME -->
+                                            <!-- NAME -->
+                                            <td>
+                                                <a href="#" data-toggle="ajax-modal" data-target="#update-modal" data-url="@Url.Action("Update", "AddPatients", new { id = item.PatientId })">
+                                                    @item.PatientName
+                                                </a>
+                                            </td>
                                             <td>@item.PatientSex</td><!-- GENDER -->
                                             <td>
                                                 <!-- AGE/DOB -->

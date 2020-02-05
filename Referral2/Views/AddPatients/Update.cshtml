@@ -1,0 +1,119 @@
+﻿@model Patient
+
+<div class="modal fade" id="update-modal">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <form asp-action="Update">
+                <input type="hidden" asp-for="Id" value="@Model.Id" />
+                <fieldset>
+                    <legend>
+                        <i class="fa fa-pencil"></i>&nbsp;
+                        Update Patient
+                    </legend>
+                </fieldset>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>PhilHealth Status:</label>
+                        <select class="form-control" asp-for="PhicStatus" required>
+                            <option>None</option>
+                            <option>Member</option>
+                            <option>Dependent</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>PhilHealth ID:</label>
+                        <input type="text" class="form-control" asp-for="PhicId" autofocus>
+                    </div>
+                    <div class="form-group">
+                        <label>First Name ::</label>
+                        <input type="text" class="form-control" asp-for="FirstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Middle Name:</label>
+                        <input type="text" class="form-control" asp-for="MiddleName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name :</label>
+                        <input type="text" class="form-control" asp-for="LastName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Birth Date :</label>
+                        <input type="date" class="form-control" asp-for="DateOfBirth" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Sex:</label>
+                        <select class="form-control" asp-for="Sex" required>
+                            <option>
+                                Male
+                            </option>
+                            <option>Female</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Civil Status:</label>
+                        <select class="form-control" asp-for="CivilStatus" required>
+                            <option selected>Single</option>
+                            <option>Married</option>
+                            <option>Divorced</option>
+                            <option>Separated</option>
+                            <option>Widowed</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Municipality:</label>
+                        <select class="form-control muncity" id="muncityFilter" asp-for="MuncityId" asp-items="ViewBag.Muncities" required>
+                            <option value="">Select Municipality/City</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Barangay:</label>
+                        <select class="form-control" asp-for="BarangayId" id="barangay" asp-items="ViewBag.Barangays" required>
+                            <option value="">Select Barangay</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        <i class="fa fa-times"></i>&nbsp;
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fa fa-check"></i>&nbsp;
+                        Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var muncitySelect = $('#muncityFilter');
+    var barangaySelect = $('#barangay');
+    var muncityId = 0;
+    muncitySelect.on('change', function () {
+        muncityId = muncitySelect.val();
+        if (muncityId != '') {
+            $.when(GetBarangayFiltered(muncityId)).done(function (output) {
+                barangaySelect.empty()
+                    .append($('<option>', {
+                        value: '',
+                        text: 'Select Barangay...'
+                    }));
+                jQuery.each(output, function (i, item) {
+                    barangaySelect.append($('<option>', {
+                        value: item.id,
+                        text: item.description
+                    }));
+                });
+            });
+        }
+        else {
+            barangaySelect.empty()
+                .append($('<option>', {
+                    value: '',
+                    text: 'Select Barangay...'
+                }));
+        }
+    });
+</script>

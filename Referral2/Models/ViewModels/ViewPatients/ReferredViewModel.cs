@@ -18,11 +18,13 @@ namespace Referral2.Models.ViewModels.ViewPatients
         public string PatientAddress { get; set; }
         public string ReferredBy { get; set; }
         public string ReferredTo { get; set; }
+        public int? ReferredFrom { get; set; }
         public bool Pregnant { get; set; }
+        public bool Seen { get; set; }
         public string Code { get; set; }
         public string Status { get; set; }
         public bool Walkin { get; set; }
-        public IEnumerable<Activity> Activities { get; set; }
+        public IEnumerable<ActivityLess> Activities { get; set; }
         public DateTime UpdatedAt { get; set; }
 
     }

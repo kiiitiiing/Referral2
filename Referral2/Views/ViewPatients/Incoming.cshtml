@@ -84,6 +84,50 @@
 
                                     switch (item.Status)
                                     {
+                                        case "rejected":
+                                            {
+                                                <div>
+                                                    <i class="fa fa-user-times bg-maroon"></i>
+                                                    <div class="timeline-item">
+                                                        <span class="time">
+                                                            <i class="fa fa-calendar">
+                                                                &nbsp;@dateAction
+                                                            </i>
+                                                        </span>
+                                                        <h3 class="timeline-header no-border">
+                                                            <small class="text-bold">
+                                                                <a href="@Url.Action("Track","ViewPatients", new { code = item.Code })" target="_blank">@item.Code</a>
+                                                            </small>
+                                                            <a href="#">@item.PatientName</a>
+                                                            was RECOMMENDED TO REDIRECT to other facility by
+                                                            <span class="custom-warning">@item.ActionMd</span>
+                                                        </h3>
+                                                        <div class="timeline-footer">
+                                                            <div class="form-inline">
+                                                                <div class="form-group">
+                                                                    @if (item.SeenCount > 0)
+                                                                    {
+                                                                        <button type="button" class="btn btn-success btn-xs" data-toggle="ajax-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens","Modals", new { trackingId = item.TrackingId })">
+                                                                            <i class="fa fa-user-md"></i>
+                                                                            &nbsp;Seen
+                                                                            <small class="badge bg-green">@item.SeenCount</small>
+                                                                        </button>
+                                                                    }
+                                                                    <button type="button" class="btn btn-info btn-xs" data-toggle="ajax-modal" data-target="#reco-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
+                                                                        <i class="fa fa-comments"></i>
+                                                                        &nbsp;ReCo
+                                                                        @if (item.FeedbackCount > 0)
+                                                                        {
+                                                                            <small class="badge bg-blue">@item.FeedbackCount</small>
+                                                                        }
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                break;
+                                            }
                                         case "accepted":
                                             {
                                                 <div>
@@ -95,9 +139,11 @@
                                                             </i>
                                                         </span>
                                                         <h3 class="timeline-header no-border">
-                                                            <small class="text-bold">@item.Code</small>
+                                                            <small class="text-bold">
+                                                                <a href="@Url.Action("Track","ViewPatients", new { code = item.Code })" target="_blank">@item.Code</a>
+                                                            </small>
                                                             <a href="#">@item.PatientName</a>
-                                                            was 
+                                                            was
                                                             <span class="badge badge-success">
                                                                 accepted
                                                             </span>
@@ -141,7 +187,9 @@
                                                             </i>
                                                         </span>
                                                         <h3 class="timeline-header no-border">
-                                                            <small class="text-bold">@item.Code</small>
+                                                            <small class="text-bold">
+                                                                <a href="@Url.Action("Track","ViewPatients", new { code = item.Code })" target="_blank">@item.Code</a>
+                                                            </small>
                                                             <a href="#">@item.PatientName</a>
                                                             was transferred by
                                                             <span class="text-success">@item.ActionMd</span>'s
@@ -161,7 +209,9 @@
                                                             </i>
                                                         </span>
                                                         <h3 class="timeline-header no-border">
-                                                            <small class="text-bold">@item.Code</small>
+                                                            <small class="text-bold">
+                                                                <a href="@Url.Action("Track","ViewPatients", new { code = item.Code })" target="_blank">@item.Code</a>
+                                                            </small>
                                                             <a href="#">@item.PatientName</a>
                                                             has arrived by
                                                             <span class="text-success">@item.ActionMd</span>'s
@@ -204,7 +254,9 @@
                                                             </i>
                                                         </span>
                                                         <h3 class="timeline-header no-border">
-                                                            <small class="text-bold">@item.Code</small>
+                                                            <small class="text-bold">
+                                                                <a href="@Url.Action("Track","ViewPatients", new { code = item.Code })" target="_blank">@item.Code</a>
+                                                            </small>
                                                             <a href="#">@item.PatientName</a>
                                                             was
                                                             <span class="badge badge-danger">
@@ -250,49 +302,9 @@
                                                             </i>
                                                         </span>
                                                         <h3 class="timeline-header no-border">
-                                                            <small class="text-bold">@item.Code</small>
-                                                            <a href="#">@item.PatientName</a>
-                                                            was admitted by
-                                                            <span class="text-success">@item.ActionMd</span>
-                                                        </h3>
-                                                        <div class="timeline-footer">
-                                                            <div class="form-inline">
-                                                                <div class="form-group">
-                                                                    @if (item.SeenCount > 0)
-                                                                    {
-                                                                        <button type="button" class="btn btn-success btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens","Modals", new { trackingId = item.TrackingId })">
-                                                                            <i class="fa fa-user-md"></i>
-                                                                            &nbsp;Seen
-                                                                            <small class="badge bg-green">@item.SeenCount</small>
-                                                                        </button>
-                                                                    }
-                                                                    <button type="button" class="btn btn-info btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
-                                                                        <i class="fa fa-comments"></i>
-                                                                        &nbsp;ReCo
-                                                                        @if (item.FeedbackCount > 0)
-                                                                        {
-                                                                            <small class="badge bg-blue">@item.FeedbackCount</small>
-                                                                        }
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                break;
-                                            }
-                                        case "rejected":
-                                            {
-                                                <div>
-                                                    <i class="fa fa-user-plus bg-olive"></i>
-                                                    <div class="timeline-item">
-                                                        <span class="time">
-                                                            <i class="fa fa-calendar">
-                                                                &nbsp;@dateAction
-                                                            </i>
-                                                        </span>
-                                                        <h3 class="timeline-header no-border">
-                                                            <small class="text-bold">@item.Code</small>
+                                                            <small class="text-bold">
+                                                                <a href="@Url.Action("Track","ViewPatients", new { code = item.Code })" target="_blank">@item.Code</a>
+                                                            </small>
                                                             <a href="#">@item.PatientName</a>
                                                             was admitted by
                                                             <span class="text-success">@item.ActionMd</span>
@@ -325,16 +337,19 @@
                                             }
                                         case "referred":
                                             {
+                                                var bgColor = currentUserDepartment == item.DepartmentId ? "#ADFE95" : "#C2FCFE";
                                                 <div>
                                                     <i class="fa fa-ambulance bg-gradient-blue"></i>
-                                                    <div class="timeline-item">
+                                                    <div class="timeline-item" style="background-color: @bgColor !important;">
                                                         <span class="time">
                                                             <i class="fa fa-calendar">
                                                                 &nbsp;@dateAction
                                                             </i>
                                                         </span>
                                                         <h3 class="timeline-header no-border">
-                                                            <small class="text-bold">@item.Code</small>
+                                                            <small class="text-bold">
+                                                                <a href="@Url.Action("Track","ViewPatients", new { code = item.Code })" target="_blank">@item.Code</a>
+                                                            </small>
                                                             <a href="#">@item.PatientName</a>
                                                             <small class="text-muted">[@item.PatientSex, @item.PatientAge]</small>
                                                             was <span class="badge bg-blue">referred</span> to
@@ -351,7 +366,7 @@
                                                                     {
                                                                         var dataTarget = item.Pregnant ? "pregnant-form-modal" : "patient-form-modal";
                                                                         var dataUrl = item.Pregnant ? Url.Action("PregnantForm", "ViewForms", new { code = item.Code }) : Url.Action("PatientForm", "ViewForms", new { code = item.Code });
-                                                                        
+
                                                                         <button type="button" class="btn btn-warning btn-xs" data-toggle="ajax-modal" data-target="#@dataTarget" data-url="@dataUrl">
                                                                             <i class="fa fa-user-md"></i>
                                                                             &nbsp;View Form
@@ -392,7 +407,9 @@
                                                             </i>
                                                         </span>
                                                         <h3 class="timeline-header no-border">
-                                                            <small class="text-bold">@item.Code</small>
+                                                            <small class="text-bold">
+                                                                <a href="@Url.Action("Track","ViewPatients", new { code = item.Code })" target="_blank">@item.Code</a>
+                                                            </small>
                                                             <a href="#">@item.PatientName</a>
                                                             was
                                                             <span class="badge badge-success">
@@ -487,6 +504,20 @@
     </div>
 </div>
 
+<div class="modal fade" role="dialog" id="redirect-modal">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>REFER TO OTHER FACILITY</h4>
+            </div>
+            <div id="redirect-content">
+                <hr />
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+
 
 <script>
     $(document).ready(function () {
@@ -496,4 +527,5 @@
             endDate: '@endDate'
         });
     });
+    
 </script>

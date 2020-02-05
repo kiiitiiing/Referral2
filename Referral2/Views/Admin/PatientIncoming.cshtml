@@ -1,0 +1,110 @@
+﻿@model IEnumerable<PatientIncomingViewModel>
+@{
+    ViewData["Title"] = "Incoming Patients";
+    var startDate = ViewBag.StartDate;
+    var endDate = ViewBag.EndDate;
+    var dateRange = startDate.ToString("dd/MM/yyyy") + " - " + endDate.ToString("dd/MM/yyyy");
+}
+
+<div class="content">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header card-success">
+                    <input class="form-control form-control-sm" type="text" value="@dateRange" id="daterange" name="daterange" autocomplete="off">
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-block bg-gradient-success">
+                        <i class="fa fa-calendar"></i>&nbsp;
+                        Change Date
+                    </button>
+                    <a class="btn btn-block bg-gradient-orange">
+                        <i class="fa fa-file-excel"></i>&nbsp;
+                        Export Data
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <partial name="~/Views/Shared/PartialViews/_LinksPartial.cshtml" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="card card-success card-outline">
+            <div class="card-header">
+                <h4>
+                    Incoming Patients
+                    <small class="text-sm text-success fa-pull-right">
+                        @startDate.ToString("MMMM (yyyy)") to @endDate.ToString("MMMM (yyyy)")
+                    </small>
+                </h4>
+            </div>
+            <div class="card-body">
+                @if (Model.Count() > 0)
+                {
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover table-bordered" width="100px">
+                            <thead>
+                                <tr class="bg-black">
+                                    <th class="text-center"></th>
+                                    <th class="text-center">Date and Time Arrived</th>
+                                    <th class="text-center">Patient Code</th>
+                                    <th class="text-center">Age / Sex</th>
+                                    <th class="text-center">Complete Address</th>
+                                    <th class="text-center">Referred From</th>
+                                    <th class="text-center">Diagnosis and Impression</th>
+                                    <th class="text-center">Referring MD / HCW (Contact No.)</th>
+                                    <th class="text-center">Reason for Referral</th>
+                                    <th class="text-center">Referred to MD / HCW (Contact No.)</th>
+                                    <th class="text-center">Method of Transportation</th>
+                                    <th class="text-center">ReCo<br>"Call Done"</th>
+                                    <th class="text-center">Acknowledgements<br>Receipt<br>Returned</th>
+                                    <th class="text-center">Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td class="text-warning text-center">@item.DateReferred</td>
+                                        <td class="text-success text-center">@item.DateArrived</td>
+                                        <td class="text-success text-center">@item.PatientName</td>
+                                        <td class="text-center">
+                                            @item.PatientAge / @item.PatientSex
+                                        </td>
+                                        <td class="text-center">@item.PatientAddress</td>
+                                        <td class="text-center">@item.ReferredFrom</td>
+                                        <td class="text-center">@item.Diagnosis</td>
+                                        <td class="text-center">@item.ReferringMd</td>
+                                        <td class="text-center">@item.Reason</td>
+                                        <td class="text-center">@item.ReferredMd</td>
+                                        <td class="text-center">@item.Transportation</td>
+                                        <td class="text-center">
+                                            @item.Reco
+                                            <ul class="pull-left"></ul>
+                                        </td>
+                                        <td>@item.Acknowledgements</td>
+                                        <td>
+                                            @item.Remarks
+                                            <ul class="pull-left"></ul>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-warning">
+                        <span class="text-lg">
+                            <i class="fa fa-exclamation-triangle"></i>
+                            &nbsp;No data found!
+                        </span>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -15,16 +15,26 @@
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/assets/plugins/fontawesome-free/css/all.min.css" />
     <link rel="stylesheet" type="text/css" href="~/assets/daterangepicker/daterangepicker-bs3.css" />
+    <link rel="stylesheet" href="~/assets/plugins/select2/css/select2.min.css" />
+    <link rel="stylesheet" href="~/assets/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css" />
+    <link rel="stylesheet" href="~/assets/dist/css/bootstrap-datetimepicker.css" />
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 
 
     <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="~/assets/plugins/chart.js/Chart.js"></script>
     <script src="~/js/site.js" asp-append-version="true" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"
             integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ"
             crossorigin="anonymous"></script>
+
+    <script type="text/javascript" src="~/assets/daterangepicker/moment.js"></script>
+    <script type="text/javascript" src="~/assets/daterangepicker/daterangepicker.js"></script>
     <script src="~/assets/plugins/bootstrap/js/bootstrap.bundle.js"></script>
+    <script src="~/assets/plugins/select2/js/select2.full.min.js"></script>
     <script src="~/assets/dist/js/bootstrap-select.js"></script>
+    <script src="~/assets/plugins/moment/moment.min.js"></script>
+    <script src="~/assets/dist/js/bootstrap-datetimepicker.js"></script>
     <script type="text/javascript" src="~/assets/plugins/toastr/toastr.min.js"></script>
 
 
@@ -76,12 +86,12 @@
                     </fieldset>
                 </div>
                 <div class="modal-body">
-                    <button id="btn-on-duty" asp-controller="NoReload" asp-action="ChangeLoginStatus" asp-route-status="onDuty" type="button" class="btn btn-success col-sm-5">
+                    <button id="btn-on-duty" type="button" class="btn btn-success col-sm-5">
                         <i class="fa-5x fa fa-user-md"></i>
                         <br>
                         ON DUTY
                     </button>
-                    <button id="btn-off-duty" asp-controller="NoReload" asp-action="ChangeLoginStatus" asp-route-status="offDuty" type="button" class="btn btn-default col-sm-5">
+                    <button id="btn-off-duty" type="button" class="btn btn-default col-sm-5">
                         <i class="fa-5x fa fa-user-md"></i>
                         <br>
                         OFF DUTY
@@ -91,8 +101,54 @@
         </div>
     </div>
     <!-- MODALS -->
+    <!-- CALL REQUEST ALERT MODAL -->
+    <div class="modal fade" id="call-alert-modal">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4>
+                        REQUEST SENT
+                    </h4>
+                </div>
+                <div class="modal-body justify-content-center">
+                    <span class="text-success">
+                        A call request has been sent to the referring facility!
+                    </span>
+                </div>
+                <div class="modal-footer justify-content-end">
+                    <button type="button" data-dismiss="modal" class="btn btn-sm btn-default">
+                        <i class="fa fa-times"></i>&nbsp;
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <div class="modal fade"role="dialog" id="notif-modal">
+    <!-- REDIRECT ALERT MODAL -->
+    <div class="modal fade" id="redirect-alert-modal">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-body" style="align-content:center;">
+                    <h5 class="text-danger">
+                        Are you sure you want to recommend to redirect to other facility?
+                    </h5>
+                </div>
+                <div class="modal-footer justify-content-end">
+                    <button type="button" data-dismiss="modal" class="btn btn-sm btn-default">
+                        <i class="fa fa-times"></i>&nbsp;
+                        No
+                    </button>
+                    <button id="redirect-yes" type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#redirect-modal">
+                        <i class="far fa-trash-alt"></i>&nbsp;
+                        Yes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" role="dialog" id="notif-modal">
         <div class="modal-dialog modal-md" role="document">
             <div class="modal-content">
                 <div class="modal-body">
@@ -188,9 +244,12 @@
             </div>
         </footer>
     }
+    <script type="text/javascript">
+        $('.select2').select2({
+            theme: 'bootstrap4'
+        })
+    </script>
 
-    <script type="text/javascript" src="~/assets/daterangepicker/moment.js"></script>
-    <script type="text/javascript" src="~/assets/daterangepicker/daterangepicker.js"></script>
     <script type="text/javascript" src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script type="text/javascript" src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
     @RenderSection("Scripts", required: false)

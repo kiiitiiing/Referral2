@@ -54,11 +54,12 @@
                             Facility:
                         </td>
                         <td colspan="4">
-                            <select class="form-control form-control-sm" asp-for="ReferredTo" asp-items="ViewBag.Facilities" id="facilityFilter" style="width:100%" required>
-                                <option value="">Select Facility...</option>
-                            </select>
+                            <div class="" style="background-color:white !important;">
+                                <select class="form-control form-control-sm select2" style="width:100%;" asp-for="ReferredTo" asp-items="ViewBag.Facilities" id="facilityFilter" style="width:100%" required>
+                                    <option value="">Select Facility...</option>
+                                </select>
+                            </div>
                             <span class="text-danger" asp-validation-for="ReferredTo"></span>
-
                         </td>
                     </tr>
                     <tr>
@@ -305,4 +306,8 @@
     form.removeData('validator');
     form.removeData('unobtrusiveValidation');
     $.validator.unobtrusive.parse(form);
+
+    $('.select2').select2({
+        theme: 'bootstrap4'
+    })
 </script>

@@ -20,7 +20,6 @@ namespace Referral2.Services
     {
         Task<(bool, User)> ValidateUserCredentialsAsync(string username, string password);
         Task<(bool, User)> SwitchUserAsync(int id, string password);
-
         bool ChangePasswordAsync(User user, string newPassword);
 
 

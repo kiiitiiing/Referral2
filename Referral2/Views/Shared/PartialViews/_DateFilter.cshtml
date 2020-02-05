@@ -1,0 +1,27 @@
+﻿@model SearchModel
+
+@{
+    var firstDayOfMonth = (ViewBag.StartDate).ToString("dd/MM/yyyy");
+    var lastDayOfMonth = (ViewBag.EndDate).ToString("dd/MM/yyyy");
+    var dateRange = firstDayOfMonth + " - " + lastDayOfMonth;
+}
+
+<form class="fa-pull-right form-inline ml-3" asp-action="@Model.Action" method="get">
+    <div class="form-actions note-color"><input class="form-control form-control-sm" type="text" value="@dateRange" id="daterange" name="daterange" autocomplete="off">
+        <button type="submit" value="Search" class="btn btn-sm btn-success">
+            <i class="fa fa-calendar"></i>
+            Change Date
+        </button>
+    </div>
+</form>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('input[name="daterange"]').daterangepicker({
+            format: 'DD/MM/YYYY',
+            startDate: '@firstDayOfMonth',
+            endDate: '@lastDayOfMonth',
+            opens: 'left'
+        });
+    });
+</script>

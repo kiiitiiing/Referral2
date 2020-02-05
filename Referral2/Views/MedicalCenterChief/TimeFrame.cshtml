@@ -1,7 +1,113 @@
-﻿
+﻿@model IEnumerable<TimeFrameViewModel>
+
 @{
-    ViewData["Title"] = "TimeFrame";
+    ViewData["Title"] = "Referral Time Frame";
+    var startDate = ViewBag.StartDate;
+    var endDate = ViewBag.EndDate;
+    var dateRange = startDate.ToString("dd/MM/yyyy") + " - " + endDate.ToString("dd/MM/yyyy");
 }
 
-<h1>TimeFrame</h1>
+<div class="row">
+    <!-- CARD DANGER -->
+    <div class="col-md-3">
+        <!-- SELECT DATE -->
+        <div class="card card-danger card-green">
+            <!-- CARD DANGER HEADER -->
+            <div class="card-header">
+                <h3 class="card-title">Track Patient</h3>
+            </div>
+            <!-- CARD DANGER BODY -->
+            <form asp-action="TimeFrame" method="post">
+                <div class="card-body">
+                    <!-- SEARCH -->
+                    <div class="form-group">
+                        <input class="form-control form-control-sm" type="text" value="@dateRange" id="daterange" name="daterange" autocomplete="off">
+                    </div>
+                    <!-- BUTTONS -->
+                    <div class="form-group">
+                        <!-- FILTER -->
+                        <button type="submit" value="Filter" class="btn btn-block btn-success">
+                            <i class="fa fa-filter"></i>
+                            &nbsp;Filter Result
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <!-- MAIN MENU -->
+        <partial name="~/Views/Shared/PartialViews/_OtherLinksPartial.cshtml" />
+    </div>
+    <div class="col-md-9">
+        <div class="card card-outline card-success">
+            <div class="card-header">
+                <h3>
+                    Referral Time Frame
+                </h3>
 
+                <small class="fa-pull-right text-success">@startDate.ToString("MMMM d, yyyy") to @endDate.ToString("MMMM d, yyyy")</small>
+            </div>
+            <div class="card-body">
+                @if (Model.Count() != 0)
+                {
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover table-bordered">
+                            <thead>
+                                <tr class="bg-black">
+                                    <th class="text-center" rowspan="2">Referral Code</th>
+                                    <th class="text-center" rowspan="2">Time<br>Referred</th>
+                                    <th class="text-center" colspan="4">Time Frame for Actions Taken</th>
+                                </tr>
+                                <tr class="bg-black">
+                                    <th class="text-center">Seen</th>
+                                    <th class="text-center">Accepted</th>
+                                    <th class="text-center">Arrived</th>
+                                    <th class="text-center">Redirected</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td class="custom-warning">@item.Code</td>
+                                        <td class="text-muted">@item.TimeReferred</td>
+                                        <td class="text-right text-danger">
+                                            <span>@item.Seen.ToString("#.##")</span>
+                                        </td>
+                                        <td class="text-right text-danger">
+                                            <span>@item.Accepted.ToString("#.##")</span>
+                                        </td>
+                                        <td class="text-right text-danger">
+                                            <span>@item.Arrived.ToString("#.##")</span>
+                                        </td>
+                                        <td class="text-right text-danger">
+                                            <span>@item.Redirected.ToString("#.##")</span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-warning">
+                        <span class="text-lg">
+                            <i class="fa fa-exclamation-triangle"></i>
+                            &nbsp;No data found!
+                        </span>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('input[name="daterange"]').daterangepicker({
+            format: 'DD/MM/YYYY',
+            startDate: '@startDate.ToString("dd/MM/yyyy")',
+            endDate: '@endDate.ToString("dd/MM/yyyy")',
+            opens: 'right'
+        });
+    });
+</script>

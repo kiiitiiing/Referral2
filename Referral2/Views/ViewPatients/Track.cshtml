@@ -9,6 +9,11 @@
     var admitted = "disabled";
     var discharged = "disabled";
     var transpo = ListContainer.TranspoMode;
+    bool seenReject = false;
+    if (Model.Status == "referred")
+        seenReject = true;
+    else if (Model.Status == "rejected")
+        seenReject = true;
 }
 
 <div class="content">
@@ -115,7 +120,15 @@
                     }
                     <div style="border:2px solid #7E7E7E" class="card card-outline">
                         <!-- DAILY USERS HEADER -->
-
+                        @if(Model.Seen && seenReject)
+                        {
+                            referred = "complete";
+                            seen = "active";
+                            accepted = "disabled";
+                            arrived = "disabled";
+                            admitted = "disabled";
+                            discharged = "disabled";
+                        }
                         <div class="card-header panel-success">
                             <span class="patientTitle">
                                 <i class="fa fa-wheelchair"></i>
@@ -183,31 +196,46 @@
                                 <div class="table-responsive">
                                     <table>
                                         <tbody>
-                                            @foreach (var item in Model.Activities)
+                                            @foreach (var item2 in Model.Activities)
                                             {
-                                                var dateReferred = item.DateReferred.ToString("MMM dd, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
-                                                var patientName = GlobalFunctions.GetFullName(item.Patient);
-                                                var referredFrom = item.ReferredFromNavigation.Name;
-                                                var facilityContact = item.ReferredFromNavigation.Contact;
-                                                var referredTo = item.ReferredToNavigation == null ? "" : item.ReferredToNavigation.Name;
-                                                var actionMd = GlobalFunctions.GetMDFullName(item.ActionMdNavigation);
-                                                var actionMdFacility = item.ActionMdNavigation == null ? "" : item.ActionMdNavigation.Facility.Name;
-                                                var referringMd = GlobalFunctions.GetMDFullName(item.ReferringMdNavigation);
-                                                var referringMdFacililty = item.ReferredFromNavigation.Name;
-                                                var remarks = item.Remarks;
-
-                                                switch (item.Status)
+                                                switch (item2.Status)
                                                 {
-                                                    case "travel":
+                                                    case "rejected":
                                                         {
                                                             <tr>
                                                                 <td class="table-date">
-                                                                    <span class="text-muted">@dateReferred</span>
+                                                                    <span class="text-muted">@item2.DateAction</span>
                                                                 </td>
                                                                 <td>
-                                                                    <span class="patient-color">@patientName</span>
+                                                                    <span class="md-color">@item2.ActionMd</span>
+                                                                    of
+                                                                    <span class="hospital-color">@item2.FacilityTo</span>
+                                                                    recommend to redirect
+                                                                    <span class="patient-color">@item2.PatientName</span>
+                                                                    to other facility.<br />
+                                                                    <span class="text-warning">Remarks: @item2.Remarks</span>
+                                                                </td>
+                                                            </tr>
+                                                            break;
+                                                        }
+                                                    case "travel":
+                                                        {
+                                                            var other = "";
+                                                            var transpoId = int.Parse(item2.Remarks[0].ToString()) - 1;
+                                                            var remarks = transpo[transpoId];
+                                                            if (transpoId == 4)
+                                                            {
+                                                                other = item2.Remarks.Substring(item2.Remarks.LastIndexOf(" ")).Trim();
+                                                                remarks = "Others - ";
+                                                            }
+                                                            <tr>
+                                                                <td class="table-date">
+                                                                    <span class="text-muted">@item2.DateAction</span>
+                                                                </td>
+                                                                <td>
+                                                                    <span class="patient-color">@item2.PatientName</span>
                                                                     has departed by
-                                                                    <span class="md-color">@transpo[(int.Parse(remarks)-1)]</span>
+                                                                    <span class="md-color">@remarks@other</span>
                                                                 </td>
                                                             </tr>
                                                             break;
@@ -216,25 +244,25 @@
                                                         {
                                                             <tr>
                                                                 <td class="table-date">
-                                                                    <span class="text-muted">@dateReferred</span>
+                                                                    <span class="text-muted">@item2.DateAction</span>
                                                                 </td>
                                                                 @if (!Model.Walkin)
                                                                 {
                                                                     <td>
-                                                                        <span class="patient-color">@patientName</span>
+                                                                        <span class="patient-color">@item2.PatientName</span>
                                                                         was referred by
-                                                                        <span class="md-color">@referringMd</span>
+                                                                        <span class="md-color">@item2.ReferringMd</span>
                                                                         of
-                                                                        <span class="hospital-color">@referredFrom</span>
+                                                                        <span class="hospital-color">@item2.FacilityFrom</span>
                                                                         to
-                                                                        <span class="hospital-color">@referredTo</span>
+                                                                        <span class="hospital-color">@item2.FacilityTo</span>
                                                                     </td>
                                                                 }
                                                                 else
                                                                 {
                                                                     <td>
                                                                         <strong>Walk-In Patient: </strong>
-                                                                        <span class="patient-color">@patientName</span>
+                                                                        <span class="patient-color">@item2.PatientName</span>
                                                                     </td>
                                                                 }
                                                             </tr>
@@ -244,16 +272,16 @@
                                                         {
                                                             <tr>
                                                                 <td class="table-date">
-                                                                    <span class="text-muted">@dateReferred</span>
+                                                                    <span class="text-muted">@item2.DateAction</span>
                                                                 </td>
                                                                 <td>
-                                                                    <span class="patient-color">@patientName</span>
+                                                                    <span class="patient-color">@item2.PatientName</span>
                                                                     was accepted by
-                                                                    <span class="md-color">@actionMd</span>
+                                                                    <span class="md-color">@item2.ActionMd</span>
                                                                     of
-                                                                    <span class="hospital-color">@actionMdFacility</span>
+                                                                    <span class="hospital-color">@item2.FacilityTo</span>
                                                                     <br />
-                                                                    <span class="text-warning">Remarks: @remarks</span>
+                                                                    <span class="text-warning">Remarks: @item2.Remarks</span>
                                                                 </td>
                                                             </tr>
                                                             break;
@@ -262,14 +290,14 @@
                                                         {
                                                             <tr>
                                                                 <td class="table-date">
-                                                                    <span class="text-muted">@dateReferred</span>
+                                                                    <span class="text-muted">@item2.DateAction</span>
                                                                 </td>
                                                                 <td>
-                                                                    <span class="patient-color">@patientName</span>
+                                                                    <span class="patient-color">@item2.PatientName</span>
                                                                     has arrived at
-                                                                    <span class="hospital-color">@actionMdFacility</span>
+                                                                    <span class="hospital-color">@item2.FacilityTo</span>
                                                                     <br />
-                                                                    <span class="text-warning">Remarks: @remarks</span>
+                                                                    <span class="text-warning">Remarks: @item2.Remarks</span>
                                                                 </td>
                                                             </tr>
                                                             break;
@@ -278,14 +306,14 @@
                                                         {
                                                             <tr>
                                                                 <td class="table-date">
-                                                                    <span class="text-muted">@dateReferred</span>
+                                                                    <span class="text-muted">@item2.DateAction</span>
                                                                 </td>
                                                                 <td>
-                                                                    <span class="patient-color">@patientName</span>
+                                                                    <span class="patient-color">@item2.PatientName</span>
                                                                     was admitted at
-                                                                    <span class="hospital-color">@actionMdFacility</span>
+                                                                    <span class="hospital-color">@item2.FacilityTo</span>
                                                                     <br />
-                                                                    <span class="text-warning">Remarks: @remarks</span>
+                                                                    <span class="text-warning">Remarks: @item2.Remarks</span>
                                                                 </td>
                                                             </tr>
                                                             break;
@@ -294,14 +322,14 @@
                                                         {
                                                             <tr>
                                                                 <td class="table-date">
-                                                                    <span class="text-muted">@dateReferred</span>
+                                                                    <span class="text-muted">@item2.DateAction</span>
                                                                 </td>
                                                                 <td>
-                                                                    <span class="patient-color">@patientName</span>
+                                                                    <span class="patient-color">@item2.PatientName</span>
                                                                     was discharged from
-                                                                    <span class="hospital-color">@actionMdFacility</span>
+                                                                    <span class="hospital-color">@item2.FacilityTo</span>
                                                                     <br />
-                                                                    <span class="text-warning">Remarks: @remarks</span>
+                                                                    <span class="text-warning">Remarks: @item2.Remarks</span>
                                                                 </td>
                                                             </tr>
                                                             break;
@@ -310,16 +338,30 @@
                                                         {
                                                             <tr>
                                                                 <td class="table-date">
-                                                                    <span class="text-muted">@dateReferred</span>
+                                                                    <span class="text-muted">@item2.DateAction</span>
                                                                 </td>
                                                                 <td>
-                                                                    <span class="md-color">@actionMd</span>
+                                                                    <span class="md-color">@item2.ActionMd</span>
                                                                     of
-                                                                    <span class="hospital-color">@actionMdFacility</span>
+                                                                    <span class="hospital-color">@item2.FacilityTo</span>
                                                                     is requesting a call from
-                                                                    <span class="hospital-color">@referringMdFacililty</span>.
-                                                                    Please contact this number
-                                                                    <span class="contact-color">Remarks: @facilityContact</span>
+                                                                    <span class="hospital-color">@item2.FacilityFrom</span>.
+                                                                </td>
+                                                            </tr>
+                                                            break;
+                                                        }
+                                                    case "cancelled":
+                                                        {
+                                                            <tr>
+                                                                <td class="table-date">
+                                                                    <span class="text-muted">@item2.DateAction</span>
+                                                                </td>
+                                                                <td>
+                                                                    <span class="patient-color">@item2.PatientName</span>
+                                                                    was cancelled by
+                                                                    <span class="md-color">@item2.ActionMd</span>
+                                                                    <br />
+                                                                    <span class="text-warning">Remarks: @item2.Remarks</span>
                                                                 </td>
                                                             </tr>
                                                             break;

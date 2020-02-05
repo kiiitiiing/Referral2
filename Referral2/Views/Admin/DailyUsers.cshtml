@@ -1,0 +1,111 @@
+﻿@model IEnumerable<DailyUsersAdminModel>
+
+@{
+    ViewData["Title"] = "Daily Users";
+    var date = DateTime.Now.ToString("MMMM dd, yyyy");
+}
+
+<div class="content">
+    <div class="container">
+        <div class="row">
+            <!-- CARD DANGER -->
+            <div class="col-md-3">
+                <!-- SELECT DATE -->
+                <div class="card card-green">
+                    <!-- CARD DANGER HEADER -->
+                    <div class="card-header">
+                        Select Date
+                    </div>
+                    <form asp-action="DailyUsers" method="post">
+                        <!-- CARD DANGER BODY -->
+                        <div class="card-body">
+                            <input class="form-control form-control-sm" type="date" value="@ViewBag.Date" name="date" />
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-sm bg-gradient-success">
+                                <i class="fa fa-calendar-alt"></i>&nbsp;
+                                Change Date
+                            </button>
+                            <a class="btn btn-sm bg-gradient-orange">
+                                <i class="far fa-file-excel"></i>&nbsp;
+                                Export Data
+                            </a>
+                        </div>
+                    </form>
+                </div>
+                <partial name="~/Views/Shared/PartialViews/_LinksPartial.cshtml" />
+            </div>
+            <div class="col-md-9">
+                <!-- DAILY USERS -->
+                <div class="card card-outline">
+                    <!-- DAILY USERS HEADER -->
+                    <div class="card-header with-border">
+                        <h3>
+                            Incoming Patients
+                            <br />
+                            <small class="text-success">
+                                @date
+                            </small>
+                        </h3>
+                    </div>
+                    <!-- DAILY USERS BODY -->
+                    <div class="card-body cust-font-14">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover table-bordered">
+                                <thead>
+                                    <tr class="bg-black">
+                                        <th rowspan="2">Name of Hospital</th>
+                                        <th class="text-center" colspan="3">Health Professional</th>
+                                        <th rowspan="2">Subtotal</th>
+                                        <th class="text-center" colspan="2">IT</th>
+                                        <th rowspan="2">Subtotal</th>
+                                        <th rowspan="2">TOTAL</th>
+                                    </tr>
+                                    <tr class="bg-black">
+                                        <th>On Duty</th>
+                                        <th>Off Duty</th>
+                                        <th>Offline</th>
+                                        <th>Online</th>
+                                        <th>Offline</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        var facilityBool = item.Facility.Length > 25;
+                                        var facility = facilityBool? new string(item.Facility.Take(25).ToArray())+"..." : item.Facility;
+                                        var totalHP = item.OnDutyHP + item.OffDutyHP + item.OfflineHP;
+                                        var totalIT = item.OnlineIT + item.OfflineIT;
+                                        var total = totalHP + totalIT;
+                                        <tr>
+                                            <td style="text-align: left;" title="@item.Facility">
+                                                @facility
+                                            </td>
+                                            <td class="text-center">@item.OnDutyHP</td>
+                                            <td class="text-center">@item.OffDutyHP</td>
+                                            <td class="text-center">@item.OffDutyHP</td>
+                                            <td class="text-center">@totalHP</td>
+                                            <td class="text-center">@item.OnlineIT</td>
+                                            <td class="text-center">@item.OfflineIT</td>
+                                            <td class="text-center">@totalIT</td>
+                                            <td class="text-center">@total</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $('input[name="daterange"]').daterangepicker({
+            format: 'YYYY/MM/DD',
+        });
+    });
+</script>

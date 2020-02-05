@@ -139,11 +139,21 @@
             </li>
             <!-- LOGOUT -->
             <li class="dropdown-item">
-                <a class=" nav-link" data-target="modal" asp-area="" asp-controller="Home" asp-action="loginas">
+                <a class=" nav-link" data-target="modal" asp-area="" asp-controller="Account" asp-action="Logout">
                     <i class="fa fa-sign-out-alt"></i>
                     &nbsp;Logout
                 </a>
             </li>
+            <!-- BACK AS ADMIN-->
+            @if (User.FindFirstValue("RealRole").Equals("admin"))
+            {
+                <li class="dropdown-item">
+                    <a class=" nav-link" data-target="modal" asp-area="" asp-controller="Account" asp-action="BackAsAdmin">
+                        <i class="fa fa-user-secret"></i>
+                        &nbsp;Back as Admin
+                    </a>
+                </li>
+            }
         </ul>
     </li>
 </ul>

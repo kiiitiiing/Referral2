@@ -1,0 +1,18 @@
+﻿@model RemarksViewModel
+@{
+}
+<form asp-controller="Remarks" asp-action="RejectRemarks">
+    <div class="modal-body">
+        <div class="">
+            <input type="hidden" asp-for="Code" />
+        </div>
+        <div class="">
+            <textarea asp-for="Remarks" class="form-control" rows="7" required></textarea>
+            <span asp-validation-for="Remarks" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="modal-footer justify-content-end">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-success">Submit</button>
+    </div>
+</form>

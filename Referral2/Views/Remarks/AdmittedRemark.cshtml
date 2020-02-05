@@ -15,7 +15,7 @@
                     </div>
                     <div class="">
                         <span>Select Date/Time:</span>
-                        <input asp-for="DateAdmitted" value="@DateTime.Now.ToString("yyyy-MM-ddThh:mm",System.Globalization.CultureInfo.InvariantCulture)" class="form-control" />
+                        <input asp-for="DateAdmitted" type="text" value="@DateTime.Now.ToString("yyyy-MM-dd HH:mm")" id='datetimepicker4' class="form-control" />
                         <span asp-validation-for="DateAdmitted" class="text-danger"></span>
                     </div>
                 </div>
@@ -27,3 +27,21 @@
         </div>
     </div>
 </div>
+
+<script>
+    $(function () {
+        $('#datetimepicker4').datetimepicker({
+            format: 'yyyy-mm-dd hh:ii',
+            weekStart: 1,
+            todayBtn:  1,
+            autoclose: 1,
+            todayHighlight: 1,
+            startView: 2,
+            forceParse: 0,
+            showMeridian: 1,
+            minuteStep: 2,
+            endDate: '@DateTime.Now.ToString("yyyy-MM-dd")',
+            endTime: '@DateTime.Now.ToString("HH:mm")'
+        });
+    });
+</script>

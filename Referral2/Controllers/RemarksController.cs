@@ -16,6 +16,7 @@ using Referral2.Models.ViewModels;
 using Referral2.Resources;
 using Microsoft.Extensions.Options;
 using Referral2.Models.ViewModels.Remarks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Referral2.Controllers
 {
@@ -38,6 +39,42 @@ namespace Referral2.Controllers
         public string Code { get; set; }
 
         public int Id { get; set; }
+
+        #region REDIRECT
+
+        /*public IActionResult Redirect(string code)
+        {
+            return PartialView();
+        }
+*/
+        #endregion
+
+        #region CALL
+        [HttpGet]
+        public void RequestCall(string code)
+        {
+            var tracking = _context.Tracking.SingleOrDefault(x => x.Code == code);
+            var activity = new Activity
+            {
+                Code = code,
+                PatientId = tracking.PatientId,
+                DateReferred = DateTime.Now,
+                DateSeen = default,
+                ReferredFrom = tracking.ReferredFrom,
+                ReferredTo = tracking.ReferredTo,
+                DepartmentId = null,
+                ReferringMd = null,
+                ActionMd = UserId(),
+                Remarks = "N/A",
+                Status = _status.Value.CALLING,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            };
+            _context.Add(activity);
+            _context.SaveChanges();
+        }
+
+        #endregion
 
         #region ISSUES AND CONCERN
 
@@ -259,7 +296,8 @@ namespace Referral2.Controllers
         [HttpGet]
         public IActionResult CancelRemark(string code)
         {
-            return PartialView();
+            ViewBag.Code = code;
+            return PartialView("~/Views/Remarks/CancelRemark.cshtml");
         }
 
         [HttpPost]
@@ -269,12 +307,12 @@ namespace Referral2.Controllers
             {
                 var tracking = CancelTracking(model, _status.Value.CANCELLED);
                 var activity = NewActivity(tracking, DateTime.Now);
-                _context.Update(activity);
+                await _context.AddAsync(activity);
                 _context.Update(tracking);
                 await _context.SaveChangesAsync();
-                return RedirectToAction("Referred", "ViewPatients");
+                return RedirectToAction("Cancelled", "ViewPatients");
             }
-            return PartialView();
+            return PartialView("~/Views/Remarks/CancelRemark.cshtml");
         }
 
         #endregion
@@ -339,8 +377,14 @@ namespace Referral2.Controllers
 
         private Tracking TravelTracking(TravelViewModel model)
         {
+            
             var tracking = _context.Tracking.Find(model.TrackingId);
-            tracking.Transportation = model.TranspoId.ToString();
+
+            if (model.TranspoId != 5)
+                tracking.Transportation = model.TranspoId.ToString();
+            else
+                tracking.Transportation = model.TranspoId + " - " + model.Other;
+
             tracking.UpdatedAt = DateTime.Now;
 
             return tracking;
@@ -388,7 +432,9 @@ namespace Referral2.Controllers
         private Tracking RejectedTracking(RemarksViewModel model, string status)
         {
             var currentTracking = _context.Tracking.FirstOrDefault(x => x.Code.Equals(model.Code));
-
+            currentTracking.Status = status;
+            currentTracking.Remarks = model.Remarks;
+            currentTracking.UpdatedAt = DateTime.Now;
             return currentTracking;
         }
 
@@ -575,8 +621,7 @@ namespace Referral2.Controllers
                     }
                 case "rejected":
                     {
-                        activity.Remarks = UserName() + " called " + tracking.ReferredFromNavigation.Name;
-                        activity.DateSeen = default;
+                        activity.Remarks = tracking.Remarks;
                         activity.ReferredFrom = tracking.ReferredFrom;
                         activity.ReferredTo = tracking.ReferredTo;
                         activity.DepartmentId = null;

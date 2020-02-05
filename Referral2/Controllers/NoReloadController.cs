@@ -76,6 +76,9 @@ namespace Referral2.Controllers
         }
 
 
+
+
+
         [HttpGet]
         public List<SelectAddress> FilteredBarangay(int? muncityId)
         {
@@ -93,20 +96,22 @@ namespace Referral2.Controllers
         public void ChangeLoginStatus(string status)
         {
             var currentUser = _context.User.Find(UserId());
-
-            if(status.Equals("onDuty"))
+            var login = new Login
             {
-                currentUser.LoginStatus = "login";
-            }
-            else if(status.Equals("offDuty"))
-            {
-                currentUser.LoginStatus = "login off";
-            }
-
+                UserId = UserId(),
+                Login1 = DateTime.Now,
+                Status = status == "onDuty" ? "login" : "login off",
+                Logout = default,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            };
+            currentUser.LoginStatus = status == "onDuty" ? "login" : "login off";
             currentUser.UpdatedAt = DateTime.Now;
+            _context.Add(login);
             _context.Update(currentUser);
-            _context.SaveChangesAsync();
+            _context.SaveChanges();
         }
+
 
 
         //  FilterDepartment?facilityId=

@@ -1,0 +1,88 @@
+﻿@model IEnumerable<ReferralStatusViewModel>
+@{
+    ViewData["Title"] = "Referral Status";
+    var bgColor = "";
+
+    var startDate = ViewBag.StartDate;
+    var endDate = ViewBag.EndDate;
+
+
+    void SetBgColor(string status)
+    {
+        if (status.Equals("accepted") || status.Equals("arrived"))
+            bgColor = "custom-bg-success";
+        else if (status.Equals("Seen"))
+            bgColor = "custom-bg-danger";
+        else if (status.Equals("discharged") || status.Equals("admitted"))
+            bgColor = "custom-bg-warning";
+        else
+            bgColor = "";
+    }
+}
+
+
+
+<div class="card card-outline">
+    <div class="card-header card-success">
+        @await Html.PartialAsync("~/Views/Shared/PartialViews/_DateFilter.cshtml", new SearchModel
+            {
+                Action = "ReferralStatus"
+            })
+        <h3>
+            Referral Status
+            <br />
+            <small class="text-success">
+                @startDate.ToString("MMMM dd, yyyy") - @endDate.ToString("MMMM dd, yyyy")
+            </small>
+        </h3>
+    </div>
+    <div class="card-body">
+        @if (Model.Count() != 0)
+        {
+
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered">
+                <!-- TABLE HEADER -->
+                <thead>
+                    <tr class="bg-black">
+                        <th>Date Referred</th>
+                        <th>Referred From</th>
+                        <th>Referred To</th>
+                        <th>Department</th>
+                        <th>Patient Name</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(var item in Model)
+                    {
+                        var facilityFrom = item.FacilityFrom.Length > 25? new string(item.FacilityFrom.Take(25).ToArray())+"..." : item.FacilityFrom;
+                        var facilityTo = item.FacilityTo.Length > 25 ? new string(item.FacilityTo.Take(25).ToArray()) + "..." : item.FacilityTo;
+                        SetBgColor(item.Status);
+                        <tr class="@bgColor">
+                            <td class="text-success">@item.DateReferred</td>
+                            <td class="custom-warning" title="@item.FacilityFrom">@facilityFrom</td>
+                            <td class="custom-warning" title="@item.FacilityTo">@facilityTo</td>
+                            <td class="text-maroon">@item.Department</td>
+                            <td class="text-blue">@item.PatientName</td>
+                            <td class="text-maroon">@item.Status</td>
+                        </tr>
+                    }
+                </tbody>
+                </table>
+            </div>
+        }
+        else
+            {
+            <div class="alert alert-warning">
+                <span class="text-lg">
+                    <i class="fa fa-exclamation-triangle"></i>
+                    &nbsp;No Data Found!
+                </span>
+            </div>
+            }
+        </div>
+    <div class="card-footer">
+
+    </div>
+</div>

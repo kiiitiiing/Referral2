@@ -72,6 +72,38 @@ namespace Referral2.Controllers
         }
         #endregion
 
+        #region Update Patient
+
+        public async Task<IActionResult> Update(int? id)
+        {
+            var patient = await _context.Patient.FindAsync(id);
+            var muncities = _context.Muncity.Where(x => x.ProvinceId == patient.ProvinceId);
+            var barangays = _context.Barangay.Where(x => x.MuncityId == patient.MuncityId);
+            ViewBag.Muncities = new SelectList(muncities, "Id", "Description", patient.MuncityId);
+            ViewBag.Barangays = new SelectList(barangays, "Id", "Description", patient.BarangayId);
+
+            return PartialView(patient);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Update([Bind] Patient model)
+        {
+            if(ModelState.IsValid)
+            {
+                _context.Update(model);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("ListPatients", "ViewPatients", new { name = model.FirstName, muncityId = model.MuncityId, barangayId = model.BarangayId });
+            }
+            var muncities = _context.Muncity.Where(x => x.ProvinceId == model.ProvinceId);
+            var barangays = _context.Barangay.Where(x => x.MuncityId == model.MuncityId);
+            ViewBag.Muncities = new SelectList(muncities, "Id", "Description", model.MuncityId);
+            ViewBag.Barangays = new SelectList(barangays, "Id", "Description", model.BarangayId);
+
+            return PartialView();
+        }
+
+        #endregion
+
         #region Refer Patient
         //GET: ReferPartial
         public IActionResult Refer(int? id)

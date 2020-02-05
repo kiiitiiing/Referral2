@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "OnlineUsers";
     var date = DateTime.Parse(ViewBag.Date).ToString("MMMM d, yyyy");
+    var facility = "";
 }
 
 
@@ -11,7 +12,7 @@
             <form class="fa-pull-right form-inline" asp-action="OnlineUsers" method="post">
                 <div class="form-actions no-color">
                     <p>
-                        <input class="form-control form-control-sm" type="text" name="Date" value="@ViewBag.Date" />
+                        <input type="date" class="form-control form-control-sm" type="text" name="Date" value="@ViewBag.Date" />
                         <button type="submit" value="Search" class="btn btn-sm btn-success">
                             <i class="fa fa-calendar"></i>
                             &nbsp;Change Date
@@ -46,14 +47,17 @@
                             @foreach (var item in Model)
                             {
                                 var timeLogin = item.UserLoginTime.ToString("hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+                                var test = facility == item.FacilityName ? "" : item.FacilityName;
+                                var status = item.UserStatus.Equals("login off") ? "Off Duty" : "On Duty";
                                 <tr>
-                                    <td>@item.FacilityName</td>
-                                    <td>@item.UserFullName</td>
-                                    <td>@item.UserLevel</td>
-                                    <td>@item.UserDepartment</td>
-                                    <td>@item.UserStatus</td>
+                                    <td class="custom-warning">@test</td>
+                                    <td class="text-success">@item.UserFullName</td>
+                                    <td class="text-danger">@item.UserLevel</td>
+                                    <td class="text-danger">@item.UserDepartment</td>
+                                    <td>@status</td>
                                     <td>@timeLogin</td>
                                 </tr>
+                                facility = item.FacilityName;
                             }
                         </tbody>
                     </table>

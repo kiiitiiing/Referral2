@@ -6,17 +6,53 @@ body {
     background: #d2d6de;
 }
 
+.select2-results__option{
+    font-size: 14px !important;
+}
+
+.bg-white {
+    background-color: white !important;
+}
+
+.cust-font-10{
+    font-size: 10px !important;
+}
+
+.cust-font-14 {
+    font-size: 14px !important;
+}
+
+.custom-bg-lime {
+    color: #ADFE95 !important;
+}
+
+.custom-bg-cyan {
+    color: #C2FCFE !important;
+}
+
 .custom-warning {
     color: #8a6d3b;
 }
 
-.container-fluid-important{
-    width: 100vw !important;
-    padding-left: 15px !important;
-    padding-right: 15px !important;
-    margin-right: auto !important;
-    margin-left: auto !important;
+.custom-bg-success {
+    background-color: #dff0d8;
 }
+
+.custom-bg-danger {
+    background-color: #f2dede;
+}
+
+.custom-bg-warning {
+    background-color: #fcf8e3;
+}
+
+/*.content {
+    position: fixed;
+    top: auto;
+    left: 1%;
+    bottom: auto;
+    right: 1%;
+}*/
 
 .table-add{
     text-align:right;

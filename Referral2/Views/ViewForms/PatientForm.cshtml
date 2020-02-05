@@ -15,12 +15,12 @@
                     <!-- CLOSE -->
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     <!-- CALL REQUEST -->
-                    <button class="btn btn-info" asp-controller="Remarks" asp-action="ActionRemark" asp-route-code="@code" value="@code" type="button" data-toggle="modal" data-target="#@accept">
+                    <button id="call-request" type="button" data-toggle="modal" data-target="#call-alert-modal" class="btn btn-success">
                         <i class="fa fa-phone"></i>
                         Call Request
                     </button>
                     <!-- RECOMMEND TO REDIRECT -->
-                    <button class="btn btn-danger" asp-controller="Remarks" asp-action="ActionRemark" asp-route-code="@code" value="@code" type="button" data-toggle="modal" data-target="#@accept">
+                    <button class="btn btn-danger" type="button" data-toggle="modal" data-target="#redirect-alert-modal">
                         <i class="fa fa-line-chart"></i>
                         Recommend to Redirect
                     </button>
@@ -34,12 +34,13 @@
         </div>
     </div>
 
+
 <script>
 
     var acceptBtn = $('#accept-btn');
-
+    var yesBtn = $('#redirect-yes');
+    var redAlert = $('#redirect-alert-modal');
     acceptBtn.on('click', function () {
-        console.log('yow');
         var patientCode = this.value;
         var url = "/Remarks/AcceptedRemark?code=" + patientCode;
         console.log(url);
@@ -48,6 +49,20 @@
             $("#accept_content").html(result);
         })
     });
+
+    yesBtn.on('click', function () {
+        redAlert.modal('hide');
+        var url = "/Remarks/RejectRemarks?code=" + '@code';
+        $("#redirect-content").html("Loading..............");
+        $.get(url, function (result) {
+            $("#redirect-content").html(result);
+        })
+    })
+
+    $('#call-request').on('click', function () {
+        CallRequest('@code');
+    })
+
 
 </script>
 

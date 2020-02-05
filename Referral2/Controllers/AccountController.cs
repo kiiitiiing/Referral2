@@ -190,6 +190,27 @@ namespace Referral2.Controllers
             return View(model);
         }
 
+        public async Task<ActionResult> BackAsAdmin()
+        {
+            var realRole = User.FindFirstValue("RealRole");
+            var realFacility = int.Parse(User.FindFirstValue("RealFacility"));
+            await LoginAsAsync(realFacility, realRole);
+
+            if (realRole.Equals(_roles.Value.ADMIN))
+                return RedirectToAction("AdminDashboard", "Admin");
+            else if (realRole.Equals(_roles.Value.DOCTOR))
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            else if (realRole.Equals(_roles.Value.SUPPORT))
+            {
+                return RedirectToAction("SupportDashboard", "Support");
+            }
+            else //if (level.Equals(_roles.Value.MCC))
+            {
+                return RedirectToAction("MccDashboard", "MedicalCenterChief");
+            }
+        }
         public async Task<IActionResult> Logout(string returnUrl)
         {
             ViewBag.ReturnUrl = returnUrl;
@@ -251,6 +272,39 @@ namespace Referral2.Controllers
             return !string.IsNullOrWhiteSpace(returnUrl) && Uri.IsWellFormedUriString(returnUrl, UriKind.Relative);
         }
 
+        private async Task LoginAsAsync(int facilityId, string level)
+        {
+            var user = await _context.User.FindAsync(UserId());
+            var properties = new AuthenticationProperties
+            {
+                AllowRefresh = false,
+                IsPersistent = false
+            };
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.GivenName, user.Firstname+" "+user.Middlename),
+                new Claim(ClaimTypes.Surname, user.Lastname),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.MobilePhone, user.Contact),
+                new Claim(ClaimTypes.Role, level),
+                new Claim("Facility", facilityId.ToString()),
+                new Claim("Department", user.DepartmentId.ToString()),
+                new Claim("Province", user.ProvinceId.ToString()),
+                new Claim("Muncity", user.MuncityId.ToString()),
+                new Claim("Barangay", user.BarangayId.ToString()),
+                new Claim("RealRole", user.Level),
+                new Claim("RealFacility", user.FacilityId.ToString())
+            };
+
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(identity);
+            await HttpContext.SignInAsync(principal, properties);
+        }
+
+
         private async Task LoginAsync(User user, bool rememberMe)
         {
             var properties = new AuthenticationProperties
@@ -262,17 +316,15 @@ namespace Referral2.Controllers
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Username),
                 new Claim(ClaimTypes.GivenName, user.Firstname+" "+user.Middlename),
                 new Claim(ClaimTypes.Surname, user.Lastname),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.MobilePhone, user.Contact),
                 new Claim(ClaimTypes.Role, user.Level),
                 new Claim("Facility", user.FacilityId.ToString()),
                 new Claim("Department", user.DepartmentId.ToString()),
                 new Claim("Province", user.ProvinceId.ToString()),
                 new Claim("Muncity", user.MuncityId.ToString()),
-                new Claim("Barangay", user.BarangayId.ToString())
+                new Claim("Barangay", user.BarangayId.ToString()),
+                new Claim("RealRole", user.Level)
             };
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

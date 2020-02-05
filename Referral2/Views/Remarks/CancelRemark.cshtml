@@ -1,17 +1,18 @@
 ﻿@model RemarksViewModel
 
-<div class="modal fade" id="cancel-modal" ">
+<div class="modal fade" id="cancel-modal">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
-            <form asp-action="CancelRemark" method="post" id="cancel-form">
+            <form asp-action="CancelRemark">
                 <div class="modal-header">
                     <h4>
-                        Admit Patient
+                        <i class="fa fa-user-times"></i>
+                        Cancel Referral
                     </h4>
                 </div>
                 <div class="modal-body">
                     <div class="">
-                        <input type="hidden" asp-for="Code" />
+                        <input type="hidden" asp-for="Code" value="@ViewBag.Code" />
                     </div>
                     <div class="">
                         <textarea asp-for="Remarks" placeholder="Reason for Cancellation" class="form-control" rows="5" required></textarea>
