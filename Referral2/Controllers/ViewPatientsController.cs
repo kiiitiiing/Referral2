@@ -409,8 +409,49 @@ namespace Referral2.Controllers
             ViewBag.StartDate = StartDate.Date.ToString("yyyy/MM/dd");
             ViewBag.EndDate = EndDate.Date.ToString("yyyy/MM/dd");
 
+            var incoming = _context.Tracking
+               .Where(t => t.ReferredTo == UserFacility() && t.DateReferred >= StartDate && t.DateReferred <= EndDate)
+               .Join(
+                  _context.Activity.Where(x =>  x.DateReferred >= StartDate && x.DateReferred <= EndDate),
+                  t =>
+                     new
+                     {
+                         Code = t.Code,
+                         Status = t.Status
+                     },
+                  a =>
+                     new
+                     {
+                         Code = a.Code,
+                         Status = a.Status
+                     },
+                  (t, a) =>
+                     new IncomingViewModel()
+                     {
+                         Pregnant = t.Type.Equals("pregnant"),
+                         TrackingId = t.Id,
+                         Code = t.Code,
+                         PatientName = GlobalFunctions.GetFullName(t.Patient),
+                         PatientSex = t.Patient.Sex,
+                         PatientAge = GlobalFunctions.ComputeAge(t.Patient.DateOfBirth),
+                         Status = t.Status,
+                         ReferringMd = GlobalFunctions.GetMDFullName(t.ReferringMdNavigation),
+                         ActionMd = GlobalFunctions.GetMDFullName(a.ActionMdNavigation),
+                         SeenCount = _context.Seen.Where(x => x.TrackingId.Equals(t.Id)).Count(),
+                         CallCount = _context.Activity.Where(x => x.Code.Equals(t.Code) && x.Status.Equals(_status.Value.CALLING)).Count(),
+                         FeedbackCount = _context.Feedback.Where(x => x.Code.Equals(t.Code)).Count(),
+                         DateAction = a.DateReferred,
+                         ReferredFrom = t.ReferredFromNavigation.Name,
+                         ReferredFromId = (int)t.ReferredFrom,
+                         ReferredTo = t.ReferredToNavigation.Name,
+                         ReferredToId = (int)t.ReferredTo,
+                         Department = t.Department.Description,
+                         DepartmentId = (int)t.DepartmentId
+                     });
 
-            var incoming = from t in _context.Tracking.Where(f => f.ReferredTo == UserFacility())
+
+
+            /*var incoming = from t in _context.Tracking.Where(f => f.ReferredTo == UserFacility())
                            join a in _context.Activity
                            on new
                            {
@@ -445,7 +486,7 @@ namespace Referral2.Controllers
                                ReferredToId = (int)t.ReferredTo,
                                Department = t.Department.Description,
                                DepartmentId = (int)t.DepartmentId
-                           };
+                           };*/
 
             incoming = incoming
                 .Where(x => x.ReferredToId == UserFacility())

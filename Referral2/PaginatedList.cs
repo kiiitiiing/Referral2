@@ -10,12 +10,13 @@ namespace Referral2
     {
         public int _pageIndex { get; private set; }
         public int _totalPages { get; private set; }
+        public int _pageSize { get; private set; }
 
         public PaginatedList(List<T> items, int count, int pageIndex, int pageSize)
         {
             _pageIndex = pageIndex;
             _totalPages = (int)Math.Ceiling(count / (double)pageSize);
-
+            _pageSize = pageSize;
             this.AddRange(items);
         }
 

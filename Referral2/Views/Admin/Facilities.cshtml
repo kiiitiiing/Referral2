@@ -1,4 +1,4 @@
-﻿@model  IEnumerable<FacilitiesViewModel>
+﻿@model  PaginatedList<FacilitiesViewModel>
 @{
     ViewData["Title"] = "List of Facilities";
 }
@@ -7,15 +7,15 @@
         <div class="card card-success card-outline">
             <div class="card-header">
                 <form class="fa-pull-right form-inline" asp-action="Facilities" method="get">
-                            <input class="form-control form-control-sm" type="text" placeholder="Search name..." name="search" value="@ViewBag.Search" />
-                            <button class="btn btn-sm btn-success" type="submit" value="Search" >
-                                <i class="fa fa-search"></i>
-                                &nbsp;Search
-                            </button>
-                            <button type="button" class="btn btn-sm btn-primary" data-toggle="ajax-modal" data-target="#add-facility-modal" data-url="@Url.Action("AddFacility")">
-                                <i class="fa fa-hospital"></i>
-                                &nbsp;Add Facility
-                            </button>
+                    <input class="form-control form-control-sm" type="text" placeholder="Search name..." name="search" value="@ViewBag.Filter" />
+                    <button class="btn btn-sm btn-success" type="submit" value="Search">
+                        <i class="fa fa-search"></i>
+                        &nbsp;Search
+                    </button>
+                    <button type="button" class="btn btn-sm btn-primary" data-toggle="ajax-modal" data-target="#add-facility-modal" data-url="@Url.Action("AddFacility")">
+                        <i class="fa fa-hospital"></i>
+                        &nbsp;Add Facility
+                    </button>
                 </form>
                 <h3>List of Facility</h3>
             </div>
@@ -55,6 +55,46 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+            <!-- CARD FOOTER -->
+            <div class="card-footer">
+                @if(Model.Count() >= Model._pageSize)
+                {
+                    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+                    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+                    <div class="text-center">
+                        <ul class="pagination">
+                            <li>
+                                <a asp-action="Facilities"
+                                   asp-route-page="@(Model._pageIndex - 1)"
+                                   asp-route-filter="@ViewBag.Filter"
+                                   class="btn btn-default @prevDisabled">
+                                    «
+                                </a>
+                            </li>
+                            @for (int x = 1; x <= Model._totalPages; x++)
+                            {
+                                var activeClass = x == Model._pageIndex ? "btn-primary" : "btn-default";
+                                <li>
+                                    <a asp-action="Facilities"
+                                       asp-route-page="@x"
+                                       asp-route-filter="@ViewBag.Filter"
+                                       class="btn @activeClass">
+                                        @x
+                                    </a>
+                                </li>
+                            }
+                            <li>
+                                <a asp-action="Facilities"
+                                   asp-route-page="@(Model._pageIndex + 1)"
+                                   asp-route-filter="@ViewBag.Filter"
+                                   class="btn btn-default @nextDisabled">
+                                    »
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                }
             </div>
         </div>
     </div>
