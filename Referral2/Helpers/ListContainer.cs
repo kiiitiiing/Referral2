@@ -7,78 +7,91 @@ namespace Referral2.Helpers
 {
     public partial class ListContainer
     {
-        public static List<string> PhicStatus
+        public static List<KeyValuePair<string, string>> PhicStatus
         {
             get
             {
-                return new List<string>
+                return new List<KeyValuePair<string, string>>
                 {
-                    "None",
-                    "Member",
-                    "Dependent"
+                    new KeyValuePair<string, string>("none","None"),
+                    new KeyValuePair<string, string>("member","Member"),
+                    new KeyValuePair<string, string>("dependent","Dependent")
                 };
             }
         }
 
-        public static List<string> CivilStatus 
+        public static List<KeyValuePair<string, string>> CivilStatus 
         {
             get
             {
-                return new List<string>
+                return new List<KeyValuePair<string, string>>
                 {
-                    "Single",
-                    "Married",
-                    "Divorced",
-                    "Separated",
-                    "WIdowed"
+                    new KeyValuePair<string, string>("single","Single"),
+                    new KeyValuePair<string, string>("married","Married"),
+                    new KeyValuePair<string, string>("divorced","Divorced"),
+                    new KeyValuePair<string, string>("separated","Separated"),
+                    new KeyValuePair<string, string>("widowed","Widowed")
                 };
             }
         }
 
-        public static List<string> Sex
+        public static List<KeyValuePair<string, string>> Sex
         {
             get
             {
-                return new List<string>
+                return new List<KeyValuePair<string, string>>
                 {
-                    "Male",
-                    "Female"
+                    new KeyValuePair<string, string>("male","Male"),
+                    new KeyValuePair<string, string>("female","Female")
                 };
             }
         }
 
-        public static List<string> Status
+        public static List<KeyValuePair<int, string>> Status
         {
             get
             {
-                return new List<string>
+                return new List<KeyValuePair<int, string>>
                 {
-                    "active",
-                    "inactive"
-                };
-            }
-        }
-        public static List<string> HospitalLevel
-        {
-            get
-            {
-                return new List<string>
-                {
-                    "Level 1",
-                    "Level 2",
-                    "Level 3"
+                    new KeyValuePair<int, string>(1,"Active"),
+                    new KeyValuePair<int, string>(0,"Inactive")
                 };
             }
         }
 
-        public static List<string> HospitalType
+        public static List<KeyValuePair<string, string>> UserStatus
         {
             get
             {
-                return new List<string>
+                return new List<KeyValuePair<string, string>>
                 {
-                    "Government",
-                    "Private"
+                    new KeyValuePair<string, string>("active","Active"),
+                    new KeyValuePair<string, string>("inactive","Inactive")
+                };
+            }
+        }
+
+        public static List<KeyValuePair<int, string>> HospitalLevel
+        {
+            get
+            {
+                return new List<KeyValuePair<int, string>>()
+                {
+                    new KeyValuePair<int, string>(1, "Level 1"),
+                    new KeyValuePair<int, string>(2, "Level 2"),
+                    new KeyValuePair<int, string>(3, "Level 3")
+                };
+            }
+        }
+
+        public static List<KeyValuePair<string, string>> HospitalType
+        {
+            get
+            {
+                return new List<KeyValuePair<string, string>>()
+                {
+                    new KeyValuePair<string, string>("government", "Government"),
+                    new KeyValuePair<string, string>("private", "Private")
                 };
             }
         }
@@ -96,19 +109,5 @@ namespace Referral2.Helpers
                 };
             }
         }
-
-
-
-
-        public static bool computeHours(DateTime time)
-        {
-            var hr = time.AddDays(3);
-
-            if (hr == DateTime.Now)
-                return true;
-            else
-                return false;
-        }
-
     }
 }

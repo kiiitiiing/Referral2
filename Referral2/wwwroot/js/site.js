@@ -16,7 +16,6 @@ $(function () {
 
 
     var numberOfNotif = $('span.numberNotif');
-    var bodey = $('body');
 
     if (numberOfNotif.length > 0) {
         $.when(GetNumberNotif()).done(function (output) {
@@ -65,7 +64,6 @@ $(function () {
 
     //---------------------- ACCEPT MODAL ---------------------------
 
-    var secondPlaceHolder = $('#modal-second-placeholder');
 
     //---------------------- MODALS ---------------------------------
 
@@ -111,7 +109,6 @@ $(function () {
 
     $('button[data-toggle="ajax-modal"]').click(function (event) {
         var url = $(this).data('url');
-        console.log(url);
         $.get(url).done(function (data) {
             placeholderElement.empty();
             placeholderElement.html(data);
@@ -168,19 +165,21 @@ $(function () {
         var formId = placeholderElement.find('.modal').attr('id');
         console.log(formId);
         var actionUrl = form.attr('action');
-        console.log(actionUrl);
         var dataToSend = form.serialize();
         $.post(actionUrl, dataToSend).done(function (data) {
             var newBody = $('.modal-body', data);
             placeholderElement.find('.modal-body').replaceWith(newBody);
             var validation = $('span.text-danger').text();
             if (validation == '') {
-                //placeholderElement.find('.modal').modal('hide');
-                //location.href = '/Home/Index';
+                placeholderElement.find('.modal').modal('hide');
                 if (formId == 'update-doctor-modal') {
-                    location.href = '/Support/ManageUsers';
+                    //placeholderElement.find('.modal').modal('hide');
+                    sessionStorage.setItem('onReload', 'updateDoctor');
+                    location.reload();
                 }
                 else if (formId == 'change-password-modal') {
+                    //placeholderElement.find('.modal').modal('hide');
+                    sessionStorage.setItem('onReload', 'passWordChanged');
                     location.reload();
                 }
                 else if (formId == 'reco-modal') {
@@ -190,11 +189,41 @@ $(function () {
                 else if (formId == 'switch-user-modal') {
                     location.href = '/Home/Index';
                 }
+                else if (formId == 'add-doctor-modal') {
+                    //placeholderElement.find('.modal').modal('hide');
+                    sessionStorage.setItem('onReload', 'addDoctor');
+                    location.reload();
+                }
+                else if (formId == 'add-support-modal') {
+                    //placeholderElement.find('.modal').modal('hide');
+                    sessionStorage.setItem('onReload', 'addSupport');
+                    location.reload();
+                }
+                else if (formId == 'update-support-modal') {
+                    //placeholderElement.find('.modal').modal('hide');
+                    sessionStorage.setItem('onReload', 'updateSupport');
+                    location.reload();
+                }
+                else if (formId == 'add-facility-modal') {
+                    //placeholderElement.find('.modal').modal('hide');
+                    sessionStorage.setItem('onReload', 'addFacility');
+                    location.reload();
+                } 
+                else if (formId == 'update-facility-modal') {
+                    //placeholderElement.find('.modal').modal('hide');
+                    sessionStorage.setItem('onReload', 'updateFacility');
+                    location.reload();
+                }
             }
         });
     });
 
     //---------------------- MODALS ---------------------------------
+
+    //-------------------- REMOVE FACILITY CONFIRMATION -------------------
+
+    
+
 
     //-------------------- CHANGE LOGIN STATUS ----------------------------
 
@@ -303,6 +332,10 @@ $(function () {
 
 //----------------------- FUNCTIONS --------------------------
 
+function Test() {
+    console.log('wat');
+}
+
 function getDepartmentFiltered() {
     var urls = "/NoReload/FilterDepartment?facilityId=" + facilityId;
     return $.ajax({
@@ -310,6 +343,27 @@ function getDepartmentFiltered() {
         type: 'get',
         async: true
     });
+}
+
+function ChangePasswordSuccess(type,message) {
+    toastr.options = {
+        "closeButton": false,
+        "debug": false,
+        "newestOnTop": false,
+        "progressBar": false,
+        "positionClass": "toast-top-right",
+        "preventDuplicates": false,
+        "onclick": null,
+        "showDuration": "1000",
+        "hideDuration": "1500",
+        "timeOut": "1500",
+        "extendedTimeOut": "1500",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    }
+    Command: toastr[type](message)
 }
 
 
@@ -328,6 +382,15 @@ function GetDashboardValues() {
     return $.ajax({
         url: urlss, 
         type: 'get',
+        async: true
+    });
+}
+
+function RemoveFacility(id) {
+    var url = "/Admin/RemoveFacility?id=" + id;
+    $.ajax({
+        url: url,
+        tpye: 'get',
         async: true
     });
 }

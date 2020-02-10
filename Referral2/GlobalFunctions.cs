@@ -15,6 +15,16 @@ namespace Referral2
             return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(input.ToLower());
         }
 
+        public static string ComputeTimeFrame(double minutes)
+        {
+            var min = Math.Floor(minutes);
+            var minute = min == 0 ? "" : min + "m";
+            var sec = Math.Round((minutes - min) * 60);
+            var seconds = sec == 0 ? "" : sec + "s";
+            var total = minute + " " + seconds;
+            return total;
+        }
+
         public static int ComputeAge(DateTime dob)
         {
             var today = DateTime.Today;

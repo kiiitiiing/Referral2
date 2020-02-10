@@ -25,7 +25,6 @@ namespace Referral2.Controllers
     [Authorize(Policy = "Administrator")]
     public class AdminController : Controller
     {
-        const string SessionSupportUsername = "_username";
         private readonly IUserService _userService;
         public readonly ReferralDbContext _context;
         private readonly IOptions<ReferralRoles> _roles;
@@ -64,8 +63,8 @@ namespace Referral2.Controllers
         {
             var provinces = _context.Province;
             ViewBag.Provinces = new SelectList(provinces, "Id", "Description");
-            ViewBag.HospitalLevels = new SelectList(ListContainer.HospitalLevel);
-            ViewBag.HospitalTypes = new SelectList(ListContainer.HospitalType);
+            ViewBag.HospitalLevels = new SelectList(ListContainer.HospitalLevel, "Key", "Value");
+            ViewBag.HospitalTypes = new SelectList(ListContainer.HospitalType, "Key", "Value");
             return PartialView();
         }
 
@@ -94,6 +93,18 @@ namespace Referral2.Controllers
             }
             var provinces = _context.Province;
             ViewBag.Provinces = new SelectList(provinces, "Id", "Description", model.Province);
+            if(model.Muncity != null)
+            {
+                var muncities = _context.Muncity.Where(x => x.ProvinceId == model.Province);
+                ViewBag.Muncities = new SelectList(muncities, "Id", "Description", model.Muncity);
+            }
+            if(model.Barangay != null)
+            {
+                var barangays = _context.Barangay.Where(x => x.ProvinceId == model.Province && x.MuncityId == model.Muncity);
+                ViewBag.Barangays = new SelectList(barangays, "Id", "Description", model.Barangay);
+            }
+            ViewBag.HospitalLevels = new SelectList(ListContainer.HospitalLevel, "Key", "Value", model.Level);
+            ViewBag.HospitalTypes = new SelectList(ListContainer.HospitalType, "Key", "Value", model.Type);
             return PartialView(model);
         }
 
@@ -109,10 +120,7 @@ namespace Referral2.Controllers
         {
             if (ModelState.IsValid)
             {
-                model.Firstname = GlobalFunctions.FixName(model.Firstname);
-                model.Middlename = GlobalFunctions.FixName(model.Middlename);
-                model.Lastname = GlobalFunctions.FixName(model.Lastname);
-                if (await _userService.RegisterDoctorAsync(model))
+                if (await _userService.RegisterSupportAsync(model))
                 {
                     return RedirectToAction("SupportUsers");
                 }
@@ -161,14 +169,14 @@ namespace Referral2.Controllers
             #region INCOMING
             // INCOMING: INCOMING
             var inIncoming = await trackings
-                .Where(x => x.ReferredTo.Equals(UserFacility()) && x.DateReferred >= StartDate && x.DateReferred <= EndDate).CountAsync();
+                .Where(x => x.ReferredTo.Equals(UserFacility) && x.DateReferred >= StartDate && x.DateReferred <= EndDate).CountAsync();
             // INCOMING: ACCEPTED
             var inAccepted = await _context.Tracking
-                .Where(x => x.ReferredTo == UserFacility() && x.DateAccepted != default && x.DateReferred >= StartDate && x.DateReferred <= EndDate)
+                .Where(x => x.ReferredTo == UserFacility && x.DateAccepted != default && x.DateReferred >= StartDate && x.DateReferred <= EndDate)
                 .CountAsync();
             // INCOMING: REFERRING FACILITY
             var inReferringFac = await trackings
-                .Where(x => x.ReferredTo == UserFacility())
+                .Where(x => x.ReferredTo == UserFacility)
                 .GroupBy(x => x.ReferredFrom)
                 .Select(i => new ListItem
                 {
@@ -178,7 +186,7 @@ namespace Referral2.Controllers
                 .ToListAsync();
             // INCOMING: REFERRING DOCTOS
             var inReferringDoc = await trackings
-                .Where(x => x.ReferredTo == UserFacility())
+                .Where(x => x.ReferredTo == UserFacility)
                 .GroupBy(x => x.ReferringMd)
                 .Select(i => new ListItem
                 {
@@ -192,12 +200,12 @@ namespace Referral2.Controllers
             // INCOMING: DIAGNOSIS
 
             var inDiagnosis = patientForms
-               .Where(p => p.ReferredTo == UserFacility())
+               .Where(p => p.ReferredTo == UserFacility)
                .Select(p => p.Diagnosis)
                .AsEnumerable()
                .Concat(
                   pregnantForms
-                     .Where(pf => pf.ReferredTo == UserFacility())
+                     .Where(pf => pf.ReferredTo == UserFacility)
                      .Select(pf => pf.WomanMajorFindings)
                )
                .GroupBy(u => u)
@@ -212,12 +220,12 @@ namespace Referral2.Controllers
 
             // INCOMING: REASONS
             var inReason = patientForms
-               .Where(p => p.ReferredTo == UserFacility())
+               .Where(p => p.ReferredTo == UserFacility)
                .Select(p => p.Reason)
                .AsEnumerable()
                .Concat(
                   pregnantForms
-                     .Where(pf => pf.ReferredTo == UserFacility())
+                     .Where(pf => pf.ReferredTo == UserFacility)
                      .Select(pf => pf.WomanReason)
                )
                .GroupBy(u => u)
@@ -231,7 +239,7 @@ namespace Referral2.Controllers
                .Take(10);
             // INCOMING: TRANSPORTATIONS
             var inTransportation = await trackings
-                .Where(x => x.ReferredTo == UserFacility())
+                .Where(x => x.ReferredTo == UserFacility)
                 .GroupBy(x => x.Transportation)
                 .Select(i => new ListItem
                 {
@@ -241,7 +249,7 @@ namespace Referral2.Controllers
                .ToListAsync();
             // INCOMING: DEPARTMENT
             var inDepartment = await trackings
-                .Where(x => x.ReferredTo == UserFacility())
+                .Where(x => x.ReferredTo == UserFacility)
                 .GroupBy(x => x.DepartmentId)
                 .Select(i => new ListItem
                 {
@@ -255,24 +263,24 @@ namespace Referral2.Controllers
             #region OUTGOING
             // OUTGOING: OUTGOING
             var outOutgoing = await trackings
-                .Where(x => x.ReferredTo.Equals(UserFacility()) && x.DateReferred >= StartDate && x.DateReferred <= EndDate).CountAsync();
+                .Where(x => x.ReferredTo.Equals(UserFacility) && x.DateReferred >= StartDate && x.DateReferred <= EndDate).CountAsync();
             // OUTGOING: ACCEPTED
             var outAccepted = await trackings
-                .Where(x => x.ReferredTo == UserFacility() && x.DateAccepted != default)
+                .Where(x => x.ReferredTo == UserFacility && x.DateAccepted != default)
                 .CountAsync();
             // OUTGOING: REDIRECTED
             var outRedirected = await activities
-                .Where(x => x.ReferredFrom.Equals(UserFacility()) && x.Status.Equals(_status.Value.REJECTED))
+                .Where(x => x.ReferredFrom.Equals(UserFacility) && x.Status.Equals(_status.Value.REJECTED))
                 .CountAsync();
             // OUTGOING: ARCHIVED
             var outArchived = await trackings
-                .Where(x => x.ReferredFrom.Equals(UserFacility()))
+                .Where(x => x.ReferredFrom.Equals(UserFacility))
                 .Where(x => x.Status.Equals(_status.Value.REFERRED) || x.Status.Equals(_status.Value.SEEN))
                 //.Where(x => GlobalFunctions.ArchivedTime(x.DateReferred) > 4320)
                 .CountAsync();
             // OUTGOING: REFERRING FACILITY
             var outReferringFac = await trackings
-                .Where(x => x.ReferredFrom == UserFacility())
+                .Where(x => x.ReferredFrom == UserFacility)
                 .GroupBy(x => x.ReferredTo)
                 .Select(i => new ListItem
                 {
@@ -282,7 +290,7 @@ namespace Referral2.Controllers
                 .ToListAsync();
             // OUTGOING: REFERRING DOCTOS
             var outReferringDoc = await trackings
-                .Where(x => x.ReferredFrom == UserFacility())
+                .Where(x => x.ReferredFrom == UserFacility)
                 .GroupBy(x => x.ReferringMd)
                 .Select(i => new ListItem
                 {
@@ -296,12 +304,12 @@ namespace Referral2.Controllers
             // OUTGOING: DIAGNOSIS
 
             var outDiagnosis = patientForms
-               .Where(p => p.ReferringFacilityId == UserFacility())
+               .Where(p => p.ReferringFacilityId == UserFacility)
                .Select(p => p.Diagnosis)
                .AsEnumerable()
                .Concat(
                   pregnantForms
-                     .Where(pf => pf.ReferringFacility == UserFacility())
+                     .Where(pf => pf.ReferringFacility == UserFacility)
                      .Select(pf => pf.WomanMajorFindings)
                )
                .GroupBy(u => u)
@@ -316,12 +324,12 @@ namespace Referral2.Controllers
 
             // OUTGOING: REASONS
             var outReason = patientForms
-               .Where(p => p.ReferringFacilityId == UserFacility())
+               .Where(p => p.ReferringFacilityId == UserFacility)
                .Select(p => p.Reason)
                .AsEnumerable()
                .Concat(
                   pregnantForms
-                     .Where(pf => pf.ReferringFacility == UserFacility())
+                     .Where(pf => pf.ReferringFacility == UserFacility)
                      .Select(pf => pf.WomanReason)
                )
                .GroupBy(u => u)
@@ -335,7 +343,7 @@ namespace Referral2.Controllers
                .Take(10);
             // OUTGOING: TRANSPORTATIONS
             var outTransportation = await trackings
-                .Where(x => x.ReferredFrom == UserFacility())
+                .Where(x => x.ReferredFrom == UserFacility)
                 .GroupBy(x => x.Transportation)
                 .Select(i => new ListItem
                 {
@@ -345,7 +353,7 @@ namespace Referral2.Controllers
                .ToListAsync();
             // OUTGOING: DEPARTMENT
             var outDepartment = await trackings
-                .Where(x => x.ReferredFrom == UserFacility())
+                .Where(x => x.ReferredFrom == UserFacility)
                 .GroupBy(x => x.DepartmentId)
                 .Select(i => new ListItem
                 {
@@ -486,6 +494,7 @@ namespace Referral2.Controllers
             else
                 search = filter;
             ViewBag.Filter = search;
+            int size = 6;
 
             var facilities = _context.Facility
                             .Select(x => new FacilitiesViewModel
@@ -495,12 +504,13 @@ namespace Referral2.Controllers
                                 Address = x.Address,
                                 Contact = x.Contact,
                                 Email = x.Email,
-                                Chief = x.ChiefHospital ?? "N/A",
+                                Chief = x.ChiefHospital,
                                 Level = x.HospitalLevel,
-                                Type = x.HospitalType ?? "N/A"
-                            });
+                                Type = x.HospitalType
+                            })
+                            .OrderBy(x => x.Facility)
+                            .AsQueryable();
 
-            int size = 10;
 
             if(!string.IsNullOrEmpty(search))
             {
@@ -656,7 +666,7 @@ namespace Referral2.Controllers
             ViewBag.EndDate = EndDate;
 
             var tracking = await _context.Tracking
-                .Where(x => x.DateReferred >= StartDate && x.DateReferred <= EndDate && x.ReferredTo == UserFacility())
+                .Where(x => x.DateReferred >= StartDate && x.DateReferred <= EndDate && x.ReferredTo == UserFacility)
                 .AsNoTracking()
                 .ToListAsync();
 
@@ -694,9 +704,24 @@ namespace Referral2.Controllers
             return View(referrals);
         }
 
-        // SUPPORT USERS
-        public async Task<IActionResult> SupportUsers()
+        // REMOVE FACILITY
+        public void RemoveFacility(int? id)
         {
+            var facility = _context.Facility.Find(id);
+            _context.Facility.Remove(facility);
+            _context.SaveChanges();
+        }
+
+        // SUPPORT USERS
+        public async Task<IActionResult> SupportUsers(int? page, string search, string filter)
+        {
+            if (search != null)
+                page = 1;
+            else
+                search = filter;
+            ViewBag.Filter = search;
+            int size = 10;
+
             var support = _context.User.Where(x => x.Level.Equals(_roles.Value.SUPPORT))
                             .Select(x => new SupportUsersViewModel
                             {
@@ -710,10 +735,14 @@ namespace Referral2.Controllers
                                 LastLogin = x.LastLogin == null ? default : x.LastLogin
                             });
 
-            return View(await support.ToListAsync());
+            if (!string.IsNullOrEmpty(search))
+                support = support.Where(x => x.Name.Contains(search));
+
+            return View(await PaginatedList<SupportUsersViewModel>.CreateAsync(support.AsNoTracking(), page ?? 1, size));
         }
 
         // GET: UPDATE FACILITY
+        [HttpGet]
         public async Task<IActionResult> UpdateFacility(int? id)
         {
             var facilityModel = await _context.Facility.FindAsync(id);
@@ -722,26 +751,68 @@ namespace Referral2.Controllers
 
             var province = _context.Province;
             var muncity = _context.Muncity.Where(x => x.ProvinceId.Equals(facility.Province));
-            var barangay = _context.Barangay.Where(x => x.MuncityId.Equals(facility.Barangay));
+            var barangay = _context.Barangay.Where(x => x.MuncityId.Equals(facility.Muncity));
 
             ViewBag.Provinces = new SelectList(province, "Id", "Description", facility.Province);
             ViewBag.Muncities = new SelectList(muncity, "Id", "Description", facility.Muncity);
             ViewBag.Barangays = new SelectList(barangay, "Id", "Description", facility.Barangay);
+            ViewBag.Levels = new SelectList(ListContainer.HospitalLevel, "Key", "Value", facility.Level);
+            ViewBag.Types = new SelectList(ListContainer.HospitalType, "Key", "Value", facility.Type);
 
-            return PartialView(facility);
+            return PartialView("~/Views/Admin/UpdateFacility.cshtml", facility);
         }
 
         // POST: UPDATE FACILITY
         [HttpPost]
-        public async Task<IActionResult> UpdateFacility([Bind] Facility model)
+        public async Task<IActionResult> UpdateFacility([Bind] FacilityViewModel model)
         {
+            if (string.IsNullOrEmpty(model.Chief))
+                model.Chief = "";
             if (ModelState.IsValid)
             {
-                _context.Update(model);
-                await _context.SaveChangesAsync();
+                var facilities = _context.Facility.Where(x => x.Id != model.Id);
+                if (!facilities.Any(x => x.Name.Equals(model.Name)))
+                {
+                    var saveFacility = await SaveFacilityAsync(model);
+                    _context.Update(saveFacility);
+                    await _context.SaveChangesAsync();
+                    return PartialView("~/Views/Admin/UpdateFacility.cshtml", model);
+                }
+                else
+                {
+                    ModelState.AddModelError("Name", "Facility name already exists!");
+                }
             }
 
-            return PartialView(model);
+            var province = _context.Province;
+            var muncity = _context.Muncity.Where(x => x.ProvinceId.Equals(model.Province));
+            var barangay = _context.Barangay.Where(x => x.MuncityId.Equals(model.Barangay));
+
+            ViewBag.Provinces = new SelectList(province, "Id", "Description", model.Province);
+            ViewBag.Muncities = new SelectList(muncity, "Id", "Description", model.Muncity);
+            ViewBag.Barangays = new SelectList(barangay, "Id", "Description", model.Barangay);
+            ViewBag.Levels = new SelectList(ListContainer.HospitalLevel, "Key", "Value", model.Level);
+            ViewBag.Types = new SelectList(ListContainer.HospitalType, "Key", "Value", model.Type);
+
+            return PartialView("~/Views/Admin/UpdateFacility.cshtml", model);
+        }
+
+        private async Task<Facility> SaveFacilityAsync(FacilityViewModel model)
+        {
+            var facility = await _context.Facility.FindAsync(model.Id);
+            facility.Name = model.Name;
+            facility.Abbrevation = model.Abbrevation;
+            facility.ProvinceId = (int)model.Province;
+            facility.MuncityId = (int)model.Muncity;
+            facility.BarangayId = (int)model.Barangay;
+            facility.Address = model.Address;
+            facility.Contact = model.Contact;
+            facility.Email = model.Email;
+            facility.ChiefHospital = model.Chief;
+            facility.HospitalLevel = (int)model.Level;
+            facility.HospitalType = model.Type;
+
+            return facility;
         }
 
         // GET: UPDATE SUPPORT
@@ -752,13 +823,12 @@ namespace Referral2.Controllers
             var currentSupport = await _context.User.FindAsync(id);
             if (currentSupport != null)
             {
-                ViewBag.Status = new SelectList(ListContainer.Status, currentSupport.Status);
+                ViewBag.Status = new SelectList(ListContainer.UserStatus, "Key", "Value", currentSupport.Status);
                 ViewBag.Facility = new SelectList(facility, "Id", "Name", currentSupport.FacilityId);
                 currentSupport.Password = "";
             }
 
             var support = ReturnSupportInfo(currentSupport);
-            HttpContext.Session.SetString(SessionSupportUsername, currentSupport.Username);
             return PartialView(support);
         }
 
@@ -766,39 +836,26 @@ namespace Referral2.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateSupport([Bind] UpdateSupportViewModel model)
         {
-            var doctorLastUsername = HttpContext.Session.GetString(SessionSupportUsername);
             var facilities = _context.Facility;
-            var support = SetSupportViewModel(model);
+            var support = await SetSupportViewModel(model);
             if (ModelState.IsValid)
             {
-                if (!string.IsNullOrEmpty(model.Password))
+                var supports = _context.User.Where(x => x.Id != support.Id);
+                if (!supports.Any(x => x.Username.Equals(model.Username)))
                 {
-                    if (_userService.ChangePasswordAsync(support, model.Password))
-                    {
-                        return RedirectToAction("ManageUsers", "Support");
-                    }
+                    if (!string.IsNullOrEmpty(model.Password))
+                        _userService.ChangePasswordAsync(support, model.Password);
+                    _context.Update(support);
+                    await _context.SaveChangesAsync();
+                    return PartialView("~/Views/Admin/UpdateSupport.cshtml", model);
                 }
                 else
                 {
-                    if (!model.Username.Equals(doctorLastUsername))
-                    {
-                        if (!_context.User.Any(x => x.Username.Equals(model.Username)))
-                        {
-                            _context.Update(support);
-                            await _context.SaveChangesAsync();
-                            return RedirectToAction("ManageUsers", "Support");
-                        }
-                        else
-                        {
-                            ModelState.AddModelError("Username", "Username already exist");
-                        }
-
-                    }
+                    ModelState.AddModelError("Username", "Username already exist");
                 }
-
             }
-            ViewBag.Statuses = new SelectList(ListContainer.Status, support.Status);
-            ViewBag.Facilities = new SelectList(facilities, "Id", "Description", support.FacilityId);
+            ViewBag.Status = new SelectList(ListContainer.UserStatus, "Key", "Value", support.Status);
+            ViewBag.Facility = new SelectList(facilities, "Id", "Description", support.FacilityId);
             return PartialView("~/Views/Admin/UpdateSupport.cshtml", model);
         }
 
@@ -806,7 +863,7 @@ namespace Referral2.Controllers
 
         private async Task LoginAsAsync(int facilityId, string level)
         {
-            var user = await _context.User.FindAsync(UserId());
+            var user = await _context.User.FindAsync(UserId);
             var properties = new AuthenticationProperties
             {
                 AllowRefresh = false,
@@ -882,6 +939,7 @@ namespace Referral2.Controllers
         {
             var support = new UpdateSupportViewModel
             {
+                Id = currentSupport.Id,
                 Firstname = currentSupport.Firstname,
                 Middlename = currentSupport.Middlename,
                 Lastname = currentSupport.Lastname,
@@ -894,9 +952,9 @@ namespace Referral2.Controllers
             };
             return support;
         }
-        private User SetSupportViewModel(UpdateSupportViewModel model)
+        private async Task<User> SetSupportViewModel(UpdateSupportViewModel model)
         {
-            var support = _context.User.First(x => x.Username.Equals(model.Username));
+            var support = await _context.User.FindAsync(model.Id);
 
             support.Firstname = model.Firstname;
             support.Middlename = model.Middlename;
@@ -911,35 +969,13 @@ namespace Referral2.Controllers
             return support;
         }
 
-        public int UserId()
-        {
-            return int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-        }
-        public int UserFacility()
-        {
-            return int.Parse(User.FindFirstValue("Facility"));
-        }
-        public int UserDepartment()
-        {
-            return int.Parse(User.FindFirstValue("Department"));
-        }
-        public int UserProvince()
-        {
-            return int.Parse(User.FindFirstValue("Province"));
-        }
-        public int UserMuncity()
-        {
-            return int.Parse(User.FindFirstValue("Muncity"));
-        }
-        public int UserBarangay()
-        {
-            return int.Parse(User.FindFirstValue("Barangay"));
-        }
-        public string UserName()
-        {
-            return "Dr. " + User.FindFirstValue(ClaimTypes.GivenName) + " " + User.FindFirstValue(ClaimTypes.Surname);
-        }
-
+        public int UserId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        public int UserFacility => int.Parse(User.FindFirstValue("Facility"));
+        public int UserDepartment => int.Parse(User.FindFirstValue("Department"));
+        public int UserProvince => int.Parse(User.FindFirstValue("Province"));
+        public int UserMuncity => int.Parse(User.FindFirstValue("Muncity"));
+        public int UserBarangay => int.Parse(User.FindFirstValue("Barangay"));
+        public string UserName => "Dr. " + User.FindFirstValue(ClaimTypes.GivenName) + " " + User.FindFirstValue(ClaimTypes.Surname);
         #endregion
     }
 }

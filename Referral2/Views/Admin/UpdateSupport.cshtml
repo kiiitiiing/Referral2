@@ -1,6 +1,6 @@
 ﻿@model UpdateSupportViewModel
 
-    <div class="modal fade" id="update-support-modal" tabindex="-1" role="dialog" aria-labelledby="addContactLabel" aria-hidden="true">
+    <div class="modal fade" id="update-support-modal">
         <div class="modal-dialog modal-sm" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -12,7 +12,8 @@
                     </fieldset>
                 </div>
                 <div class="modal-body">
-                    <form asp-action="UpdateUser">
+                    <form asp-controller="Admin" asp-action="UpdateSupport" method="post">
+                        <input asp-for="Id" hidden />
                         <!-- FIRST NAME -->
                         <div class="form-group">
                             <label>First Name:</label>
@@ -44,25 +45,26 @@
                             <span asp-validation-for="Email" class="text-danger"></span>
                         </div>
                         <hr />
+                        <!-- FACILITY -->
+                        <div class="form-group">
+                            <label>Facility:</label>
+                            <select class="form-control" asp-for="Facility" asp-items="ViewBag.Facility" required autocomplete="off">
+                                <option>Select Facility...</option>
+                            </select>
+                            <span asp-validation-for="Facility" class="text-danger"></span>
+                        </div>
                         <!-- DESIGNATION -->
                         <div class="form-group">
                             <label>Designation:</label>
                             <input type="text" class="form-control" asp-for="Designation" autofocus required autocomplete="off">
                             <span asp-validation-for="Designation" class="text-danger"></span>
                         </div>
-                        <!-- FACILITY -->
-                        <div class="form-group">
-                            <label>Facility:</label>
-                            <select class="form-control" asp-for="Facility" asp-items="ViewBag.Facilities" required autocomplete="off">
-                                <option>Select Department...</option>
-                            </select>
-                            <span asp-validation-for="Facility" class="text-danger"></span>
-                        </div>
                         <hr />
                         <!-- STATUS -->
                         <div class="form-group">
                             <label>Status:</label>
-                            <input type="text" class="form-control" asp-for="Status" autofocus required autocomplete="off">
+                            <select type="text" class="form-control" asp-for="Status" asp-items="ViewBag.Status" required autocomplete="off">
+                            </select>
                             <span asp-validation-for="Status" class="text-danger"></span>
                         </div>
                         <hr />
@@ -92,7 +94,7 @@
                         <i class="fa fa-times"></i>
                         &nbsp;Close
                     </button>
-                    <button class="btn btn-success" data-save="modal" data-url="@Url.Action("UpdateUser","Support")">
+                    <button class="btn btn-success" data-save="modal">
                         <i class="fa fa-check"></i>
                         &nbsp;Save
                     </button>

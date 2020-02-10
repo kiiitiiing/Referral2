@@ -1,6 +1,6 @@
 ﻿@model UpdateDoctorViewModel
 
-<div class="modal fade" id="update-doctor-modal" tabindex="-1" role="dialog" aria-labelledby="addContactLabel" aria-hidden="true">
+<div class="modal fade" id="update-doctor-modal">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -13,7 +13,7 @@
             </div>
             <div class="modal-body">
                 <form asp-controller="Support" asp-action="UpdateUser" method="post">
-                    <input asp-for="Id" value="@Model.Id" hidden />
+                    <input asp-for="Id" hidden />
                     <!-- FIRST NAME -->
                     <div class="form-group">
                         <label>First Name:</label>
@@ -63,9 +63,7 @@
                     <!-- STATUS -->
                     <div class="form-group">
                         <label>Status:</label>
-                        <select type="text" class="form-control" asp-for="Status" autofocus required autocomplete="off">
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
+                        <select type="text" class="form-control" asp-for="Status" asp-items="ViewBag.Status" required autocomplete="off">
                         </select>
                         <span asp-validation-for="Status" class="text-danger"></span>
                     </div>
@@ -105,7 +103,7 @@
                     <i class="fa fa-times"></i>
                     &nbsp;Close
                 </button>
-                <button class="btn btn-success" data-save="modal" data-url="@Url.Action("UpdateUser","Support")">
+                <button class="btn btn-success" data-save="modal">
                     <i class="fa fa-check"></i>
                     &nbsp;Save
                 </button>

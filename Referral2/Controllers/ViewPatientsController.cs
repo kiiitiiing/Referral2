@@ -3,10 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using System.Reflection;
-using System.Resources;
 using System.Globalization;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -335,35 +332,37 @@ namespace Referral2.Controllers
             var feedbacks = _context.Feedback.Where(x => x.Code.Equals(code));
 
             var track = await _context.Tracking
-                .Where(x => x.Code.Equals(code))
+                .Where(x => x.Code == code)
                 .Select(t => new ReferredViewModel
                 {
-                    Pregnant = t.Type.Equals("pregnant"),
-                    Seen = t.DateSeen != default,
-                    TrackingId = t.Id,
+                    PatientId = t.PatientId,
                     PatientName = t.Patient.FirstName + " " + t.Patient.MiddleName + " " + t.Patient.LastName,
                     PatientSex = t.Patient.Sex,
                     PatientAge = GlobalFunctions.ComputeAge(t.Patient.DateOfBirth),
                     PatientAddress = GlobalFunctions.GetAddress(t.Patient),
-                    ReferredBy = t.ReferringMdNavigation == null ? "" : GlobalFunctions.GetMDFullName(t.ReferringMdNavigation),
-                    ReferredTo = t.ActionMdNavigation == null ? "" : GlobalFunctions.GetMDFullName(t.ActionMdNavigation),
+                    ReferredBy = GlobalFunctions.GetMDFullName(t.ReferringMdNavigation),
+                    ReferredTo = GlobalFunctions.GetMDFullName(t.ActionMdNavigation),
+                    ReferredFrom = t.ReferredFrom,
+                    TrackingId = t.Id,
                     SeenCount = _context.Seen.Where(x => x.TrackingId.Equals(t.Id)).Count(),
-                    CallerCount = activities == null ? 0 : activities.Where(x => x.Status.Equals(_status.Value.CALLING)).Count(),
-                    ReCoCount = feedbacks == null ? 0 : feedbacks.Count(),
+                    CallerCount = activities.Where(x => x.Status.Equals(_status.Value.CALLING)).Count(),
+                    ReCoCount = feedbacks.Where(x => x.Code.Equals(t.Code)).Count(),
                     Travel = string.IsNullOrEmpty(t.Transportation),
                     Code = t.Code,
-                    Status = t.Status,
+                    Status = t.Status == _status.Value.REFERRED && t.DateSeen != default ? "seen" : t.Status,
+                    Pregnant = t.Type.Equals("pregnant"),
+                    Seen = t.DateSeen != default,
                     Walkin = t.WalkIn.Equals("yes"),
                     UpdatedAt = t.UpdatedAt,
-                    Activities = activities.Where(x => x.Code == t.Code).OrderByDescending(x => x.CreatedAt)
+                    Activities = activities.Where(x => x.Code.Equals(t.Code)).OrderByDescending(x => x.CreatedAt)
                         .Select(i => new ActivityLess
                         {
                             Status = i.Status,
                             DateAction = i.DateReferred.ToString("MMM dd, yyyy hh:mm tt", CultureInfo.InvariantCulture),
                             FacilityFrom = i.ReferredFromNavigation == null ? "" : i.ReferredFromNavigation.Name,
                             FacilityFromContact = i.ReferredFromNavigation == null ? "" : i.ReferredFromNavigation.Contact,
-                            FacilityTo = i.ReferredToNavigation == null ? "" : i.ReferredToNavigation.Name,
-                            PatientName = GlobalFunctions.GetFullName(i.Patient),
+                            FacilityTo = i.ActionMdNavigation.Facility.Name,
+                            PatientName = i.Patient.FirstName + " " + i.Patient.MiddleName + " " + i.Patient.LastName,
                             ActionMd = GlobalFunctions.GetMDFullName(i.ActionMdNavigation),
                             ReferringMd = GlobalFunctions.GetMDFullName(i.ReferringMdNavigation),
                             Remarks = i.Remarks
@@ -542,6 +541,7 @@ namespace Referral2.Controllers
                 .Where(x => x.ReferredFrom == UserFacility() && x.DateReferred >= StartDate && x.DateReferred <= EndDate)
                 .Select(t => new ReferredViewModel
                 {
+                    PatientId = t.PatientId,
                     PatientName = t.Patient.FirstName+" "+ t.Patient.MiddleName+" "+ t.Patient.LastName,
                     PatientSex = t.Patient.Sex,
                     PatientAge = GlobalFunctions.ComputeAge(t.Patient.DateOfBirth),
@@ -567,7 +567,7 @@ namespace Referral2.Controllers
                             DateAction = i.DateReferred.ToString("MMM dd, yyyy hh:mm tt", CultureInfo.InvariantCulture),
                             FacilityFrom = i.ReferredFromNavigation == null ? "" : i.ReferredFromNavigation.Name,
                             FacilityFromContact = i.ReferredFromNavigation == null ? "" : i.ReferredFromNavigation.Contact,
-                            FacilityTo = i.ReferredToNavigation == null ? "" : i.ReferredToNavigation.Name,
+                            FacilityTo = i.ActionMdNavigation.Facility.Name,
                             PatientName = i.Patient.FirstName + " " + i.Patient.MiddleName + " " + i.Patient.LastName,
                             ActionMd = GlobalFunctions.GetMDFullName(i.ActionMdNavigation),
                             ReferringMd = GlobalFunctions.GetMDFullName(i.ReferringMdNavigation),

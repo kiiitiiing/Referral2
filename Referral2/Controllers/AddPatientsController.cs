@@ -47,8 +47,8 @@ namespace Referral2.Controllers
         {
             ViewBag.BarangayId = new SelectList(_context.Barangay.Where(x => x.ProvinceId.Equals(UserProvince())), "Id", "Description");
             ViewBag.MuncityId = new SelectList(_context.Muncity.Where(x => x.ProvinceId.Equals(UserProvince())), "Id", "Description");
-            ViewBag.CivilStatus = new SelectList(ListContainer.CivilStatus);
-            ViewBag.PhicStatus = new SelectList(ListContainer.PhicStatus);
+            ViewBag.CivilStatus = new SelectList(ListContainer.CivilStatus, "Key", "Value");
+            ViewBag.PhicStatus = new SelectList(ListContainer.PhicStatus, "Key", "Value");
             return View();
         }
 
@@ -66,8 +66,8 @@ namespace Referral2.Controllers
             ViewBag.BarangayId = new SelectList(_context.Barangay, "Id", "Description", patient.BarangayId);
             ViewBag.MuncityId = new SelectList(_context.Muncity, "Id", "Description", patient.MuncityId);
             ViewBag.ProvinceId = new SelectList(_context.Province, "Id", "Description", patient.ProvinceId);
-            ViewBag.CivilStatus = new SelectList(ListContainer.CivilStatus, patient.CivilStatus);
-            ViewBag.PhicStatus = new SelectList(ListContainer.PhicStatus, patient.PhicStatus);
+            ViewBag.CivilStatus = new SelectList(ListContainer.CivilStatus, "Key", "Value", patient.CivilStatus);
+            ViewBag.PhicStatus = new SelectList(ListContainer.PhicStatus, "Key", "Value", patient.PhicStatus);
             return View(patient);
         }
         #endregion

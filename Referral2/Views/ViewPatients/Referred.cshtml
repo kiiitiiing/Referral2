@@ -164,6 +164,7 @@
                 var seenCount = item.SeenCount;
                 var callerCount = item.CallerCount;
                 var recoCount = item.ReCoCount;
+                int ctr = 0;
                 seen = "disabled";
                 accepted = "disabled";
                 arrived = "disabled";
@@ -255,11 +256,13 @@
 
                                         @foreach (var item2 in item.Activities)
                                         {
-                                            switch (item2.Status)
-                                            {
-                                                case "rejected":
-                                                    {
-                                                        <tr>
+                                            var trClass = ctr == 0 ? "" : "toggle toggle" + item.PatientId;
+                                            var trStyle = ctr == 0 ? "" : "display: none;";
+                                            <tr class="@trClass" style="@trStyle">
+                                                @switch (item2.Status)
+                                                {
+                                                    case "rejected":
+                                                        {
                                                             <td class="table-date">
                                                                 <span class="text-muted">@item2.DateAction</span>
                                                             </td>
@@ -272,20 +275,20 @@
                                                                 to other facility.<br />
                                                                 <span class="text-warning">Remarks: @item2.Remarks</span>
                                                             </td>
-                                                        </tr>
-                                                        break;
-                                                    }
-                                                case "travel":
-                                                    {
-                                                        var other = "";
-                                                        var transpoId = int.Parse(item2.Remarks[0].ToString()) - 1;
-                                                        var remarks = transpo[transpoId];
-                                                        if (transpoId == 4)
-                                                        {
-                                                            other = item2.Remarks.Substring(item2.Remarks.LastIndexOf(" ")).Trim();
-                                                            remarks = "Others - ";
+
+                                                            break;
                                                         }
-                                                        <tr>
+                                                    case "travel":
+                                                        {
+                                                            var other = "";
+                                                            var transpoId = int.Parse(item2.Remarks[0].ToString()) - 1;
+                                                            var remarks = transpo[transpoId];
+                                                            if (transpoId == 4)
+                                                            {
+                                                                other = item2.Remarks.Substring(item2.Remarks.LastIndexOf(" ")).Trim();
+                                                                remarks = "Others - ";
+                                                            }
+
                                                             <td class="table-date">
                                                                 <span class="text-muted">@item2.DateAction</span>
                                                             </td>
@@ -294,12 +297,12 @@
                                                                 has departed by
                                                                 <span class="md-color">@remarks@other</span>
                                                             </td>
-                                                        </tr>
-                                                        break;
-                                                    }
-                                                case "referred":
-                                                    {
-                                                        <tr>
+
+                                                            break;
+                                                        }
+                                                    case "referred":
+                                                        {
+
                                                             <td class="table-date">
                                                                 <span class="text-muted">@item2.DateAction</span>
                                                             </td>
@@ -322,12 +325,12 @@
                                                                     <span class="patient-color">@item2.PatientName</span>
                                                                 </td>
                                                             }
-                                                        </tr>
-                                                        break;
-                                                    }
-                                                case "accepted":
-                                                    {
-                                                        <tr>
+
+                                                            break;
+                                                        }
+                                                    case "accepted":
+                                                        {
+
                                                             <td class="table-date">
                                                                 <span class="text-muted">@item2.DateAction</span>
                                                             </td>
@@ -340,12 +343,12 @@
                                                                 <br />
                                                                 <span class="text-warning">Remarks: @item2.Remarks</span>
                                                             </td>
-                                                        </tr>
-                                                        break;
-                                                    }
-                                                case "arrived":
-                                                    {
-                                                        <tr>
+
+                                                            break;
+                                                        }
+                                                    case "arrived":
+                                                        {
+
                                                             <td class="table-date">
                                                                 <span class="text-muted">@item2.DateAction</span>
                                                             </td>
@@ -356,12 +359,12 @@
                                                                 <br />
                                                                 <span class="text-warning">Remarks: @item2.Remarks</span>
                                                             </td>
-                                                        </tr>
-                                                        break;
-                                                    }
-                                                case "admitted":
-                                                    {
-                                                        <tr>
+
+                                                            break;
+                                                        }
+                                                    case "admitted":
+                                                        {
+
                                                             <td class="table-date">
                                                                 <span class="text-muted">@item2.DateAction</span>
                                                             </td>
@@ -372,12 +375,12 @@
                                                                 <br />
                                                                 <span class="text-warning">Remarks: @item2.Remarks</span>
                                                             </td>
-                                                        </tr>
-                                                        break;
-                                                    }
-                                                case "discharged":
-                                                    {
-                                                        <tr>
+
+                                                            break;
+                                                        }
+                                                    case "discharged":
+                                                        {
+
                                                             <td class="table-date">
                                                                 <span class="text-muted">@item2.DateAction</span>
                                                             </td>
@@ -388,12 +391,12 @@
                                                                 <br />
                                                                 <span class="text-warning">Remarks: @item2.Remarks</span>
                                                             </td>
-                                                        </tr>
-                                                        break;
-                                                    }
-                                                case "calling":
-                                                    {
-                                                        <tr>
+
+                                                            break;
+                                                        }
+                                                    case "calling":
+                                                        {
+
                                                             <td class="table-date">
                                                                 <span class="text-muted">@item2.DateAction</span>
                                                             </td>
@@ -404,12 +407,12 @@
                                                                 is requesting a call from
                                                                 <span class="hospital-color">@item2.FacilityFrom</span>.
                                                             </td>
-                                                        </tr>
-                                                        break;
-                                                    }
-                                                case "cancelled":
-                                                    {
-                                                        <tr>
+
+                                                            break;
+                                                        }
+                                                    case "cancelled":
+                                                        {
+
                                                             <td class="table-date">
                                                                 <span class="text-muted">@item2.DateAction</span>
                                                             </td>
@@ -420,14 +423,27 @@
                                                                 <br />
                                                                 <span class="text-warning">Remarks: @item2.Remarks</span>
                                                             </td>
-                                                        </tr>
-                                                        break;
-                                                    }
+
+                                                            break;
+                                                        }
+                                                }
+                                            </tr>
+                                            @if (ctr == 0)
+                                            {
+                                                ctr = 1;
                                             }
                                         }
                                     </tbody>
                                 </table>
                             </div>
+                            @if (item.Activities.Count() > 1)
+                            {
+                                <div style="border-top: 1px solid #ccc;">
+                                    <div class="text-center">
+                                        <a href="#toggle" data-id="@item.PatientId">View More</a> <small class="text-muted">(@item.Activities.Count())</small>
+                                    </div>
+                                </div>
+                            }
                         </div>
                     </div>
                     @{ 
@@ -509,9 +525,17 @@
             startDate: '@startDate.ToString("yyyy/MM/dd")',
             endDate: '@endDate.ToString("yyyy/MM/dd")'
         });
-    });
-</script>
+        
+        $('.selectpicker').selectpicker();
 
-<script>
-    $('.selectpicker').selectpicker();
+        $("a[href='#toggle']").on('click',function () {
+            var id = $(this).data('id');
+            $('.toggle'+id).toggle("fast");
+            var txt = ($(this).html() =='View More') ? 'View Less': 'View More';
+            $(this).html(txt);
+        });
+
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+
 </script>

@@ -56,7 +56,7 @@ namespace Referral2
                 options.LoginPath = "/Account/Login";
                 options.LogoutPath = "/Account/Logout";
                 options.AccessDeniedPath = "/Account/AccessDenied";
-                //options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                //options.ExpireTimeSpan = TimeSpan.FromMinutes(1);
             });
 
             services.AddAuthorization(options =>

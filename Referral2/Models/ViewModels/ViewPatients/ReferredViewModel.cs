@@ -7,6 +7,7 @@ namespace Referral2.Models.ViewModels.ViewPatients
 {
     public partial class ReferredViewModel
     {
+        public int PatientId { get; set; }
         public string PatientName { get; set; }
         public string PatientSex { get; set; }
         public int PatientAge { get; set; } 

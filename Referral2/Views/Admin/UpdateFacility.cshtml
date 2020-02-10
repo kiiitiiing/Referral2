@@ -1,25 +1,31 @@
 ﻿@model FacilityViewModel
 
-<div class="modal fade" id="update-facility-modal" tabindex="-1" role="dialog" aria-labelledby="updateFacilityLabel" aria-hidden="true">
+<div class="modal fade" id="update-facility-modal">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <fieldset>
-                    <legend><i class="fa fa-plus"></i> Add Facility</legend>
+                    <legend>
+                        <i class="fa fa-plus"></i>
+                        &nbsp;Update Facility
+                    </legend>
                 </fieldset>
             </div>
             <div class="modal-body">
-                <form asp-action="AddFacility" method="post" id="update-facility-form">
+                <form asp-controller="Admin" asp-action="UpdateFacility" method="post">
                     <input asp-for="Id" hidden />
+                    <!-- FACILITY NAME -->
                     <div class="form-group">
                         <label>Facility name:</label>
                         <input class="form-control" type="text" asp-for="Name" autofocus required>
                         <span class="text-danger" asp-validation-for="Name"></span>
                     </div>
+                    <!-- ABBREVATION -->
                     <div class="form-group">
                         <label>Abbr:</label>
                         <input class="form-control" type="text" asp-for="Abbrevation">
                     </div>
+                    <!-- PROVINCE -->
                     <div class="form-group">
                         <label>Province:</label>
                         <select class="form-control" id="province-filter" asp-for="Province" asp-items="ViewBag.Provinces" required>
@@ -27,56 +33,59 @@
                         </select>
                         <span class="text-danger" asp-validation-for="Province"></span>
                     </div>
+                    <!-- MUNCITY -->
                     <div class="form-group">
                         <label>Municipality:</label>
-                        <select class="form-control" asp-for="Muncity" asp-items="ViewBag.Muncities">
+                        <select class="form-control" id="muncity-filter" asp-for="Muncity" asp-items="ViewBag.Muncities">
                             <option value="">Select Municipality</option>
                         </select>
                         <span class="text-danger" asp-validation-for="Muncity"></span>
                     </div>
+                    <!-- BARANGAY -->
                     <div class="form-group">
                         <label>Barangay:</label>
-                        <select class="form-control" asp-for="Barangay" asp-items="ViewBag.Barangays">
+                        <select class="form-control" id="barangay-filter" asp-for="Barangay" asp-items="ViewBag.Barangays">
                             <option value="">Select Barangay</option>
                         </select>
                         <span class="text-danger" asp-validation-for="Barangay"></span>
                     </div>
+                    <!-- ADDRESS -->
                     <div class="form-group">
                         <label>Address:</label>
                         <input class="form-control" type="text" asp-for="Address" required>
                         <span class="text-danger" asp-validation-for="Address"></span>
                     </div>
+                    <!-- CONTACT -->
                     <div class="form-group">
                         <label>Contact:</label>
                         <input class="form-control" type="text" asp-for="Contact" required>
                         <span class="text-danger" asp-validation-for="Contact"></span>
                     </div>
+                    <!-- EMAIL -->
                     <div class="form-group">
                         <label>Email:</label>
                         <input class="form-control" type="text" asp-for="Email">
                         <span class="text-danger" asp-validation-for="Email"></span>
                     </div>
+                    <!-- CHIEF -->
                     <div class="form-group">
                         <label>Chief of hospital(name):</label>
                         <input class="form-control" type="text" asp-for="Chief">
                         <span class="text-danger" asp-validation-for="Chief"></span>
                     </div>
+                    <!-- LEVEL -->
                     <div class="form-group">
                         <label>Hospital Level:</label>
-                        <select class="form-control" asp-for="Level">
+                        <select class="form-control" asp-for="Level" asp-items="ViewBag.Levels">
                             <option value="">Select Hospital Level</option>
-                            <option value="1">Level 1</option>
-                            <option value="2">Level 2</option>
-                            <option value="3">Level 3</option>
                         </select>
                         <span class="text-danger" asp-validation-for="Level"></span>
                     </div>
+                    <!-- TYPE -->
                     <div class="form-group">
                         <label>Hospital Type:</label>
-                        <select class="form-control" asp-for="Type">
+                        <select class="form-control" asp-for="Type" asp-items="ViewBag.Types">
                             <option value="">Select Hospital Type</option>
-                            <option value="government">Government</option>
-                            <option value="private">Private</option>
                         </select>
                         <span class="text-danger" asp-validation-for="Type"></span>
                     </div>
@@ -84,8 +93,12 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-default btn-sm" data-dismiss="modal"><i class="fa fa-times"></i> Cancel</button>
-                <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#sure-modal"><i class="fa fa-times"></i> Remove</button>
+                <button class="btn btn-default btn-sm" data-dismiss="modal">
+                    <i class="fa fa-times"></i> Cancel
+                </button>
+                <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#remove-facility-alert" value="@Model.Id">
+                    <i class="fa fa-times"></i> Remove
+                </button>
                 <button class="btn btn-success btn-sm" data-save="modal">
                     <i class="fa fa-check"></i>
                     &nbsp;Save
@@ -97,12 +110,7 @@
 
 
 
-<script>
-    var form = $('#update-facility-form');
-    form.removeData('validator');
-    form.removeData('unobtrusiveValidation');
-    $.validator.unobtrusive.parse(form);
-
+<script type="text/javascript">
     var province = $('#province-filter');
     var muncity = $('#muncity-filter');
     var barangay = $('#barangay-filter');

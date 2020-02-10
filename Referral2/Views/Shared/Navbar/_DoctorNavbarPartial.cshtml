@@ -115,15 +115,15 @@
         </a>
         <ul class="dropdown-menu">
             <!-- CHANGE PASSWORD -->
-            <li class="dropdown-item">
-                <a class="nav-link" data-toggle="ajax-modal" data-target="#change-password-modal" data-url="@Url.Action("ChangePassword","Users")">
+            <li>
+                <a href="#" class="nav-link dropdown-item" data-toggle="ajax-modal" data-target="#change-password-modal" data-url="@Url.Action("ChangePassword","Users")">
                     <i class="fa fa-key"></i>
                     &nbsp;Change Password
                 </a>
             </li>
             <!-- CHANGE LOGIN STATUS -->
-            <li class="dropdown-item">
-                <a class=" nav-link" data-toggle="modal" data-target="#login-status-modal">
+            <li >
+                <a href="#" class="dropdown-item nav-link" data-toggle="modal" data-target="#login-status-modal">
                     <i class="fa fa-user-md"></i>
                     &nbsp;Change Login Status
                 </a>
@@ -131,15 +131,15 @@
             <!-- DIVIDER -->
             <li class="dropdown-divider"></li>
             <!-- SWITCH USER -->
-            <li class="dropdown-item">
-                <a class=" nav-link" data-toggle="ajax-modal" data-target="#switch-user-modal" data-url="@Url.Action("SwitchUser","Account")">
+            <li >
+                <a href="#" class="dropdown-item nav-link" data-toggle="ajax-modal" data-target="#switch-user-modal" data-url="@Url.Action("SwitchUser","Account")">
                     <i class="fa fa-users"></i>
                     &nbsp;Switch User
                 </a>
             </li>
             <!-- LOGOUT -->
-            <li class="dropdown-item">
-                <a class=" nav-link" data-target="modal" asp-area="" asp-controller="Account" asp-action="Logout">
+            <li >
+                <a class="dropdown-item nav-link" data-target="modal" asp-area="" asp-controller="Account" asp-action="Logout">
                     <i class="fa fa-sign-out-alt"></i>
                     &nbsp;Logout
                 </a>
@@ -147,8 +147,8 @@
             <!-- BACK AS ADMIN-->
             @if (User.FindFirstValue("RealRole").Equals("admin"))
             {
-                <li class="dropdown-item">
-                    <a class=" nav-link" data-target="modal" asp-area="" asp-controller="Account" asp-action="BackAsAdmin">
+                <li >
+                    <a class="dropdown-item nav-link" data-target="modal" asp-area="" asp-controller="Account" asp-action="BackAsAdmin">
                         <i class="fa fa-user-secret"></i>
                         &nbsp;Back as Admin
                     </a>

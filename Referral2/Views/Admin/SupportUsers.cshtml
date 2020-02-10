@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SupportUsersViewModel>
+﻿@model PaginatedList<SupportUsersViewModel>
 @{
     ViewData["Title"] = "List of Support User";
 }
@@ -6,22 +6,17 @@
 <div class="col-md-12">
     <div class="card card-success card-outline">
         <div class="card-header">
-            <form class="fa-pull-right" asp-action="SupportUsers" method="get">
+            <form class="fa-pull-right form-inline ml-3" asp-action="SupportUsers" method="get">
                 <div class="form-actions no-color">
-                    <p>
-                        <input type="text" placeholder="Search name..." name="SearchString" value="@ViewBag.SearchString" />
-                        <button type="submit" value="Search" class="btn btn-flat btn-sm btn-success">
-                            <i class="fa fa-search"></i>
-                            &nbsp;Search
-                        </button>
-                        @*
-                            <button type="button" class="btn btn-sm btn-primary" data-toggle="ajax-modal" data-target="#arrived-modal" data-url="@Url.Action("ArrivedRemark","Remarks",new { code = item.Code})">
-                        *@
-                        <button type="button" class="btn btn-flat btn-sm btn-primary" data-toggle="ajax-modal" data-target="#add-support-modal" data-url="@Url.Action("AddSupport")">
-                            <i class="fa fa-user"></i>
-                            &nbsp;Add User
-                        </button>
-                    </p>
+                    <input type="text" class="form-control form-control-sm" placeholder="Search name..." name="search" value="@ViewBag.Filter" />
+                    <button type="submit" value="Search" class="btn btn-sm btn-success">
+                        <i class="fa fa-search"></i>
+                        &nbsp;Search
+                    </button>
+                    <button type="button" class="btn btn-sm btn-primary" data-toggle="ajax-modal" data-target="#add-support-modal" data-url="@Url.Action("AddSupport")">
+                        <i class="fa fa-user"></i>
+                        &nbsp;Add User
+                    </button>
                 </div>
             </form>
             <h3>List of Support User</h3>
@@ -40,16 +35,22 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach(var item in Model)
+                        @foreach (var item in Model)
                         {
-                            var lastLogin = item.LastLogin.ToString();
-                            if(lastLogin.Equals(default))
+                            var lastLogin = item.LastLogin.ToString("MMM d, yyyy h:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+                            if (lastLogin.Equals(default))
                             {
                                 lastLogin = "Never login";
                             }
                             <tr>
                                 <td>
-                                    <a class="text-warning" data-toggle="ajax-modal" data-target="#update-doctor-modal" data-url="@Url.Action("UpdateSupport", new { id = item.Id })">@item.Name</a>
+                                    <a class="text-warning text-bold" 
+                                       style="cursor:pointer;"
+                                       data-toggle="ajax-modal" 
+                                       data-target="#update-support-modal" 
+                                       data-url="@Url.Action("UpdateSupport", new { id = item.Id })">
+                                        @item.Name
+                                    </a>
                                 </td>
                                 <td>@item.Facility</td>
                                 <td>
@@ -58,11 +59,11 @@
                                 </td>
                                 <td>@item.Username</td>
                                 <td>
-                                    @if(item.Status.Equals("login"))
+                                    @if (item.Status.Equals("login"))
                                     {
                                         <strong class="text-success">Login</strong>
                                     }
-                                    else if(item.Status.Equals("logout"))
+                                    else if (item.Status.Equals("logout"))
                                     {
                                         <strong class="text-danger">Logout</strong>
                                     }
@@ -73,6 +74,43 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+        <div class="card-footer">
+            @if (Model.Count() >= Model._pageSize)
+            {
+                var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+                var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+                <ul class="pagination" style="justify-content:center!important;">
+                    <li>
+                        <a asp-action="Facilities"
+                           asp-route-page="@(Model._pageIndex - 1)"
+                           asp-route-filter="@ViewBag.Filter"
+                           class="btn btn-default @prevDisabled">
+                            «
+                        </a>
+                    </li>
+                    @for (int x = 1; x <= Model._totalPages; x++)
+                    {
+                        var activeClass = x == Model._pageIndex ? "btn-primary" : "btn-default";
+                        <li>
+                            <a asp-action="Facilities"
+                               asp-route-page="@x"
+                               asp-route-filter="@ViewBag.Filter"
+                               class="btn @activeClass">
+                                @x
+                            </a>
+                        </li>
+                    }
+                    <li>
+                        <a asp-action="Facilities"
+                           asp-route-page="@(Model._pageIndex + 1)"
+                           asp-route-filter="@ViewBag.Filter"
+                           class="btn btn-default @nextDisabled">
+                            »
+                        </a>
+                    </li>
+                </ul>
+            }
         </div>
     </div>
 </div>

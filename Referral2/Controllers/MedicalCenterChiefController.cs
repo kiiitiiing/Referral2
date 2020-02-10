@@ -451,8 +451,8 @@ namespace Referral2.Controllers
                     Code = x.Code,
                     TimeReferred = x.DateReferred.ToString("MMM d, yyyy h:mm tt", CultureInfo.InvariantCulture),
                     Seen = x.DateSeen == default ? 0 : x.DateSeen.Subtract(x.DateReferred).TotalMinutes,
-                    Accepted = x.DateAccepted == default ? 0 : x.DateAccepted.Subtract(x.DateSeen).TotalMinutes,
-                    Arrived = x.DateArrived == default ? 0 : x.DateArrived.Subtract(x.DateAccepted).TotalMinutes,
+                    Accepted = x.DateAccepted == default ? 0 : x.DateAccepted.Subtract(x.DateReferred).TotalMinutes,
+                    Arrived = x.DateArrived == default ? 0 : x.DateArrived.Subtract(x.DateReferred).TotalMinutes,
                     Redirected = x.DateTransferred == default ? 0 : x.DateTransferred.Subtract(x.DateReferred).TotalMinutes
                 })
                 .ToListAsync();

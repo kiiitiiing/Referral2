@@ -1,7 +1,10 @@
 ﻿@model PaginatedList<IncomingReportViewModel>
 
 @{
-    ViewData["Title"] = "Patient List";
+    ViewData["Title"] = "Incoming Referral Report";
+    var startDate = ViewBag.StartDate;
+    var endDate = ViewBag.EndDate;
+    var dateRange = startDate.ToString("dd/MM/yyyy") + " - " + endDate.ToString("dd/MM/yyyy");
 }
 
 <div class="content">
@@ -15,27 +18,28 @@
                     <div class="card-header">
                         <h3 class="card-title">
                             Filter Result
-                            <span class="badge fa-pull-right">
-                                Result: @ViewBag.Total
-                            </span>
                         </h3>
+                        <small class="badge bg-gradient-orange fa-pull-right">
+                            Result: @ViewBag.Total
+                        </small>
                     </div>
                     <!-- CARD DANGER BODY -->
-                    <form method="post" action="">
-                        <input type="hidden" name="_token" value="" autocomplete="off" />
+                    <form method="post" asp-action="IncomingReport">
                         <div class="card-body">
-                            <!-- SEARCH -->
+                            <!-- DATE RANGE FILTER -->
                             <div class="form-group">
-                                <input type="text" placeholder="Seach Keyword..." class="form-control" name="SearchString" value="@ViewBag.CurrentFilter" required autocomplete="off" />
+                                <input type="text" class="form-control bg-white" name="daterange" value="@dateRange" style="cursor:pointer;" readonly />
                             </div>
-                            <!-- MUNICIPALITY -->
+                            <!-- FACILITY -->
                             <div class="form-group">
-                                <select class="form-control" name="municity">
+                                <select class="form-control" name="facility" asp-items="ViewBag.Facilities">
+                                    <option value="">All Facility</option>
                                 </select>
                             </div>
-                            <!-- BARANGAY -->
+                            <!-- DEPARTMENT -->
                             <div class="form-group">
-                                <select class="form-control" name="brngy">
+                                <select class="form-control" name="department" asp-items="ViewBag.Departments">
+                                    <option value="">All Department</option>
                                 </select>
                             </div>
                             <div class="form-group hide"></div>
@@ -54,61 +58,94 @@
             </div>
             <div class="col-md-9">
                 <!-- PATIENT LIST -->
-                <div class="card card-outline">
+                <div class="card card-outline card-success">
                     <!-- DAILY USERS HEADER -->
                     <div class="card-header with-border">
-                        <h2>
+                        <h4>
                             Incoming Referral Report
-                        </h2>
-                        <small class="text-success">@DateTime.Now.ToString("MMMM dd, yyyy")</small>
+                            <small class="text-success fa-pull-right">@startDate.ToString("MMMM dd, yyyy") to @endDate.ToString("MMMM dd, yyyy")</small>
+                        </h4>
                     </div>
                     <!-- DAILY USERS BODY -->
                     <div class="card-body">
-                        <!-- TABLE START -->
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover table-bordered">
-                                <!-- TABLE HEADER -->
-                                <thead>
-                                    <tr class="bg-black">
-                                        <th class="text-center" rowspan="2">Patient Code</th>
-                                        <th class="text-center" rowspan="2">Referring Facility</th>
-                                        <th class="text-center" colspan="5">Status</th>
-                                    </tr>
-                                    <tr class="bg-black">
-                                        <th class="text-center">Arrived</th>
-                                        <th class="text-center">Admitted</th>
-                                        <th class="text-center">Discharged</th>
-                                        <th class="text-center">Transferred</th>
-                                        <th class="text-center">Cancelled</th>
-                                    </tr>
-                                </thead>
-                                <!-- TABLE BODY -->
-                                <tbody>
-                                    @foreach (var item in Model)
-                                    {
-                                        var code = item.Code;
-                                        var referredFrom = item.Facility;
-                                        var arrived = item.DateArrived == null || item.DateArrived == default ? "" : item.DateArrived.ToString("MM/dd/yy hh:mm");
-                                        var admitted = item.DateAdmitted == null || item.DateAdmitted == default? "" : item.DateAdmitted.ToString("MM/dd/yy hh:mm");
-                                        var discharged = item.DateDischarged == null || item.DateDischarged == default? "" : item.DateDischarged.ToString("MM/dd/yy hh:mm");
-                                        var transferred = item.DateTransferred == null || item.DateTransferred == default? "" : item.DateTransferred.ToString("MM/dd/yy hh:mm");
-                                        var cancelled = item.DateCancelled == null || item.DateCancelled == default? "" : item.DateCancelled.ToString("MM/dd/yy hh:mm");
-                                    <tr>
-                                        <th><small class="">@code</small></th>
-                                        <th><small class="text-success">@referredFrom</small></th>
-                                        <th><small class="text-success">@arrived</small></th>
-                                        <th><small class="text-success">@admitted</small></th>
-                                        <th><small class="text-success">@discharged</small></th>
-                                        <th><small class="text-success">@transferred</small></th>
-                                        <th><small class="text-success">@cancelled</small></th>
-                                    </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
+                        @if (Model.Count() > 0)
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover table-bordered">
+                                    <!-- TABLE HEADER -->
+                                    <thead>
+                                        <tr class="bg-black">
+                                            <th class="text-center" rowspan="2">Patient Code</th>
+                                            <th class="text-center" rowspan="2">Referring Facility</th>
+                                            <th class="text-center" colspan="5">Status</th>
+                                        </tr>
+                                        <tr class="bg-black">
+                                            <th class="text-center">Arrived</th>
+                                            <th class="text-center">Admitted</th>
+                                            <th class="text-center">Discharged</th>
+                                            <th class="text-center">Transferred</th>
+                                            <th class="text-center">Cancelled</th>
+                                        </tr>
+                                    </thead>
+                                    <!-- TABLE BODY -->
+                                    <tbody>
+                                        @foreach (var item in Model)
+                                        {
+                                            var code = item.Code;
+                                            var length = item.Facility.Length > 20;
+                                            var referredFrom = length ? new string(item.Facility.Take(20).ToArray()) + "..." : item.Facility;
+                                            var arrived = item.DateArrived == default ? "" : item.DateArrived.ToString("MM/dd/yy HH:mm");
+                                            var admitted = item.DateAdmitted == default ? "" : item.DateAdmitted.ToString("MM/dd/yy HH:mm");
+                                            var discharged = item.DateDischarged == default ? "" : item.DateDischarged.ToString("MM/dd/yy HH:mm");
+                                            var transferred = item.DateTransferred == default ? "" : item.DateTransferred.ToString("MM/dd/yy HH:mm");
+                                            var cancelled = item.DateCancelled == default ? "" : item.DateCancelled.ToString("MM/dd/yy HH:mm");
+                                            <tr>
+                                                <th><small class="">@code</small></th>
+                                                <th><small class="text-success" title="@item.Facility">@referredFrom</small></th>
+                                                <th><small class="text-success">@arrived</small></th>
+                                                <th><small class="text-success">@admitted</small></th>
+                                                <th><small class="text-success">@discharged</small></th>
+                                                <th><small class="text-success">@transferred</small></th>
+                                                <th><small class="text-success">@cancelled</small></th>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning">
+                                <span class="text-lg">
+                                    <i class="fa fa-exclamation-triangle"></i>
+                                    &nbsp;No data found!
+                                </span>
+                            </div>
+                        }
+                    </div>
+                    <div class="card-footer">
+                        @await Html.PartialAsync("~/Views/Shared/PartialViews/_PageList.cshtml", new PageListModel
+                        {
+                            Action = "IncomingReport",
+                            HasNextPage = Model.HasNextPage,
+                            HasPreviousPage = Model.HasPreviousPage,
+                            PageIndex = Model._pageIndex,
+                            TotalPages = Model._totalPages
+                        })
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('input[name="daterange"]').daterangepicker({
+            format: 'DD/MM/YYYY',
+            startDate: '@startDate.ToString("dd/MM/yyyy")',
+            endDate: '@endDate.ToString("dd/MM/yyyy")',
+            opens: 'right'
+        });
+    });
+</script>

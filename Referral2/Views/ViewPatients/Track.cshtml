@@ -10,10 +10,6 @@
     var discharged = "disabled";
     var transpo = ListContainer.TranspoMode;
     bool seenReject = false;
-    if (Model.Status == "referred")
-        seenReject = true;
-    else if (Model.Status == "rejected")
-        seenReject = true;
 }
 
 <div class="content">
@@ -55,6 +51,10 @@
                     var callerCount = Model.CallerCount;
                     var recoCount = Model.ReCoCount;
                     
+                    if (Model.Status == "referred")
+                        seenReject = true;
+                    else if (Model.Status == "rejected")
+                        seenReject = true;
                     switch (Model.Status)
                     {
                         case "referred":

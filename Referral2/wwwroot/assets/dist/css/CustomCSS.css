@@ -10,8 +10,23 @@ body {
     font-size: 14px !important;
 }
 
+#showMore{
+    display:none;
+}
+
+table thead th{
+    vertical-align: middle !important;
+}
+
 .bg-white {
     background-color: white !important;
+}
+
+.custom-alert-danger {
+    border-color: #d73925;
+    border-radius: 3px;
+    background-repeat: repeat-x;
+    background-image: linear-gradient(to bottom,#f2dede 0,#e7c3c3 100%);
 }
 
 .cust-font-10{
@@ -113,6 +128,10 @@ label {
 
 .pregnant-bg-warning {
     background-color: #fcf8e3;
+}
+
+a{
+    cursor:pointer;
 }
 
 .fa-eye, .fa-eye-slash{

@@ -1,0 +1,157 @@
+﻿@model PageListModel
+
+@if (Model.TotalPages > 1)
+{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+    var between = false;
+    <span>Total Pages = @Model.TotalPages, Page Index = @Model.PageIndex</span>
+    <ul class="pagination" style="justify-content:center!important;">
+        <li>
+            <a asp-action="Facilities"
+               asp-route-page="@(Model.PageIndex - 1)"
+               asp-route-filter="@Model.Filter"
+               class="btn btn-default @prevDisabled">
+                «
+            </a>
+        </li>
+        @for (int x = 1; x <= Model.TotalPages; x++)
+        {
+            var activeClass = x == Model.PageIndex ? "btn-primary" : "btn-default";
+            if (Model.TotalPages > 10)
+            {
+                if (Model.PageIndex < 8)
+                {
+                    if (x < 9)
+                    {
+                        <li>
+                            <a asp-action="Facilities"
+                               asp-route-page="@x"
+                               asp-route-filter="@Model.Filter"
+                               class="btn @activeClass">
+                                @x
+                            </a>
+                        </li>
+                    }
+                    else if (x == 9 && !between)
+                    {
+                        between = !between;
+                        <li>
+                            <a class="btn btn-default link-muted" style="cursor:not-allowed;">
+                                ...
+                            </a>
+                        </li>
+                    }
+                    else if (x > (Model.TotalPages - 2))
+                    {
+                        <li>
+                            <a asp-action="Facilities"
+                               asp-route-page="@x"
+                               asp-route-filter="@Model.Filter"
+                               class="btn @activeClass">
+                                @x
+                            </a>
+                        </li>
+                    }
+                }
+                else if (Model.PageIndex >= (Model.TotalPages - 6))
+                {
+                    if (x < 3)
+                    {
+                        <li>
+                            <a asp-action="Facilities"
+                               asp-route-page="@x"
+                               asp-route-filter="@Model.Filter"
+                               class="btn @activeClass">
+                                @x
+                            </a>
+                        </li>
+                    }
+                    else if (x == 3 && !between)
+                    {
+                        between = !between;
+                        <li>
+                            <a class="btn btn-default link-muted" style="cursor:not-allowed;">
+                                ...
+                            </a>
+                        </li>
+                    }
+                    else if (x > (Model.TotalPages - 9))
+                    {
+                        <li>
+                            <a asp-action="Facilities"
+                               asp-route-page="@x"
+                               asp-route-filter="@Model.Filter"
+                               class="btn @activeClass">
+                                @x
+                            </a>
+                        </li>
+                    }
+                }
+                else if (Model.PageIndex >= 8 && (Model.TotalPages - 4) >= Model.PageIndex)
+                {
+                    if (x < 3)
+                    {
+                        <li>
+                            <a asp-action="Facilities"
+                               asp-route-page="@x"
+                               asp-route-filter="@Model.Filter"
+                               class="btn @activeClass">
+                                @x
+                            </a>
+                        </li>
+                    }
+                    else if (x == 3 || x == (Model.TotalPages - 3))
+                    {
+                        <li>
+                            <a class="btn btn-default link-muted" style="cursor:not-allowed;">
+                                ...
+                            </a>
+                        </li>
+                    }
+                    else if (x >= (Model.PageIndex - 3) && x <= (Model.PageIndex + 3))
+                    {
+                        <li>
+                            <a asp-action="Facilities"
+                               asp-route-page="@x"
+                               asp-route-filter="@Model.Filter"
+                               class="btn @activeClass">
+                                @x
+                            </a>
+                        </li>
+                    }
+                    else if (x >= (Model.TotalPages - 1))
+                    {
+                        <li>
+                            <a asp-action="Facilities"
+                               asp-route-page="@x"
+                               asp-route-filter="@Model.Filter"
+                               class="btn @activeClass">
+                                @x
+                            </a>
+                        </li>
+                    }
+                }
+            }
+            else
+            {
+                <li>
+                    <a asp-action="Facilities"
+                       asp-route-page="@x"
+                       asp-route-filter="@Model.Filter"
+                       class="btn @activeClass">
+                        @x
+                    </a>
+                </li>
+            }
+        }
+        <li>
+            <a asp-action="Facilities"
+               asp-route-page="@(Model.PageIndex + 1)"
+               asp-route-filter="@Model.Filter"
+               class="btn btn-default @nextDisabled">
+                »
+            </a>
+        </li>
+    </ul>
+}

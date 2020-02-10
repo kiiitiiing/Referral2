@@ -12,13 +12,9 @@ using Referral2.Models.ViewModels.Account;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Authorization;
 using Referral2.Helpers;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.ComponentModel.DataAnnotations;
 
 namespace Referral2.Controllers
 {
@@ -85,20 +81,6 @@ namespace Referral2.Controllers
                     CreateLogin(user.Id);
 
                     await _context.SaveChangesAsync();
-                    /*if (user.Level.Equals(_roles.Value.ADMIN))
-                        return RedirectToAction("AdminDashboard", "Admin");
-                    else if (user.Level.Equals(_roles.Value.DOCTOR))
-                    {
-                        return RedirectToAction("Index", "Home");
-                    }
-                    else if (user.Level.Equals(_roles.Value.SUPPORT))
-                    {
-                        return RedirectToAction("SupportDashboard", "Support");
-                    }
-                    else if (user.Level.Equals(_roles.Value.MCC))
-                    {
-                        return RedirectToAction("MccDashboard", "MedicalCenterChief");
-                    }*/
                 }
                 else
                 {
@@ -316,6 +298,7 @@ namespace Referral2.Controllers
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Username),
                 new Claim(ClaimTypes.GivenName, user.Firstname+" "+user.Middlename),
                 new Claim(ClaimTypes.Surname, user.Lastname),
                 new Claim(ClaimTypes.Role, user.Level),

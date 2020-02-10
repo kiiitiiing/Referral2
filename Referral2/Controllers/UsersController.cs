@@ -53,7 +53,6 @@ namespace Referral2.Controllers
         [HttpGet]
         public IActionResult ChangePassword()
         {
-            ViewData["Status"] = "sumitng";
             return PartialView("~/Views/Users/ChangePassword.cshtml");
         }
 
@@ -68,17 +67,14 @@ namespace Referral2.Controllers
 
                 if (isValid)
                 {
-                    if( _userService.ChangePasswordAsync(user, model.NewPassword))
-                    {
-                        ViewData["Status"] = "success";
-                    }
+                    _userService.ChangePasswordAsync(user, model.NewPassword);
+                    //return PartialView("~/Views/Users/ChangePassword.cshtml", model);
                 }
                 else
                 {
-                    ModelState.AddModelError("CurrentPassword", "Wrong Password");
+                    ModelState.AddModelError("CurrentPassword", "Wrong Password!");
                 }
             }
-            ViewData["Status"] = "failed";
 
             return PartialView("~/Views/Users/ChangePassword.cshtml", model);
         }

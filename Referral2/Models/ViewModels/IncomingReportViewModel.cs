@@ -7,6 +7,8 @@ namespace Referral2.Models.ViewModels
 {
     public partial class IncomingReportViewModel
     {
+        public int ReferredTo { get; set; }
+        public int Department { get; set; }
         public string Code { get; set; }
         public string Facility { get; set; }
         public DateTime DateArrived { get; set; }
