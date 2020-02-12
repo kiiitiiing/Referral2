@@ -18,6 +18,7 @@ using Referral2.Services;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Http;
 using Referral2.Models.ViewModels;
+using System.Diagnostics;
 
 namespace Referral2.Controllers
 {
@@ -163,31 +164,41 @@ namespace Referral2.Controllers
         public async Task<IActionResult> DailyUsers(string date, int? page)
         {
             StartDate = DateTime.Now.Date;
+            EndDate = StartDate.AddDays(1).AddSeconds(-1);
             if (date != null)
             {
                 page = 1;
                 StartDate = DateTime.Parse(date);
+                EndDate = StartDate.AddDays(1).AddSeconds(-1);
             }
-            int size = 20;
-
-            var month = StartDate.Month;
-            var day = StartDate.Day;
-
             ViewBag.Date = StartDate;
 
+            var logins = _context.Login
+                .Where(x => x.CreatedAt >= StartDate.Date && x.CreatedAt <= EndDate)
+                .OrderByDescending(x => x.UpdatedAt);
+
             var dailyUsers = _context.User
-                .Where(x => x.FacilityId.Equals(UserFacility) && x.Level.Equals(_roles.Value.DOCTOR) && ((DateTime)x.UpdatedAt).Date == StartDate)
-                .Select(x => new DailyUsersViewModel
+                .Where(x => x.FacilityId.Equals(UserFacility) && x.Level.Equals(_roles.Value.DOCTOR))
+                .Select(i => new DailyUsersViewModel
                 {
-                    MDName = GlobalFunctions.GetFullLastName(x),
-                    OnDuty = x.LoginStatus,
-                    LoggedIn = x.LoginStatus.Contains("login") ? true : false,
-                    LoginTime = x.LastLogin,
-                    LogoutTime = (DateTime)x.UpdatedAt
+                    MDName = GlobalFunctions.GetFullLastName(i),
+                    OnDuty = i.LastLogin != default? logins.Where(x => x.UserId == i.Id && x.Login1 >= StartDate && x.Login1 <= EndDate).First().Status : "",
+                    LoggedIn = i.LastLogin != default ? logins.Where(x => x.UserId == i.Id && x.Login1 >= StartDate && x.Login1 <= EndDate).First().Login1 != default : false,
+                    LoginTime = logins.Where(x => x.UserId == i.Id && x.Login1 >= StartDate && x.Login1 <= EndDate).First().Login1,
+                    LogoutTime = logins.Where(x => x.UserId == i.Id && x.Logout != default).First().Logout
                 });
 
+            int size = 20;
 
             return View(await PaginatedList<DailyUsersViewModel>.CreateAsync(dailyUsers.AsNoTracking(), page ?? 1, size));
+        }
+
+        public string LoginStatus(Login login)
+        {
+            if (login == null)
+                return "";
+            else
+                return login.Status;
         }
         // GET: HOSPITAL INFO
         [HttpGet]
@@ -258,9 +269,9 @@ namespace Referral2.Controllers
             return View(incoming);
         }
         // GET: MANANGE USERS
-        public async Task<IActionResult> ManageUsers(string searchName)
+        public async Task<IActionResult> ManageUsers(int? page, string search)
         {
-            ViewBag.SearchString = searchName;
+            ViewBag.SearchString = search;
             var doctors = _context.User
                 .Where(x => x.FacilityId.Equals(UserFacility) && x.Level.Equals(_roles.Value.DOCTOR))
                 .Select(y => new SupportManageViewModel
@@ -275,12 +286,13 @@ namespace Referral2.Controllers
                 });
 
 
-            if(!string.IsNullOrEmpty(searchName))
+            if(!string.IsNullOrEmpty(search))
             {
-                doctors = doctors.Where(x => x.DoctorName.Contains(searchName));
+                doctors = doctors.Where(x => x.DoctorName.Contains(search));
             }
+            int size = 10;
 
-            return View(await doctors.ToListAsync());
+            return View(await PaginatedList<SupportManageViewModel>.CreateAsync(doctors.AsNoTracking(), page ?? 1, size));
         }
         // GET: DASHBOARD
         public IActionResult SupportDashboard()

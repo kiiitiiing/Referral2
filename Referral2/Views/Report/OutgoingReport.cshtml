@@ -130,7 +130,11 @@
                             HasNextPage = Model.HasNextPage,
                             HasPreviousPage = Model.HasPreviousPage,
                             PageIndex = Model._pageIndex,
-                            TotalPages = Model._totalPages
+                            TotalPages = Model._totalPages,
+                            Parameters = new Dictionary<string, string>
+                            {
+                                { "page", Model._pageIndex.ToString() }
+                            }
                        })
                     </div>
                 </div>

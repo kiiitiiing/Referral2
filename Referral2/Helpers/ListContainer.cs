@@ -20,6 +20,18 @@ namespace Referral2.Helpers
             }
         }
 
+        public static List<KeyValuePair<string, string>> IncomingStatus
+        {
+            get
+            {
+                return new List<KeyValuePair<string, string>>
+                {
+                    new KeyValuePair<string, string>("referred","New Referral"),
+                    new KeyValuePair<string, string>("accepted","Accepted")
+                };
+            }
+        }
+
         public static List<KeyValuePair<string, string>> CivilStatus 
         {
             get
@@ -92,6 +104,23 @@ namespace Referral2.Helpers
                 {
                     new KeyValuePair<string, string>("government", "Government"),
                     new KeyValuePair<string, string>("private", "Private")
+                };
+            }
+        }
+
+        public static List<KeyValuePair<string, string>> ListStatus
+        {
+            get
+            {
+                return new List<KeyValuePair<string, string>>()
+                {
+                    new KeyValuePair<string, string>("referred", "Referred"),
+                    new KeyValuePair<string, string>("seen", "Seen"),
+                    new KeyValuePair<string, string>("accepted", "Accepted"),
+                    new KeyValuePair<string, string>("arrived", "Arrived"),
+                    new KeyValuePair<string, string>("admitted", "Admitted"),
+                    new KeyValuePair<string, string>("discharged", "Discharged"),
+                    new KeyValuePair<string, string>("cancelled", "Cancelled")
                 };
             }
         }

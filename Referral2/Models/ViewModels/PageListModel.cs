@@ -1,4 +1,6 @@
-﻿namespace Referral2.Models.ViewModels
+﻿using System.Collections.Generic;
+
+namespace Referral2.Models.ViewModels
 {
     public partial class PageListModel
     {
@@ -7,6 +9,6 @@
         public int TotalPages { get; set; }
         public string Action { get; set; }
         public int PageIndex { get; set; }
-        public string Filter { get; set; }
+        public Dictionary<string,string> Parameters { get; set; }
     }
 }

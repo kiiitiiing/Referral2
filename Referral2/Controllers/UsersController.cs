@@ -68,7 +68,7 @@ namespace Referral2.Controllers
                 if (isValid)
                 {
                     _userService.ChangePasswordAsync(user, model.NewPassword);
-                    //return PartialView("~/Views/Users/ChangePassword.cshtml", model);
+                    return PartialView("~/Views/Users/ChangePassword.cshtml", model);
                 }
                 else
                 {

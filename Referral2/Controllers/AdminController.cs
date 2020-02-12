@@ -406,7 +406,7 @@ namespace Referral2.Controllers
         }
 
         // DAILY REFERRAL
-        public async Task<IActionResult> DailyReferral(string dateRange)
+        public async Task<IActionResult> DailyReferral(int? page, string dateRange)
         {
             StartDate = DateTime.Now;
             EndDate = DateTime.Now;
@@ -438,7 +438,7 @@ namespace Referral2.Controllers
             var seen = _context.Seen.Where(x => x.CreatedAt >= StartDate && x.CreatedAt <= EndDate);
 
 
-            var facilities = await _context.Facility
+            var facilities = _context.Facility
                 .Select(i => new DailyReferralViewModel
                 {
                     Facility = i.Name,
@@ -449,15 +449,15 @@ namespace Referral2.Controllers
                     RedirectedFrom = activity.Where(x => x.ReferredFrom.Equals(i.Id) && x.Status.Equals(_status.Value.REJECTED) && x.DateReferred >= StartDate && x.DateReferred >= EndDate).Count(),
                     SeenFrom = seen.Where(x => x.Tracking.ReferredFrom.Equals(i.Id) && x.Tracking.DateSeen >= StartDate && x.Tracking.DateSeen <= EndDate).Count()
                 })
-                .OrderBy(x => x.Facility)
-                .AsNoTracking()
-                .ToListAsync();
+                .OrderBy(x => x.Facility);
 
-            return View(facilities);
+            int size = 20;
+
+            return View(await PaginatedList< DailyReferralViewModel>.CreateAsync(facilities.AsNoTracking(), page ?? 1, size));
         }
 
         // DAILY USERS
-        public async Task<IActionResult> DailyUsers(string date)
+        public async Task<IActionResult> DailyUsers(int? page, string date)
         {
             var users = _context.Login;
 
@@ -470,7 +470,7 @@ namespace Referral2.Controllers
 
             ViewBag.Date = Date.ToString("dd/MM/yyyy");
 
-            var facilities = await _context.Facility
+            var facilities = _context.Facility
                 .Select(i => new DailyUsersAdminModel
                 {
                     Facility = i.Name,
@@ -480,21 +480,17 @@ namespace Referral2.Controllers
                     OnlineIT = users.Where(x => x.User.Level.Equals(_roles.Value.SUPPORT) && !x.Status.Equals("logout") && x.User.FacilityId.Equals(i.Id) && x.Login1.Date.Equals(Date)).Count(),
                     OfflineIT = users.Where(x => x.User.Level.Equals(_roles.Value.SUPPORT) && x.Status.Equals("logout") && x.User.FacilityId.Equals(i.Id) && x.Login1.Date.Equals(Date)).Count(),
                 })
-                .OrderBy(x => x.Facility)
-                .ToListAsync();
+                .OrderBy(x => x.Facility);
 
-            return View(facilities);
+            int size = 20;
+            return View(await PaginatedList< DailyUsersAdminModel>.CreateAsync(facilities.AsNoTracking(), page ?? 1, size));
         }
 
         // FACILITIES
-        public async Task<IActionResult> Facilities(int? page, string search, string filter)
+        public async Task<IActionResult> Facilities(int? page, string search)
         {
-            if (search != null)
-                page = 1;
-            else
-                search = filter;
             ViewBag.Filter = search;
-            int size = 6;
+            int size = 10;
 
             var facilities = _context.Facility
                             .Select(x => new FacilitiesViewModel
@@ -674,21 +670,24 @@ namespace Referral2.Controllers
         }
 
         // REFERRAL STATUS
-        public async Task<IActionResult> ReferralStatus(string dateRange)
+        public async Task<IActionResult> ReferralStatus(int? page, string dateRange)
         {
-            StartDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-            EndDate = StartDate.AddMonths(1).AddDays(-1);
             var culture = CultureInfo.InvariantCulture;
-
+            int size = 20;
             if (!string.IsNullOrEmpty(dateRange))
             {
                 StartDate = DateTime.Parse(dateRange.Substring(0, dateRange.IndexOf(" ") + 1).Trim());
                 EndDate = DateTime.Parse(dateRange.Substring(dateRange.LastIndexOf(" ")).Trim());
             }
+            else
+            {
+                StartDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                EndDate = StartDate.AddMonths(1).AddDays(-1);
+            }
             ViewBag.StartDate = StartDate;
             ViewBag.EndDate = EndDate;
 
-            var referrals = await _context.Tracking
+            var referrals = _context.Tracking
                 .Where(x => x.CreatedAt >= StartDate && x.CreatedAt <= EndDate)
                 .Select(x => new ReferralStatusViewModel
                 {
@@ -698,10 +697,9 @@ namespace Referral2.Controllers
                     Department = x.Department.Description,
                     PatientName = GlobalFunctions.GetFullLastName(x.Patient),
                     Status = x.Status
-                })
-                .ToListAsync();
+                });
 
-            return View(referrals);
+            return View(await PaginatedList< ReferralStatusViewModel>.CreateAsync(referrals.AsNoTracking(), page ?? 1, size));
         }
 
         // REMOVE FACILITY
@@ -713,12 +711,8 @@ namespace Referral2.Controllers
         }
 
         // SUPPORT USERS
-        public async Task<IActionResult> SupportUsers(int? page, string search, string filter)
+        public async Task<IActionResult> SupportUsers(int? page, string search)
         {
-            if (search != null)
-                page = 1;
-            else
-                search = filter;
             ViewBag.Filter = search;
             int size = 10;
 

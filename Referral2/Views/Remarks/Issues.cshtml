@@ -1,7 +1,5 @@
-﻿@model Issue
-@{
-    int x = 0;
-}
+﻿@model IssuesModel
+
 <div class="modal fade" id="issues-modal">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
@@ -11,15 +9,34 @@
                     &nbsp;Issue and concern
                 </h4>
             </div>
-            <form asp-action="Issue" method="post" id="issues-form">
+            <form asp-action="Issues" method="post" id="issues-form">
                 <div class="modal-body">
-                    <input asp-for="TrackingId" value="@ViewBag.TrackingId" hidden />
-                    <input asp-for="Status" value="Outgoing" hidden />
+                    <input id="trackId" hidden asp-for="TrackingId" />
                     <div class="form-group issue-body">
-                        <input class="form-control" name="issue[@x]" placeholder="Enter the issue here.." required=""><br>
+                        @if (Model.Issues.Count() == 0)
+                        {
+                            Model.Issues.Add(new Issue());
+                            <input asp-for="Issues[0].TrackingId" id="track_@Model.Issues[0].Id" value="@Model.TrackingId" hidden />
+                            <input asp-for="Issues[0].Status" id="status_@Model.Issues[0].Id" value="outgoing" hidden />
+                            <input class="form-control" asp-for="Issues[0].Issue1" id="issue_@Model.Issues[0].Id" placeholder="Enter the issue here.." required><br />
+                        }
+                        else
+                        {
+                            for (int y = 0; y < Model.Issues.Count(); y++)
+                            {
+                                if (y == Model.Issues.Count() - 1)
+                                {
+                                    <input id="lastval" value="@y" hidden />
+                                }
+                                <input asp-for="Issues[y].Id" id="id_@Model.Issues[y].Id" hidden />
+                                <input asp-for="Issues[y].TrackingId" id="track_@Model.Issues[y].Id" hidden />
+                                <input asp-for="Issues[y].Status" id="status_@Model.Issues[y].Id" value="outgoing" hidden />
+                                <input class="form-control" asp-for="Issues[y].Issue1" id="issue_@Model.Issues[y].Id" placeholder="Enter the issue here.." required><br>
+                            }
+                        }
                     </div>
                     <a href="#" onclick="addIssue();" class="fa-pull-right"><i class="fa fa-plus"></i> Add</a><br><br>
-                    <div class="clearfix"></div>
+                    <span class="text-danger" asp-validation-for="Issues"></span>
                 </div>
                 <div class="modal-footer">
                     <div class="pull-right">
@@ -38,10 +55,23 @@
 </div>
 
 <script>
+    $(document).ready(function () {
+        var form = $('#issues-form');
+        form.removeData('validator');
+        form.removeData('unobtrusiveValidation');
+        $.validator.unobtrusive.parse(form);
+    });
     var x = 0;
+    var track = $('#trackId').val();
+    if ($('#lastval').val() > 0) {
+        x = $('#lastval').val();
+    }
     function addIssue() {
-        x = x + 1;
-        $(".issue-body").append('<input class="form-control" name="issue[' + x + ']" placeholder="Type the issue here.." required><br>');
+        x = +x + 1;
+        $(".issue-body").append('<input id="track_' + x + '" hidden="" type="number" name="Issues[' + x + '].TrackingId" value="' + track + '">');
+        $(".issue-body").append('<input id="status_' + x + '" value="outgoing" hidden="" type="text" data-val="true" data-val-required="The Status field is required." name="Issues[' + x + '].Status">')
+        $(".issue-body").append('<input class="form-control" id="issue_0" placeholder="Enter the issue here.." required="" type="text" data-val="true" data-val-length="The field Issue1 must be a string with a maximum length of 255." data-val-length-max="255" data-val-required="The Issue1 field is required." maxlength="255" name="Issues[' + x + '].Issue1" value=""><br/>');
         event.preventDefault();
+        console.log(x);
     }
 </script>

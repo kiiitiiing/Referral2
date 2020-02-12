@@ -1,4 +1,4 @@
-﻿@model IEnumerable<DailyReferralViewModel>
+﻿@model PaginatedList<DailyReferralViewModel>
 
 @{
     ViewData["Title"] = "Daily Referrals";
@@ -45,7 +45,7 @@
             </div>
             <div class="col-md-9">
                 <!-- DAILY USERS -->
-                <div class="card card-outline">
+                <div class="card card-success card-outline">
                     <!-- DAILY USERS HEADER -->
                     <div class="card-header with-border">
                         <h3>
@@ -103,6 +103,21 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                    <div class="card-footer">
+                        @await Html.PartialAsync("~/Views/Shared/PartialViews/_PageList.cshtml", new PageListModel
+                       {
+                           Action = "DailyReferral",
+                           HasNextPage = Model.HasNextPage,
+                           HasPreviousPage = Model.HasPreviousPage,
+                           PageIndex = Model._pageIndex,
+                           TotalPages = Model._totalPages,
+                           Parameters = new Dictionary<string, string>
+                           {
+                               { "page", Model._pageIndex.ToString() },
+                               { "daterange", dateRange }
+                           }
+                       })
                     </div>
                 </div>
             </div>

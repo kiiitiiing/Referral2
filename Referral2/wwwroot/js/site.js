@@ -214,6 +214,11 @@ $(function () {
                     sessionStorage.setItem('onReload', 'updateFacility');
                     location.reload();
                 }
+                else if (formId == 'issues-modal') {
+                    //placeholderElement.find('.modal').modal('hide');
+                    sessionStorage.setItem('onReload', 'updatedIssues');
+                    location.reload();
+                }
             }
         });
     });

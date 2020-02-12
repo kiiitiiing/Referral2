@@ -83,14 +83,17 @@
         <!-- CARD FOOTER -->
         <div class="card-footer">
             @await Html.PartialAsync("~/Views/Shared/PartialViews/_PageList.cshtml", new PageListModel
-       {
-           Action = "Facilities",
-           Filter = ViewBag.Filter,
-           HasNextPage = Model.HasNextPage,
-           HasPreviousPage = Model.HasPreviousPage,
-           PageIndex = Model._pageIndex,
-           TotalPages = Model._totalPages
-       })
+               {
+                   Action = "Facilities",
+                   HasNextPage = Model.HasNextPage,
+                   HasPreviousPage = Model.HasPreviousPage,
+                   PageIndex = Model._pageIndex,
+                   TotalPages = Model._totalPages,
+                   Parameters = new Dictionary<string, string>
+                   {
+                       { "search", ViewBag.Filter }
+                   }
+               })
         </div>
     </div>
 </div>

@@ -9,13 +9,12 @@ namespace Referral2.Models
     {
         [Key]
         public int Id { get; set; }
-        public int TrackingId { get; set; }
+        public int? TrackingId { get; set; }
         [Required]
         [Column("Issue")]
         [StringLength(255)]
         public string Issue1 { get; set; }
         [Required]
-        [StringLength(255)]
         public string Status { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }

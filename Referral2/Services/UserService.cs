@@ -13,6 +13,8 @@ using Referral2.Models.ViewModels;
 using Referral2.Models.ViewModels.Admin;
 using Referral2.Models.ViewModels.Support;
 using Microsoft.Extensions.Options;
+using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 
 namespace Referral2.Services
 {
@@ -43,20 +45,16 @@ namespace Referral2.Services
             _roles = roles;
         }
 
-        public Task<(bool, User)> ValidateUserCredentialsAsync(string username, string password)
+        public async Task<(bool, User)> ValidateUserCredentialsAsync(string username, string password)
         {
             User user = null;
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-                return Task.FromResult((false, user));
+                return (false, user);
 
-            try
-            {
-                user = _context.User.Single(x => x.Username.Equals(username));
-            }catch(InvalidOperationException e)
-            { }
+            user = await _context.User.SingleOrDefaultAsync(x => x.Username.Equals(username));
 
             if (user == null)
-                return Task.FromResult((false, user));
+                return (false, user);
 
             var result = _hashPassword.VerifyHashedPassword(user, user.Password, password);
 
@@ -68,11 +66,11 @@ namespace Referral2.Services
                 user.UpdatedAt = DateTime.Now;
                 user.Status = "active";
                 _context.Update(user);
-                return Task.FromResult((true, user));
+                return (true, user);
             }
 
             else
-                return Task.FromResult((false, user));
+                return (false, user);
         }
 
         public void ChangePasswordAsync(User user, string newPassword)
@@ -83,6 +81,7 @@ namespace Referral2.Services
             user.UpdatedAt = DateTime.Now;
 
             _context.Update(user);
+            _context.SaveChanges();
         }
 
         public Task<bool> RegisterSupportAsync(AddSupportViewModel model)

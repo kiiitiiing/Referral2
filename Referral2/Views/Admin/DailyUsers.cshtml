@@ -1,4 +1,4 @@
-﻿@model IEnumerable<DailyUsersAdminModel>
+﻿@model PaginatedList<DailyUsersAdminModel>
 
 @{
     ViewData["Title"] = "Daily Users";
@@ -19,17 +19,21 @@
                     <form asp-action="DailyUsers" method="post">
                         <!-- CARD DANGER BODY -->
                         <div class="card-body">
-                            <input class="form-control form-control-sm" type="date" value="@ViewBag.Date" name="date" />
+                            <input class="form-control form-control-sm" type="text" id="datetimepicker" value="@ViewBag.Date" name="date" />
                         </div>
                         <div class="card-footer">
-                            <button type="submit" class="btn btn-sm bg-gradient-success">
-                                <i class="fa fa-calendar-alt"></i>&nbsp;
-                                Change Date
-                            </button>
-                            <a class="btn btn-sm bg-gradient-orange">
-                                <i class="far fa-file-excel"></i>&nbsp;
-                                Export Data
-                            </a>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-block btn-sm bg-gradient-success">
+                                    <i class="fa fa-calendar-alt"></i>&nbsp;
+                                    Change Date
+                                </button>
+                            </div>
+                            <div class="form-group">
+                                <a class="btn btn-block btn-sm bg-gradient-orange">
+                                    <i class="far fa-file-excel"></i>&nbsp;
+                                    Export Data
+                                </a>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -37,11 +41,11 @@
             </div>
             <div class="col-md-9">
                 <!-- DAILY USERS -->
-                <div class="card card-outline">
+                <div class="card card-success card-outline">
                     <!-- DAILY USERS HEADER -->
                     <div class="card-header with-border">
                         <h3>
-                            Incoming Patients
+                            Daily Users
                             <br />
                             <small class="text-success">
                                 @date
@@ -72,8 +76,8 @@
                                 <tbody>
                                     @foreach (var item in Model)
                                     {
-                                        var facilityBool = item.Facility.Length > 25;
-                                        var facility = facilityBool? new string(item.Facility.Take(25).ToArray())+"..." : item.Facility;
+                                        var facilityBool = item.Facility.Length > 20;
+                                        var facility = facilityBool? new string(item.Facility.Take(20).ToArray())+"..." : item.Facility;
                                         var totalHP = item.OnDutyHP + item.OffDutyHP + item.OfflineHP;
                                         var totalIT = item.OnlineIT + item.OfflineIT;
                                         var total = totalHP + totalIT;
@@ -83,7 +87,7 @@
                                             </td>
                                             <td class="text-center">@item.OnDutyHP</td>
                                             <td class="text-center">@item.OffDutyHP</td>
-                                            <td class="text-center">@item.OffDutyHP</td>
+                                            <td class="text-center">@item.OfflineHP</td>
                                             <td class="text-center">@totalHP</td>
                                             <td class="text-center">@item.OnlineIT</td>
                                             <td class="text-center">@item.OfflineIT</td>
@@ -95,6 +99,21 @@
                             </table>
                         </div>
                     </div>
+                    <div class="card-footer">
+                        @await Html.PartialAsync("~/Views/Shared/PartialViews/_PageList.cshtml", new PageListModel
+                       {
+                           Action = "DailyUsers",
+                           HasNextPage = Model.HasNextPage,
+                           HasPreviousPage = Model.HasPreviousPage,
+                           PageIndex = Model._pageIndex,
+                           TotalPages = Model._totalPages,
+                           Parameters = new Dictionary<string, string>
+                           {
+                               { "page", Model._pageIndex.ToString()},
+                               { "date", ViewBag.Date }
+                           }
+                       })
+                    </div>
                 </div>
             </div>
         </div>
@@ -102,10 +121,12 @@
 </div>
 
 
-<script>
-    $(document).ready(function () {
-        $('input[name="daterange"]').daterangepicker({
-            format: 'YYYY/MM/DD',
+<script type="text/javascript">
+    $(function () {
+        $('#datetimepicker').datepicker({
+            format: 'dd/mm/yyyy',
+            autoclose: true,
+            forceParse: true
         });
-    });
+    })
 </script>

@@ -2,9 +2,7 @@
 
 @{
     ViewData["Title"] = "Cancelled Patients";
-    var dateToday = DateTime.Now;
-    var firstDayOfMonth = new DateTime(dateToday.Year, 1, 1);
-    var lastDayOfMonth = new DateTime(dateToday.Year, 12, 31);
+    var dateRange = ViewBag.StartDate + " - " + ViewBag.EndDate;
 }
 
 
@@ -16,7 +14,10 @@
         <div class="card-header">
             @await Html.PartialAsync("~/Views/Shared/PartialViews/_PatientSearchFilter.cshtml", new SearchModel
             {
-                Action = "Cancelled"
+                Action = "Cancelled",
+                StartDate = ViewBag.StartDate,
+                EndDate = ViewBag.EndDate,
+                Search = ViewBag.CurrentSearch
             })
             <div>
                 <h3 class="card-title">Cancelled Patients</h3><br />
@@ -66,9 +67,18 @@
                                         }
                                 </td>
                                 <td>
-                                    <a href="#">
-                                        @item.PatientName
-                                    </a>
+                                    @if (item.Type.Equals("normal"))
+                                    {
+                                        <a href="#" data-toggle="ajax-modal" data-target="#normal-form-modal" data-url="@Url.Action("PrintableNormalForm","ViewForms", new { code = item.PatientCode })">
+                                            @item.PatientName
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a href="#" data-toggle="ajax-modal" data-target="#print-pregnant-form-modal" data-url="@Url.Action("PrintablePregnantForm","ViewForms", new { code = item.PatientCode })">
+                                            @item.PatientName
+                                        </a>
+                                    }
                                     <p class="small text-muted">
                                         @item.PatientCode
                                     </p>
@@ -87,25 +97,20 @@
             </div>
             <!-- CARD FOOTER -->
             <div class="card-footer">
-                @{
-                    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
-                    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
-                }
-
-                <a asp-action="GetAcceptedPatients"
-                   asp-route-sortOrder="@ViewData["CurrentSort"]"
-                   asp-route-pageNumber="@(Model._pageIndex - 1)"
-                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
-                   class="btn btn-primary @prevDisabled">
-                    Previous
-                </a>
-                <a asp-action="GetAcceptedPatients"
-                   asp-route-sortOrder="@ViewData["CurrentSort"]"
-                   asp-route-pageNumber="@(Model._pageIndex + 1)"
-                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
-                   class="btn btn-primary @nextDisabled">
-                    Next
-                </a>
+                @await Html.PartialAsync("~/Views/Shared/PartialViews/_PageList.cshtml", new PageListModel
+               {
+                   Action = "Cancelled",
+                   HasNextPage = Model.HasNextPage,
+                   HasPreviousPage = Model.HasPreviousPage,
+                   PageIndex = Model._pageIndex,
+                   TotalPages = Model._totalPages,
+                   Parameters = new Dictionary<string, string>
+                    {
+                       { "page", Model._pageIndex.ToString() },
+                       { "search", ViewBag.CurrentSearch },
+                       { "dateRange", dateRange }
+                    }
+                })
             </div>
         </form>
     </div>

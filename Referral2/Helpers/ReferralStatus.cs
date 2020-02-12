@@ -13,7 +13,8 @@ namespace Referral2.Helpers
         public string CALLING {get;set;}
         public string ACCEPTED {get;set;}
         public string ADMITTED {get;set;}
-        public string ARCHIVED {get;set;}
+        public string ARCHIVED {get;set; }
+        public string REDIRECTED { get; set; }
         public string REFERRED {get;set;}
         public string REJECTED {get;set;}
         public string CANCELLED {get;set;}

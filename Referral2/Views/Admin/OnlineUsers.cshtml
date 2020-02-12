@@ -10,15 +10,11 @@
     <div class="card card-success card-outline">
         <div class="card-header">
             <form class="fa-pull-right form-inline" asp-action="OnlineUsers" method="post">
-                <div class="form-actions no-color">
-                    <p>
-                        <input type="date" class="form-control form-control-sm" type="text" name="Date" value="@ViewBag.Date" />
-                        <button type="submit" value="Search" class="btn btn-sm btn-success">
-                            <i class="fa fa-calendar"></i>
-                            &nbsp;Change Date
-                        </button>
-                    </p>
-                </div>
+                <input class="form-control form-control-sm" id="datetimepicker" type="text" name="date" value="@ViewBag.Date" />
+                <button type="submit" value="Search" class="btn btn-sm btn-success">
+                    <i class="fa fa-calendar"></i>
+                    &nbsp;Change Date
+                </button>
             </form>
             <h3>
                 Online Users
@@ -75,3 +71,13 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    $(function () {
+        $('#datetimepicker').datepicker({
+            format: 'dd/mm/yyyy',
+            autoclose: true,
+            forceParse: true
+        });
+    })
+</script>

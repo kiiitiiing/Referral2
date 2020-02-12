@@ -1,0 +1,93 @@
+﻿@model ReferOtherModel
+
+    <div class="modal fade" id="refer-other-modal">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <form asp-action="ReferOther" id="refer-other-form">
+                    <input type="hidden" asp-for="Code" />
+                    <div class="card-header">
+                        <h4>
+                            <i class="fas fa-directions"></i>&nbsp;
+                            REFER TO OTHER FACILITY
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>SELECT FACILITY:</label>
+                            <select class="form-control" id="facility-filter" asp-for="FacilityId" asp-items="ViewBag.Facilities" required>
+                                <option value="">Select Facility</option>
+                            </select>
+                            <span class="text-danger" asp-validation-for="FacilityId"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>SELECT DEPARTMENT:</label>
+                            <select class="form-control" asp-for="DepartmentId" id="department-filter" required>
+                                <option value="">Select Department</option>
+                            </select>
+                            <span class="text-danger" asp-validation-for="DepartmentId"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-end">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                            <i class="fa fa-times"></i>&nbsp;
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-ambulance"></i>&nbsp;
+                            Refer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var form = $('#refer-other-form');
+        form.removeData('validator');
+        form.removeData('unobtrusiveValidation');
+        $.validator.unobtrusive.parse(form);
+
+        
+        
+    });
+
+    var facilityId = $('#facility-filter');
+        var departmentSelect = $('#department-filter');
+
+        facilityId.on('change', function () {
+        var fac = facilityId.val();
+        if (fac != '') {
+            $.when(GetDepartments(fac)).done(function (output) {
+                departmentSelect.empty()
+                    .append($('<option>', {
+                        value: '',
+                        text: 'Select Department'
+                    }));
+                jQuery.each(output, function (i, item) {
+                    departmentSelect.append($('<option>', {
+                        value: item.departmentId,
+                        text: item.departmentName
+                    }));
+                });
+            });
+        }
+        else {
+            departmentSelect.empty()
+                .append($('<option>', {
+                    value: '',
+                    text: 'Select Department'
+                }));
+        }
+        });
+
+    function GetDepartments(id) {
+        var url = "/NoReload/AvailableDepartments?facilityId=" + id;
+        return $.ajax({
+        url: url,
+        type: 'get',
+        async: true
+    });
+    }
+</script>

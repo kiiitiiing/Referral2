@@ -5,18 +5,22 @@
     var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
     var nextDisabled = !Model.HasNextPage ? "disabled" : "";
     var between = false;
-    <span>Total Pages = @Model.TotalPages, Page Index = @Model.PageIndex</span>
+    var stringQuery = Model.Parameters;
+    var index = Model.Parameters;
     <ul class="pagination" style="justify-content:center!important;">
         <li>
-            <a asp-action="Facilities"
-               asp-route-page="@(Model.PageIndex - 1)"
-               asp-route-filter="@Model.Filter"
+            @{ 
+                Model.Parameters["page"] = (Model.PageIndex-1).ToString();
+            }
+            <a asp-action="@Model.Action"
+               asp-all-route-data="Model.Parameters"
                class="btn btn-default @prevDisabled">
                 «
             </a>
         </li>
         @for (int x = 1; x <= Model.TotalPages; x++)
         {
+            index["page"] = x.ToString();
             var activeClass = x == Model.PageIndex ? "btn-primary" : "btn-default";
             if (Model.TotalPages > 10)
             {
@@ -25,9 +29,8 @@
                     if (x < 9)
                     {
                         <li>
-                            <a asp-action="Facilities"
-                               asp-route-page="@x"
-                               asp-route-filter="@Model.Filter"
+                            <a asp-action="@Model.Action"
+                               asp-all-route-data="index"
                                class="btn @activeClass">
                                 @x
                             </a>
@@ -45,9 +48,8 @@
                     else if (x > (Model.TotalPages - 2))
                     {
                         <li>
-                            <a asp-action="Facilities"
-                               asp-route-page="@x"
-                               asp-route-filter="@Model.Filter"
+                            <a asp-action="@Model.Action"
+                               asp-all-route-data="index"
                                class="btn @activeClass">
                                 @x
                             </a>
@@ -59,9 +61,8 @@
                     if (x < 3)
                     {
                         <li>
-                            <a asp-action="Facilities"
-                               asp-route-page="@x"
-                               asp-route-filter="@Model.Filter"
+                            <a asp-action="@Model.Action"
+                               asp-all-route-data="index"
                                class="btn @activeClass">
                                 @x
                             </a>
@@ -79,9 +80,8 @@
                     else if (x > (Model.TotalPages - 9))
                     {
                         <li>
-                            <a asp-action="Facilities"
-                               asp-route-page="@x"
-                               asp-route-filter="@Model.Filter"
+                            <a asp-action="@Model.Action"
+                               asp-all-route-data="index"
                                class="btn @activeClass">
                                 @x
                             </a>
@@ -93,9 +93,8 @@
                     if (x < 3)
                     {
                         <li>
-                            <a asp-action="Facilities"
-                               asp-route-page="@x"
-                               asp-route-filter="@Model.Filter"
+                            <a asp-action="@Model.Action"
+                               asp-all-route-data="index"
                                class="btn @activeClass">
                                 @x
                             </a>
@@ -112,9 +111,8 @@
                     else if (x >= (Model.PageIndex - 3) && x <= (Model.PageIndex + 3))
                     {
                         <li>
-                            <a asp-action="Facilities"
-                               asp-route-page="@x"
-                               asp-route-filter="@Model.Filter"
+                            <a asp-action="@Model.Action" 
+                               asp-all-route-data="index"
                                class="btn @activeClass">
                                 @x
                             </a>
@@ -123,9 +121,8 @@
                     else if (x >= (Model.TotalPages - 1))
                     {
                         <li>
-                            <a asp-action="Facilities"
-                               asp-route-page="@x"
-                               asp-route-filter="@Model.Filter"
+                            <a asp-action="@Model.Action"
+                               asp-all-route-data="index"
                                class="btn @activeClass">
                                 @x
                             </a>
@@ -136,9 +133,8 @@
             else
             {
                 <li>
-                    <a asp-action="Facilities"
-                       asp-route-page="@x"
-                       asp-route-filter="@Model.Filter"
+                    <a asp-action="@Model.Action"
+                       asp-all-route-data="index"
                        class="btn @activeClass">
                         @x
                     </a>
@@ -146,9 +142,11 @@
             }
         }
         <li>
-            <a asp-action="Facilities"
-               asp-route-page="@(Model.PageIndex + 1)"
-               asp-route-filter="@Model.Filter"
+            @{
+                Model.Parameters["page"] = (Model.PageIndex+1).ToString();
+            }
+            <a asp-action="@Model.Action"
+               asp-all-route-data="Model.Parameters"
                class="btn btn-default @nextDisabled">
                 »
             </a>

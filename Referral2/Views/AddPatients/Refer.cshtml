@@ -33,8 +33,8 @@
                     <td colspan="3">
                         Referred to:&nbsp;&nbsp;&nbsp;
                         <div class="" style="background-color:white !important;">
-                            <select class="form-control form-control-sm facilityFilter select2 " id="facilityFilter" asp-for="ReferredTo" asp-items="ViewBag.ReferredTo" style="width: 100%" required>
-                                <option value="">Select Facility...</option>
+                            <select class="form-control form-control-sm facilityFilter select2" id="facilityFilter" style="width:100%;" asp-for="ReferredTo" asp-items="ViewBag.ReferredTo">
+                                <option value="0">Select Facility...</option>
                             </select>
                         </div>
                         <span class="text-danger" asp-validation-for="ReferredTo"></span>
@@ -175,74 +175,78 @@
     </div>
 </form>
 <script>
-    var form = $('#normal-refer-form');
-    form.removeData('validator');
-    form.removeData('unobtrusiveValidation');
-    $.validator.unobtrusive.parse(form);
-    
-    $('.select2').select2({
-        theme: 'bootstrap4'
-    })
+    $(document).ready(function () {
+        var form = $('#normal-refer-form');
+        form.removeData('validator');
+        form.removeData('unobtrusiveValidation');
+        $.validator.unobtrusive.parse(form);
 
-    var facilityId = 0;
-    var departmentId = 0;
-    $('#facilityFilter').change(function () {
-        facilityId = $('#facilityFilter').val();
+        
+        $('.select2').select2({
+            theme: 'bootstrap4'
+        })
 
-        $.when(getDepartmentFiltered()).done(function (output) {
+        var facilityId = 0;
+        var departmentId = 0;
+        $('.facilityFilter').change(function () {
+            facilityId = $('.facilityFilter').val();
+            console.log(facilityId);
 
-            $('#facilityAdress').text(output.address);
+            $.when(getDepartmentFiltered(facilityId)).done(function (output) {
 
-            $('#departmentFilter').empty()
-                .append($('<option>', {
-                    value: '',
-                    text: 'Select Department...'
-                }));
+                $('#facilityAdress').text(output.address);
 
-            $('#doctorFiltered').empty()
-                .append($('<option>', {
-                    value: '',
-                    text: 'Any'
-                }));
+                $('#departmentFilter').empty()
+                    .append($('<option>', {
+                        value: '',
+                        text: 'Select Department...'
+                    }));
 
-            jQuery.each(output.departments, function (i, item) {
-                $('#departmentFilter').append($('<option>', {
-                    value: item.departmentId,
-                    text: item.departmentName
-                }))
+                $('#doctorFiltered').empty()
+                    .append($('<option>', {
+                        value: '',
+                        text: 'Any'
+                    }));
+
+                jQuery.each(output.departments, function (i, item) {
+                    $('#departmentFilter').append($('<option>', {
+                        value: item.departmentId,
+                        text: item.departmentName
+                    }))
+                });
+            });
+        });
+
+
+
+        $('#departmentFilter').change(function () {
+            if (facilityId == '0') {
+                facilityId == '24';
+            }
+            departmentId = $('#departmentFilter').val();
+
+            $.when(getMdFiltered(facilityId, departmentId)).done(function (output) {
+                $('#doctorFiltered').empty()
+                    .append($('<option>', {
+                        value: '',
+                        text: 'Any'
+                    }));
+
+                jQuery.each(output, function (i, item) {
+                    $('#doctorFiltered').append($('<option>', {
+                        value: item.mdId,
+                        text: item.doctorName
+                    }));
+                });
             });
         });
     });
 
 
 
-    $('#departmentFilter').change(function () {
-        if (facilityId == '0') {
-            facilityId == '24';
-        }
-        departmentId = $('#departmentFilter').val();
 
-        $.when(getMdFiltered()).done(function (output) {
-            $('#doctorFiltered').empty()
-                .append($('<option>', {
-                    value: '',
-                    text: 'Any'
-                }));
-
-            jQuery.each(output, function (i, item) {
-                $('#doctorFiltered').append($('<option>', {
-                    value: item.mdId,
-                    text: item.doctorName
-                }));
-            });
-        });
-    });
-
-
-
-
-    function getDepartmentFiltered() {
-        var urls = "/NoReload/FilterDepartment?facilityId=" + facilityId;
+    function getDepartmentFiltered(id) {
+        var urls = "/NoReload/FilterDepartment?facilityId=" + id;
         return $.ajax({
             url: urls,
             type: 'get',
@@ -252,8 +256,8 @@
 
 
 
-    function getMdFiltered() {
-        var urls = "/NoReload/FilterUser?facilityId=" + facilityId + "&departmentId=" + departmentId;
+    function getMdFiltered(facId, depId) {
+        var urls = "/NoReload/FilterUser?facilityId=" + facId + "&departmentId=" + depId;
         return $.ajax({
             url: urls,
             type: 'get',

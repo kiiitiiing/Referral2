@@ -12,6 +12,7 @@ namespace Referral2.Models.ViewModels.ViewPatients
         public string PatientType { get; set; }
         public string PatientName { get; set; }
         public string PatientCode { get; set; }
+        public string Type { get; set; }
         public DateTime DateCancelled { get; set; }
         public string ReasonCancelled { get; set; }
     }

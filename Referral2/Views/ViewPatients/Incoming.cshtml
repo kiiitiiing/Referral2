@@ -5,6 +5,7 @@
     var accept = "accept-modal";
     var startDate = ViewBag.StartDate;
     var endDate = ViewBag.EndDate;
+    var dateRange = startDate + " - " + endDate;
 }
 
 <div class="content">
@@ -28,24 +29,24 @@
                         <form asp-action="Incoming" method="post">
                             <!-- SEARCH -->
                             <div class="form-group ">
-                                <input class="form-control" type="text" placeholder="Code, Firstname, Lastname" name="SearchFilter" value="@ViewBag.CurrentSearchFilter" autocomplete="off" />
+                                <input class="form-control" type="text" placeholder="Code, Firstname, Lastname" name="search" value="@ViewBag.CurrentSearch" autocomplete="off" />
                             </div>
                             <!-- DATE FILTER -->
                             <div class="form-group">
-                                <input class="form-control" type="text" name="daterange" value="@startDate - @endDate" autocomplete="off">
+                                <input class="form-control" type="text" name="daterange" value="@dateRange" autocomplete="off">
                             </div>
                             <!-- DEPARTMENT -->
                             <div class="form-group">
-                                <select class="form-control" asp-items="ViewBag.Departments" name="departmentFilter">
+                                <select class="form-control" asp-items="ViewBag.Departments" name="department">
                                     <option value="">All Department</option>
                                 </select>
                             </div>
                             <!-- STATUS -->
                             <div class="form-group">
-                                <select class="form-control" name="statusFilter">
+                                <select class="form-control" 
+                                        name="status"
+                                        asp-items="ViewBag.IncomingStatus">
                                     <option value="">Select All</option>
-                                    <option value="new">New Referral</option>
-                                    <option value="accepted">Accepted</option>
                                 </select>
                             </div>
                             <div class="form-group hide"></div>
@@ -464,25 +465,22 @@
                         </div>
                     </div>
                     <div class="card-footer">
-                        @{
-                            var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
-                                var nextDisabled = !Model.HasNextPage ? "disabled" : "";
-                            }
-
-                        <a asp-action="Incoming"
-                           asp-route-sortOrder="@ViewData["CurrentSort"]"
-                           asp-route-pageNumber="@(Model._pageIndex - 1)"
-                           asp-route-currentFilter="@ViewData["CurrentFilter"]"
-                           class="btn btn-primary @prevDisabled">
-                            Previous
-                        </a>
-                        <a asp-action="Incoming"
-                           asp-route-sortOrder="@ViewData["CurrentSort"]"
-                           asp-route-pageNumber="@(Model._pageIndex + 1)"
-                           asp-route-currentFilter="@ViewData["CurrentFilter"]"
-                           class="btn btn-primary @nextDisabled">
-                            Next
-                        </a>
+                        @await Html.PartialAsync("~/Views/Shared/PartialViews/_PageList.cshtml", new PageListModel
+                       {
+                           Action = "Incoming",
+                           HasNextPage = Model.HasNextPage,
+                           HasPreviousPage = Model.HasPreviousPage,
+                           PageIndex = Model._pageIndex,
+                           TotalPages = Model._totalPages,
+                           Parameters = new Dictionary<string, string>
+                           {
+                               {"page",Model._pageIndex.ToString() },
+                               {"search", ViewBag.CurrentSearch },
+                               { "dateRange",dateRange },
+                               { "department",ViewBag.SelectedDepartment},
+                               { "status", ViewBag.SelectedStatus }
+                           }
+                       })
                     </div>
                 </div>
             </div>

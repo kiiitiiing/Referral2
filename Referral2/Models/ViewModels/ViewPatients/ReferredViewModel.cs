@@ -14,12 +14,13 @@ namespace Referral2.Models.ViewModels.ViewPatients
         public int TrackingId { get; set; }
         public int SeenCount { get; set; }
         public int CallerCount { get; set; }
+        public int IssueCount { get; set; }
         public bool Travel { get; set; }
         public int ReCoCount { get; set; }
         public string PatientAddress { get; set; }
         public string ReferredBy { get; set; }
         public string ReferredTo { get; set; }
-        public int? ReferredFrom { get; set; }
+        public int? ReferredToId { get; set; }
         public bool Pregnant { get; set; }
         public bool Seen { get; set; }
         public string Code { get; set; }

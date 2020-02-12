@@ -4,6 +4,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
@@ -28,6 +29,7 @@ namespace Referral2
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton(Configuration);
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddDbContext<ReferralDbContext>(options =>
                 options.UseLazyLoadingProxies()
@@ -56,7 +58,7 @@ namespace Referral2
                 options.LoginPath = "/Account/Login";
                 options.LogoutPath = "/Account/Logout";
                 options.AccessDeniedPath = "/Account/AccessDenied";
-                //options.ExpireTimeSpan = TimeSpan.FromMinutes(1);
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
             });
 
             services.AddAuthorization(options =>
@@ -79,7 +81,12 @@ namespace Referral2
                         .AddNewtonsoftJson();
 
             services.AddDistributedMemoryCache(); // Adds a default in-memory implementation of IDistributedCache
-            services.AddSession();
+            services.AddSession(options=> 
+            {
+                options.Cookie.HttpOnly = true;
+                options.IdleTimeout = TimeSpan.FromSeconds(10);
+                options.Cookie.IsEssential = true;
+            });
 
         }
 

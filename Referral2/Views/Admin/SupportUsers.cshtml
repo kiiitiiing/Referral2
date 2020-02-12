@@ -76,41 +76,18 @@
             </div>
         </div>
         <div class="card-footer">
-            @if (Model.Count() >= Model._pageSize)
-            {
-                var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
-                var nextDisabled = !Model.HasNextPage ? "disabled" : "";
-                <ul class="pagination" style="justify-content:center!important;">
-                    <li>
-                        <a asp-action="Facilities"
-                           asp-route-page="@(Model._pageIndex - 1)"
-                           asp-route-filter="@ViewBag.Filter"
-                           class="btn btn-default @prevDisabled">
-                            «
-                        </a>
-                    </li>
-                    @for (int x = 1; x <= Model._totalPages; x++)
-                    {
-                        var activeClass = x == Model._pageIndex ? "btn-primary" : "btn-default";
-                        <li>
-                            <a asp-action="Facilities"
-                               asp-route-page="@x"
-                               asp-route-filter="@ViewBag.Filter"
-                               class="btn @activeClass">
-                                @x
-                            </a>
-                        </li>
-                    }
-                    <li>
-                        <a asp-action="Facilities"
-                           asp-route-page="@(Model._pageIndex + 1)"
-                           asp-route-filter="@ViewBag.Filter"
-                           class="btn btn-default @nextDisabled">
-                            »
-                        </a>
-                    </li>
-                </ul>
-            }
+            @await Html.PartialAsync("~/Views/Shared/PartialViews/_PageList.cshtml", new PageListModel
+               {
+                   Action = "SupportUsers",
+                   HasNextPage = Model.HasNextPage,
+                   HasPreviousPage = Model.HasPreviousPage,
+                   PageIndex = Model._pageIndex,
+                   TotalPages = Model._totalPages,
+                   Parameters = new Dictionary<string, string>
+                   {
+                       { "search", ViewBag.Filter }
+                   }
+               })
         </div>
     </div>
 </div>

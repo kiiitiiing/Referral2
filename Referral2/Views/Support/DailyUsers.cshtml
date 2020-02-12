@@ -25,7 +25,7 @@
                         <div class="card-body">
                                 <!-- SELECT DATE -->
                                 <div class="form-group">
-                                    <input class="form-control" type="text" id="datetimepicker" name="date" value="@ViewBag.Date.ToString("MM/dd/yyyy")" autocomplete="off">
+                                    <input class="form-control" type="text" id="datetimepicker" name="date" value="@ViewBag.Date.ToString("dd/MM/yyyy")">
                                 </div>
                         </div>
                         <div class="card-footer">
@@ -47,7 +47,7 @@
             </div>
             <div class="col-md-9">
                 <!-- PATIENT LIST -->
-                <div class="card card-outline">
+                <div class="card card-success card-outline">
                     <!-- DAILY USERS HEADER -->
                     <div class="card-header card-success with-border">
                         <h2>
@@ -73,36 +73,27 @@
                                     <tbody>
                                         @foreach (var item in Model)
                                         {
+                                            var logout = item.LogoutTime == default ? "" : item.LogoutTime.ToString("h:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+                                            var login = item.LoginTime == default ? "" : item.LoginTime.ToString("h:mm tt", System.Globalization.CultureInfo.InvariantCulture);
                                             <tr>
                                                 <td style="font-size:0.9em;white-space: nowrap;">@item.MDName</td>
                                                 <td class="text-center text-success">
-                                                    @if (item.LoggedIn)
+                                                    @if (item.OnDuty == "login")
                                                     {
-                                                        if (item.OnDuty.Equals("login"))
-                                                        {
-                                                            <i class="fa fa-check"></i>
-                                                        }
+                                                        <i class="fa fa-check"></i>
                                                     }
                                                 </td>
                                                 <td class="text-center text-danger">
-                                                    @if (item.LoggedIn) 
-                                                    { 
-                                                        if (item.OnDuty.Equals("login off")) 
-                                                        {
-                                                            <i class="fa fa-check"></i>
-                                                        }
+                                                    @if (item.OnDuty == "login off")
+                                                    {
+                                                        <i class="fa fa-check"></i>
                                                     }
                                                 </td>
                                                 <td class="text-center text-info">
-                                                    @item.LoginTime.ToString("h:mm tt", System.Globalization.CultureInfo.InvariantCulture)<br />
+                                                    @login
                                                 </td>
                                                 <td class="text-center text-warning">
-                                                    @if (!item.LoggedIn)
-                                                    {
-                                                        <span>
-                                                            @item.LogoutTime.ToString("h:mm tt", System.Globalization.CultureInfo.InvariantCulture)
-                                                        </span>
-                                                    }
+                                                    @logout
                                                 </td>
                                             </tr>
                                         }
@@ -139,8 +130,9 @@
 <script>
     $(function () {
         $('#datetimepicker').datepicker({
-            format: 'mm/dd/yyyy',
-            autoclose: true
+            format: 'dd/mm/yyyy',
+            autoclose: true,
+            forceParse: true
         });
     })
 </script>

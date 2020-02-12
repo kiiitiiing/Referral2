@@ -14,6 +14,7 @@ namespace Referral2.Models.ViewModels.ViewPatients
         public string FacilityFromContact { get; set; }
         public string FacilityTo { get; set; }
         public string ActionMd { get; set; }
+        public string ActionMdFacility { get; set; }
         public string ReferringMd { get; set; }
         public string Status { get; set; }
     }

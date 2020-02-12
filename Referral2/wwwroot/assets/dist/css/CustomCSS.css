@@ -6,9 +6,10 @@ body {
     background: #d2d6de;
 }
 
-.select2-results__option{
+.select2-results__option, nav {
     font-size: 14px !important;
 }
+
 
 #showMore{
     display:none;

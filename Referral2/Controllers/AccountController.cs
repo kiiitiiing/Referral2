@@ -49,14 +49,14 @@ namespace Referral2.Controllers
         public IActionResult SwitchUser()
         {
             var users = _context.User
-                .Where(x => x.FacilityId.Equals(UserFacility()) && x.Id != UserId() && x.Level.Equals(_roles.Value.DOCTOR))
+                .Where(x => x.FacilityId.Equals(UserFacility) && x.Id != UserId && x.Level.Equals(_roles.Value.DOCTOR))
                 .Select(x => new ChangeLoginViewModel
                 {
                     Id = x.Id,
                     UserLastname = x.Lastname + ", " + x.Firstname
                 });
 
-            ViewBag.Users = new SelectList(users, "Id", "UserLastname", UserId());
+            ViewBag.Users = new SelectList(users, "Id", "UserLastname", UserId);
             return PartialView("~/Views/Account/SwitchUser.cshtml");
         }
 
@@ -64,7 +64,7 @@ namespace Referral2.Controllers
         public async Task<IActionResult> SwitchUser([Bind] SwitchUserModel model)
         {
             var users = _context.User
-                .Where(x => x.FacilityId.Equals(UserFacility()))
+                .Where(x => x.FacilityId.Equals(UserFacility))
                 .Select(x => new ChangeLoginViewModel
                 {
                     Id = x.Id,
@@ -87,7 +87,7 @@ namespace Referral2.Controllers
                     ModelState.AddModelError("Password", "Wrong Password.");
                 }
             }
-            ViewBag.Users = new SelectList(users, "Id", "UserLastname", UserId());
+            ViewBag.Users = new SelectList(users, "Id", "UserLastname", UserId);
             return PartialView("~/Views/Account/SwitchUser.cshtml", model);
         }
 
@@ -227,7 +227,7 @@ namespace Referral2.Controllers
         {
             if(User.Identity.IsAuthenticated)
             {
-                UpdateLogin(int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)));
+                UpdateLogin(UserId);
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             }
 
@@ -237,7 +237,7 @@ namespace Referral2.Controllers
         [HttpGet]
         public IActionResult Profile()
         {
-            var user = _context.User.Find(UserId());
+            var user = _context.User.Find(UserId);
 
             if (user == null)
             {
@@ -256,7 +256,7 @@ namespace Referral2.Controllers
 
         private async Task LoginAsAsync(int facilityId, string level)
         {
-            var user = await _context.User.FindAsync(UserId());
+            var user = await _context.User.FindAsync(UserId);
             var properties = new AuthenticationProperties
             {
                 AllowRefresh = false,
@@ -329,7 +329,7 @@ namespace Referral2.Controllers
 
         public async Task<bool> ChangeUser()
         {
-            UpdateLogin(UserId());
+            UpdateLogin(UserId);
             await HttpContext.SignOutAsync();
             return true;
         }
@@ -339,7 +339,7 @@ namespace Referral2.Controllers
             Referral2.Models.Login logout = null;
             try
             {
-                logout = _context.Login.First(x => x.Login1.Date == DateTime.Now.Date && x.Logout.Equals(default) && x.UserId.Equals(userId));
+                logout = _context.Login.Where(x=>x.UserId == userId && x.Logout == default).OrderByDescending(x=>x.UpdatedAt).First();
                 
             }
             catch(Exception e)
@@ -350,7 +350,6 @@ namespace Referral2.Controllers
             {
                 var currentUser = _context.User.Find(userId);
                 logout.Logout = DateTime.Now;
-                logout.Status = "logout";
                 currentUser.LoginStatus = "logout";
                 currentUser.UpdatedAt = DateTime.Now;
                 _context.Update(currentUser);
@@ -359,34 +358,13 @@ namespace Referral2.Controllers
             }
         }
 
-        public int UserId()
-        {
-            return int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-        }
-        public int UserFacility()
-        {
-            return int.Parse(User.FindFirstValue("Facility"));
-        }
-        public int UserDepartment()
-        {
-            return int.Parse(User.FindFirstValue("Department"));
-        }
-        public int UserProvince()
-        {
-            return int.Parse(User.FindFirstValue("Province"));
-        }
-        public int UserMuncity()
-        {
-            return int.Parse(User.FindFirstValue("Muncity"));
-        }
-        public int UserBarangay()
-        {
-            return int.Parse(User.FindFirstValue("Barangay"));
-        }
-        public string UserName()
-        {
-            return "Dr. " + User.FindFirstValue(ClaimTypes.GivenName) + " " + User.FindFirstValue(ClaimTypes.Surname);
-        }
+        public int UserId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        public int UserFacility => int.Parse(User.FindFirstValue("Facility"));
+        public int UserDepartment => int.Parse(User.FindFirstValue("Department"));
+        public int UserProvince => int.Parse(User.FindFirstValue("Province"));
+        public int UserMuncity => int.Parse(User.FindFirstValue("Muncity"));
+        public int UserBarangay => int.Parse(User.FindFirstValue("Barangay"));
+        public string UserName => "Dr. " + User.FindFirstValue(ClaimTypes.GivenName) + " " + User.FindFirstValue(ClaimTypes.Surname);
         #endregion
     }
 }
