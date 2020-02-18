@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Reflection;
-using System.Resources;
-using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +13,6 @@ using Referral2.Models;
 using Referral2.Models.ViewModels.Support;
 using Referral2.Services;
 using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Http;
 using Referral2.Models.ViewModels;
 using System.Diagnostics;
 
@@ -156,7 +152,7 @@ namespace Referral2.Controllers
                     OutTotal = trackings.Where(x => x.ReferringMd.Equals(i.Id)).Count(),
                     InAccepted = tract.Where(x => x.ReferredTo.Equals(UserFacility) && x.ActionMd.Equals(i.Id) && x.Status.Equals(_status.Value.ACCEPTED)).Count(),
                     InRedirected = tract.Where(x => x.ReferredTo.Equals(UserFacility) && x.ActionMd.Equals(i.Id) && x.Status.Equals(_status.Value.REJECTED)).Count(),
-                    InSeen = seens.Where(x=>x.UserMd.Equals(i.Id)).GroupBy(x=>x.TrackingId).Select(x=>x).Count(),
+                    InSeen = seens.Where(x=>x.UserMd.Equals(i.Id)).GroupBy(x=>x.TrackingId).Select(x=>x.Key).Count(),
                 });
             return View(await PaginatedList<DailyReferralSupport>.CreateAsync(users.AsNoTracking(), page ?? 1, size));
         }

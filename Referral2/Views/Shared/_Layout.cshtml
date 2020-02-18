@@ -5,14 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Referral2</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" />
+    @*<link rel="stylesheet" href="~/css/site.css" />*@
     <link rel="stylesheet" href="~/assets/dist/css/adminlte.min.css" />
     <link rel="stylesheet" href="~/assets/dist/css/wizardstep.css" />
     <link rel="stylesheet" href="~/assets/dist/css/CustomCSS.css" />
     <link rel="stylesheet" href="~/assets/plugins/icheck-bootstrap/icheck-bootstrap.min.css" />
     <link rel="stylesheet" href="~/assets/dist/css/bootstrap-select.css" />
     <link rel="stylesheet" href="~/assets/plugins/toastr/toastr.min.css">
-    <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/assets/plugins/fontawesome-free/css/all.min.css" />
     <link rel="stylesheet" type="text/css" href="~/assets/daterangepicker/daterangepicker-bs3.css" />
     <link rel="stylesheet" href="~/assets/plugins/select2/css/select2.min.css" />
@@ -49,31 +48,31 @@
     <header>
         @if (User.Identity.IsAuthenticated)
         {
-            <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-                <div class="container">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
 
-                    <div class="navbar-collapse collapse flex-sm-row-reverse">
+                <div class="navbar-collapse collapse flex-sm-row-reverse">
 
-                        <partial name="_LoginPartial" />
-                        @if (User.FindFirstValue(ClaimTypes.Role).Equals("doctor"))
-                        {
-                            <partial name="~/Views/Shared/Navbar/_DoctorNavbarPartial.cshtml" />
-                        }
-                        else if (User.FindFirstValue(ClaimTypes.Role).Equals("admin"))
-                        {
-                            <partial name="~/Views/Shared/Navbar/_AdminNavbarPartial.cshtml" />
-                        }
-                        else if (User.FindFirstValue(ClaimTypes.Role).Equals("support"))
-                        {
-                            <partial name="~/Views/Shared/Navbar/_SupportNavbarPartial.cshtml" />
-                        }
-                        else if (User.FindFirstValue(ClaimTypes.Role).Equals("mcc"))
-                        {
-                            <partial name="~/Views/Shared/Navbar/_MccNavbarPartial.cshtml" />
-                        }
-                    </div>
+                    <partial name="_LoginPartial" />
+                    @if (User.FindFirstValue(ClaimTypes.Role).Equals("doctor"))
+                    {
+                        <partial name="~/Views/Shared/Navbar/_DoctorNavbarPartial.cshtml" />
+                    }
+                    else if (User.FindFirstValue(ClaimTypes.Role).Equals("admin"))
+                    {
+                        <partial name="~/Views/Shared/Navbar/_AdminNavbarPartial.cshtml" />
+                    }
+                    else if (User.FindFirstValue(ClaimTypes.Role).Equals("support"))
+                    {
+                        <partial name="~/Views/Shared/Navbar/_SupportNavbarPartial.cshtml" />
+                    }
+                    else if (User.FindFirstValue(ClaimTypes.Role).Equals("mcc"))
+                    {
+                        <partial name="~/Views/Shared/Navbar/_MccNavbarPartial.cshtml" />
+                    }
                 </div>
-            </nav>
+            </div>
+        </nav>
         }
         </header>
     <!-- MODALS -->
@@ -241,7 +240,7 @@
 
     @if (User.Identity.IsAuthenticated)
     {
-        <footer class="footer referral-footer">
+        <footer class="referral-footer">
             <div class="container">
                 <p class="text-center">All Rights Reserved 2020 | Version 2.1</p>
             </div>

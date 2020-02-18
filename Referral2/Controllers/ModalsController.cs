@@ -72,29 +72,35 @@ namespace Referral2.Controllers
                     MdName = GlobalFunctions.GetMDFullName(x.Sender),
                     Message = x.Message,
                     TimeSent = (DateTime)x.CreatedAt
-                });
+                }).ToList();
             ViewBag.Code = code;
 
-            return PartialView("~/Views/Modals/ViewReco.cshtml", feedbacks.AsNoTracking().ToList());
+            var chats = new ChatsModel
+            {
+                Chats = feedbacks
+            };
+
+            return PartialView("~/Views/Modals/ViewReco.cshtml", chats);
         }
 
         // POST Feedback
         [HttpPost]
-        public void ViewReco([Bind] FeedbackViewModel model)
+        public void ViewReco([Bind] ChatsModel model)
         {
-            if(ModelState.IsValid)
+            var feedbacks = _context.Feedback.Where(x => x.Code == model.Code).AsEnumerable();
+            if (ModelState.IsValid)
             {
                 var feedback = new Feedback
                 {
                     Code = model.Code,
-                    SenderId = model.MdId,
+                    SenderId = model.Sender,
                     RecieverId = null,
                     Message = model.Message,
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now
                 };
-                 _context.AddAsync(feedback);
-                 _context.SaveChangesAsync();
+                  _context.Add(feedback);
+                  _context.SaveChanges();
             }
         }
 

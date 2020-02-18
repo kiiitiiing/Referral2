@@ -6,7 +6,10 @@
     var endDate = ViewBag.EndDate;
     var dateRange = startDate.ToString("dd/MM/yyyy") + " - " + endDate.ToString("dd/MM/yyyy");
 }
-    <div class="content">
+    <div style="
+    position:absolute;
+    left: 1%;
+    right: 1%;">
         <form asp-action="ConsolidatedMcc" method="post">
             <div class="row" style="margin-top: -0.5%; margin-bottom: 1%">
                 <div class="col-md-4">
@@ -27,12 +30,12 @@
             <div class="card-body">
                 <ul class="nav nav-tabs" id="custom-content-above-tab" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link active" id="custom-content-above-home-tab" data-toggle="pill" href="#incoming" role="tab" aria-controls="custom-content-above-home" aria-selected="true">
+                        <a class="nav-link active" id="custom-content-above-home-tab" data-toggle="pill" href="#incoming" role="tab" aria-controls="custom-content-above-home">
                             Incoming
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="pill" href="#outgoing" role="tab" aria-controls="custom-content-above-profile" aria-selected="false">
+                        <a class="nav-link" data-toggle="pill" href="#outgoing" role="tab" aria-controls="custom-content-above-profile">
                             Outgoing
                         </a>
                     </li>
@@ -47,9 +50,9 @@
                             <!-- HOSPITAL SIDE -->
                             <div class="col-md-4">
                                 <div class="title-form">
-                                    <img class="img-circle profile-user-img" src="~/assets/dist/img/vsmc.png" />
+                                    <img class="img-circle profile-user-img" src="~/assets/hospitallogos/@Model.FacilityLogo" />
                                     <br />
-                                    Vicente Sotto Memorial Medical Center
+                                    @Model.FacilityName
                                 </div>
                                 <!-- TRANSACTION -->
                                 <strong>
@@ -73,14 +76,14 @@
                                         Acceptance&nbsp;
                                         <span class="badge bg-red">
                                             <i class="far fa-clock"></i>&nbsp;
-                                            21.23 mins
+                                            @Model.InAcceptance.ToString("##.##") mins
                                         </span>
                                     </label>
                                     <label class="badge badge-primary">
                                         Arrival&nbsp;
                                         <span class="badge bg-red">
                                             <i class="fa fa-clock"></i>&nbsp;
-                                            21.23 mins
+                                            @Model.InArrival.ToString("##.##") mins
                                         </span>
                                     </label>
                                     <br />
@@ -279,14 +282,14 @@
                         </div>
                     </div>
                     <!-- OUTGOING TAB -->
-                    <div class="tab-pane fade show active" id="outgoing" role="tabpanel" aria-labelledby="incoming">
+                    <div class="tab-pane fade show" id="outgoing" role="tabpanel" aria-labelledby="outgoing">
                         <div class="row">
                             <!-- HOSPITAL SIDE -->
                             <div class="col-md-4">
                                 <div class="title-form">
-                                    <img class="img-circle profile-user-img" src="~/assets/dist/img/vsmc.png" />
+                                    <img class="img-circle profile-user-img" src="~/assets/hospitallogos/@Model.FacilityLogo" />
                                     <br />
-                                    Vicente Sotto Memorial Medical Center
+                                    @Model.FacilityName
                                 </div>
                                 <!-- TRANSACTION -->
                                 <strong>
@@ -294,7 +297,7 @@
                                     Transaction
                                 </strong>
                                 <p>
-                                    <label class="badge badge-warning">Incoming <span class="badge bg-red">@Model.OutOutgoing</span></label>
+                                    <label class="badge badge-warning">Outgoing <span class="badge bg-red">@Model.OutOutgoing</span></label>
                                     <label class="badge badge-warning">Accepted <span class="badge bg-red">@Model.OutAccepted</span></label>
                                     <label class="badge badge-warning">Viewed Only <span class="badge bg-red">@Model.OutViewed</span></label>
                                     <label class="badge badge-warning">Redirected  <span class="badge bg-red">@Model.OutRedirected</span></label>
@@ -416,7 +419,7 @@
                                         }
                                         else
                                         {
-                                            <div class="tab-pane fade active in" >
+                                            <div class="tab-pane fade" >
                                                 <h1>Empty Record!</h1>
                                             </div>
                                         }
@@ -435,7 +438,7 @@
                                         }
                                         else
                                         {
-                                            <div class="tab-pane fade active in" id="transportation-out">
+                                            <div class="tab-pane fade" id="transportation-out">
                                                 <h1>Empty Record!</h1>
                                             </div>
                                         }
@@ -454,7 +457,7 @@
                                                 }
                                                 else
                                                 {
-                                                    <div class="tab-pane fade active in">
+                                                    <div class="tab-pane fade">
                                                         <h1>Empty Record!</h1>
                                                     </div>
                                                 }
@@ -470,7 +473,7 @@
                                                 }
                                                 else
                                                 {
-                                                    <div class="tab-pane fade active in">
+                                                    <div class="tab-pane fade">
                                                         <h1>Empty Record!</h1>
                                                     </div>
                                                 }
@@ -491,7 +494,7 @@
                                         }
                                         else
                                         {
-                                            <div class="tab-pane fade active in" >
+                                            <div class="tab-pane fade" >
                                                 <h1>Empty Record!</h1>
                                             </div>
                                         }
@@ -510,7 +513,7 @@
                                         }
                                         else
                                         {
-                                            <div class="tab-pane fade active in" >
+                                            <div class="tab-pane fade" >
                                                 <h1>Empty Record!</h1>
                                             </div>
                                         }

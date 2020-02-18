@@ -6,13 +6,13 @@
                 @await  Html.PartialAsync("~/Views/Shared/_patientForm.cshtml", Model)
 
                 <div class="modal-footer fa-pull-right">
-                    <a href="" target="_blank" class="btn-refer-normal btn btn-success btn-flat">
+                    <a asp-controller="Report" asp-action="NormalFormPdf" asp-route-code="@Model.Code" target="_blank" class="btn-refer-normal btn btn-success btn-flat">
                         <i class="fa fa-print"></i>
-                        &nbsp; Form
+                        &nbsp;Print Form
                     </a>
                     <button class="btn btn-default btn-flat" data-dismiss="modal">
                         <i class="fa fa-times"></i>
-                        &nbsp;
+                        &nbsp;Close
                     </button>
                 </div>
             </div>

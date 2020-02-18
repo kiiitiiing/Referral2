@@ -107,6 +107,7 @@
 
 
 <script>
+    DashboardAPI('@User.FindFirstValue(ClaimTypes.Role)');
     $('#notif-modal').modal('show');
 
         toastr.options = {

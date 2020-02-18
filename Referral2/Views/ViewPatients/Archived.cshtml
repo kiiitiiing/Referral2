@@ -1,10 +1,12 @@
-﻿@model PaginatedList<Activity>
+﻿@model PaginatedList<ArchivedViewModel>
 
 @{
     ViewData["Title"] = "Archived Patients";
-    var dateToday = DateTime.Now;
-    var firstDayOfMonth = new DateTime(dateToday.Year, 1, 1);
-    var lastDayOfMonth = new DateTime(dateToday.Year, 12, 31);
+    var dateRange = ViewBag.StartDate + " - " + ViewBag.EndDate;
+    string types = "";
+    string dataTarget = "";
+    string dataUrl = "";
+
 }
 
 
@@ -16,7 +18,10 @@
         <div class="card-header">
             @await Html.PartialAsync("~/Views/Shared/PartialViews/_PatientSearchFilter.cshtml", new SearchModel
             {
-                Action = "Archived"
+                Action = "Archived",
+                StartDate = ViewBag.StartDate,
+                EndDate = ViewBag.EndDate,
+                Search = ViewBag.CurrentSearch
             })
             <div>
                 <h3 class="card-title">Archived Patients</h3><br />
@@ -28,84 +33,91 @@
         <form method="post" action="">
             <input type="hidden" name="_token" value="" autocomplete="off" />
             <div class="card-body">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>
-                                <p>Referring Facility</p>
-                            </th>
-                            <th>
-                                <p>Patient Name/Code</p>
-                            </th>
-                            <th>
-                                <p>Date Archived</p>
-                            </th>
-                            <th>
-                                <p>Reason</p>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model)
-                        {
-                            var facility = item.ReferredFromNavigation.Name;
-                            var patientName = item.Patient.FirstName + " " + item.Patient.MiddleName + " " + item.Patient.LastName;
-                            var code = item.Code;
-                            var status = item.Status;
-                            var dateCancelled = item.DateReferred.ToString("MMMM dd, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
-                            var reason = item.Remarks;
-
+                @if (Model.Count() > 0)
+                {
+                    <table class="table table-striped">
+                        <thead>
                             <tr>
-                                <td>
-                                    @facility)<br />
-                                    @*if (item.Type.Equals("pregnant"))
-                                        {
-                                            <p class="small text-muted">Pregnant</p>
-                                        }
-                                        else
-                                        {
-                                            <p class="small text-muted">Non-Pregnant</p>
-                                        }*@
-                                </td>
-                                <td>
-                                    @patientName
-                                    <p class="small text-muted">
-                                        @code
-                                    </p>
-                                </td>
-                                <td>
-                                    <span>@dateCancelled</span>
-                                </td>
-                                <td>
-                                    @reason
-                                </td>
+                                <th>
+                                    <p>Referring Facility</p>
+                                </th>
+                                <th>
+                                    <p>Patient Name/Code</p>
+                                </th>
+                                <th>
+                                    <p>Date Archived</p>
+                                </th>
+                                <th>
+                                    <p>Reason</p>
+                                </th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                if(item.Type)
+                                {
+                                    types = "Pregnant";
+                                    dataTarget = "print-pregnant-form-modal";
+                                    dataUrl = Url.Action("PrintablePregnantForm", "ViewForms", new { code = item.Code });
+                                }
+                                else
+                                {
+                                    types = "Non-Pregnant";
+                                    dataTarget = "normal-form-modal";
+                                    dataUrl =  Url.Action("PrintableNormalForm", "ViewForms", new { code = item.Code });
+                                }
+                                <tr>
+                                    <td class="facility-color">
+                                        @item.ReferringFacility<br />
+                                        <p class="small text-muted">@types</p>
+                                    </td>
+                                    <td>
+                                        <a href="#" data-toggle="ajax-modal" data-target="#@dataTarget" data-url="@dataUrl">
+                                            @item.PatientName
+                                        </a><br />
+                                        <span class="small text-muted">
+                                            @item.Code
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span>@item.DateArchive</span>
+                                    </td>
+                                    <td>
+                                        @item.Reason
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="alert alert-warning">
+                        <span class="text-lg">
+                            <i class="fa fa-exclamation-triangle"></i>
+                            &nbsp;No data found!
+                        </span>
+                    </div>
+                }
 
             </div>
             <!-- CARD FOOTER -->
             <div class="card-footer">
-                @{
-                    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
-                    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
-                }
-
-                <a asp-action="GetAcceptedPatients"
-                   asp-route-sortOrder="@ViewData["CurrentSort"]"
-                   asp-route-pageNumber="@(Model._pageIndex - 1)"
-                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
-                   class="btn btn-primary @prevDisabled">
-                    Previous
-                </a>
-                <a asp-action="GetAcceptedPatients"
-                   asp-route-sortOrder="@ViewData["CurrentSort"]"
-                   asp-route-pageNumber="@(Model._pageIndex + 1)"
-                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
-                   class="btn btn-primary @nextDisabled">
-                    Next
-                </a>
+                @await Html.PartialAsync("~/Views/Shared/PartialViews/_PageList.cshtml", new PageListModel
+               {
+                   Action = "Archived",
+                   HasNextPage = Model.HasNextPage,
+                   HasPreviousPage = Model.HasPreviousPage,
+                   PageIndex = Model._pageIndex,
+                   TotalPages = Model._totalPages,
+                   Parameters = new Dictionary<string, string>
+                    {
+                       { "page", Model._pageIndex.ToString() },
+                       { "search", ViewBag.CurrentSearch },
+                       { "dateRange", dateRange }
+                    }
+                })
             </div>
         </form>
     </div>

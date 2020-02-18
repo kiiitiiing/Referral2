@@ -12,7 +12,7 @@ using Referral2.Helpers;
 using Referral2.Models;
 using Referral2.Models.ViewModels;
 using System.Security.Claims;
-using Referral2.Models.ViewModels.ViewPatients;
+using MoreLinq.Extensions;
 using Microsoft.Extensions.Options;
 
 namespace Referral2.Controllers
@@ -57,36 +57,21 @@ namespace Referral2.Controllers
         [HttpGet]
         public int NumberNotif()
         {
-            var incoming = from t in _context.Tracking.Where(f => f.ReferredTo.Equals(UserFacility))
-                           join a in _context.Activity
-                           on t.Code equals a.Code
-                           into tact
-                           from c in tact.DefaultIfEmpty()
-                           select new IncomingViewModel()
-                           {
-                               ReferredToId = (int)t.ReferredTo,
-                               DateAction = c.DateReferred
-                           };
-            incoming = incoming.Where(x => x.ReferredToId.Equals(UserFacility) && x.DateAction.Date.Equals(DateTime.Now.Date));
+            var incoming = _context.Tracking
+                .Where(x => x.ReferredTo == UserFacility && x.UpdatedAt >= DateTime.Now.Date);
 
             return incoming.Count();
         }
 
         public List<SelectDepartment> AvailableDepartments(int facilityId)
         {
-            var departments = _context.Department
-                 .Select(x => new SelectDepartment
-                 {
-                     DepartmentId = x.Id,
-                     DepartmentName = x.Description
-                 });
             var availableDepartments = _context.User
                 .Where(x => x.FacilityId.Equals(facilityId) && x.Level.Equals(_roles.Value.DOCTOR))
-                .GroupBy(d => d.DepartmentId)
-                .Select(y => new SelectDepartment
+                .DistinctBy(d => d.DepartmentId)
+                .Select(x => new SelectDepartment
                 {
-                    DepartmentId = departments.Single(x => x.DepartmentId.Equals(y.Key)).DepartmentId,
-                    DepartmentName = departments.Single(x => x.DepartmentId.Equals(y.Key)).DepartmentName
+                    DepartmentId = (int)x.DepartmentId,
+                    DepartmentName = x.Department.Description
                 });
             return availableDepartments.ToList();
         }
@@ -144,11 +129,11 @@ namespace Referral2.Controllers
             });
 
             var faciliyDepartment = _context.User.Where(x => x.FacilityId.Equals(facilityId) && x.Level.Equals(_roles.Value.DOCTOR))
-                                            .GroupBy(d => d.DepartmentId)
-                                            .Select(y => new SelectDepartment
+                                            .DistinctBy(d => d.DepartmentId)
+                                            .Select(x => new SelectDepartment
                                             {
-                                                DepartmentId = departments.Single(x => x.DepartmentId.Equals(y.Key)).DepartmentId,
-                                                DepartmentName = departments.Single(x => x.DepartmentId.Equals(y.Key)).DepartmentName
+                                                DepartmentId = (int)x.DepartmentId,
+                                                DepartmentName = x.Department.Description
                                             });
 
             SelectAddressDepartment selectAddress = new SelectAddressDepartment(address, faciliyDepartment);
@@ -220,7 +205,13 @@ namespace Referral2.Controllers
         {
             List<int> accepted = new List<int>();
             List<int> redirected = new List<int>();
-            var activities = _context.Activity.Where(x => x.DateReferred.Year.Equals(DateTime.Now.Year) && x.ReferredTo.Equals(UserFacility));
+
+            IQueryable<Activity> activities = null;
+
+            if(!level.Equals(_roles.Value.ADMIN))
+                activities = _context.Activity.Where(x => x.DateReferred.Year.Equals(DateTime.Now.Year) && x.ReferredTo.Equals(UserFacility));
+            else
+                activities = _context.Activity.Where(x => x.DateReferred.Year.Equals(DateTime.Now.Year));
             for (int x = 1; x <= 12; x++)
             {
                 accepted.Add(activities.Where(i => i.DateReferred.Month.Equals(x) && (i.Status.Equals(_status.Value.ACCEPTED) || i.Status.Equals(_status.Value.ARRIVED) || i.Status.Equals(_status.Value.ADMITTED))).Count());

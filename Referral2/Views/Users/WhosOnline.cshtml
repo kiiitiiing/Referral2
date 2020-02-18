@@ -1,5 +1,4 @@
-﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
-@model IEnumerable<User>
+﻿@model IEnumerable<WhosOnlineModel>
 @{
     ViewData["Title"] = "Online Doctors";
 }
@@ -15,7 +14,6 @@
                     <div class="card-header">
                         <h3 class="card-title">
                             Filter Result<br />
-                            @HttpContextAccessor.HttpContext.Session.GetString("_search")
                         </h3>
                     </div>
                     <!-- CARD DANGER BODY -->
@@ -60,13 +58,12 @@
                         <div class="row">
                             @foreach (var item in Model)
                             {
-                                var mdName = "Dr. " + item.Firstname + " " + item.Middlename + " " + item.Lastname;
-                                var abbrv = item.Facility.Abbrevation ?? "";
+                                var abbrv = item.FacilityAbrv ?? "";
                                 var contact = string.IsNullOrEmpty(item.Contact) ? "N/A" : item.Contact;
-                                var dutyTime = item.LastLogin.ToString("hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+                                var dutyTime = item.LoginTime.ToString("h:mm tt", System.Globalization.CultureInfo.InvariantCulture);
                                 string status;
                                 string widgetBg;
-                                if (item.LoginStatus.Equals("login"))
+                                if (item.LoginStatus)
                                 {
                                     status = "ON DUTY";
                                     widgetBg = "bg-gradient-success";
@@ -77,16 +74,13 @@
                                     widgetBg = "bg-gradient-warning";
                                 }
                                 <div class="col-md-4">
-                                    <!-- Widget: user widget style 2 -->
                                     <div class="card card-widget widget-user-2">
-                                        <!-- Add the bg color to the header using any of the bg-* classes -->
-                                        <div class="widget-user-header @widgetBg ">
+                                        <div class="widget-user-header @widgetBg" style="height: 160px;">
                                             <div class="widget-user-image">
                                                 <img class="img-circle elevation-2" src="~/assets/dist/img/MDMale.jpg" alt="User Avatar">
                                             </div>
-                                            <!-- /.widget-user-image -->
-                                            <h3 class="widget-user-username">@mdName</h3>
-                                            <h5 class="widget-user-desc badge bg-maroon">@abbrv</h5>
+                                            <h3 class="widget-user-username">@item.DoctorName</h3>
+                                            <h5 class="widget-user-desc badge bg-maroon" style="position:absolute; bottom:45%; right:5%;" >@abbrv</h5>
                                         </div>
                                         <div class="card-footer p-0">
                                             <ul class="nav flex-column">
@@ -100,7 +94,7 @@
                                                 </li>
                                                 <li class="nav-item">
                                                     <a href="#" class="nav-link">
-                                                        @item.Department.Description
+                                                        @item.Department
                                                         <span class="float-right badge bg-info">
                                                             <i class="fa fa-hospital"></i>
                                                         </span>

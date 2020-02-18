@@ -7,6 +7,7 @@ namespace Referral2.Models.ViewModels.Admin
 {
     public partial class OnlineAdminViewModel
     {
+        public int UserId { get; set; }
         public string FacilityName { get; set; }
         public string UserFullName { get; set; }
         public string UserLevel { get; set; }

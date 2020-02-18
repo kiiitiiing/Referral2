@@ -5,12 +5,15 @@ namespace Referral2.Models.ViewModels.Consolidated
 {
     public partial class ConsolidatedViewModel
     {
+        public int FacilitId { get; set; }
+        public string FacilityLogo { get; set; }
+        public string FacilityName { get; set; }
         //incoming
         public int InIncoming { get; set; }
         public int InAccepted { get; set; }
         public int InViewed { get; set; }
-        public float InAcceptance { get; set; }
-        public float InArrival { get; set; }
+        public double InAcceptance { get; set; }
+        public double InArrival { get; set; }
         public int InHorizontal { get; set; }
         public int InVertical { get; set; }
         public List<ListItem> InReferringFacilities { get; set; }

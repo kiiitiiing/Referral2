@@ -397,6 +397,67 @@
                                                 </div>
                                                 break;
                                             }
+                                        case "seen":
+                                            {
+                                                var bgColor = currentUserDepartment == item.DepartmentId ? "#ADFE95" : "#C2FCFE";
+                                                <div>
+                                                    <i class="fa fa-ambulance bg-gradient-blue"></i>
+                                                    <div class="timeline-item" style="background-color: @bgColor !important;">
+                                                        <span class="time">
+                                                            <i class="fa fa-calendar">
+                                                                &nbsp;@dateAction
+                                                            </i>
+                                                        </span>
+                                                        <h3 class="timeline-header no-border">
+                                                            <small class="text-bold">
+                                                                <a href="@Url.Action("Track","ViewPatients", new { code = item.Code })" target="_blank">@item.Code</a>
+                                                            </small>
+                                                            <a href="#">@item.PatientName</a>
+                                                            <small class="text-muted">[@item.PatientSex, @item.PatientAge]</small>
+                                                            was <span class="badge bg-blue">referred</span> to
+                                                            <span class="text-danger">@item.Department</span>
+                                                            by
+                                                            <span class="text-success">@item.ReferringMd</span>
+                                                            of
+                                                            <span class="text-warning">@item.ReferredFrom</span>
+                                                        </h3>
+                                                        <div class="timeline-footer">
+                                                            <div class="form-inline">
+                                                                <div class="form-group">
+                                                                    @if (currentUserFacility == item.ReferredToId && currentUserDepartment == item.DepartmentId)
+                                                                    {
+                                                                        var dataTarget = item.Pregnant ? "pregnant-form-modal" : "patient-form-modal";
+                                                                        var dataUrl = item.Pregnant ? Url.Action("PregnantForm", "ViewForms", new { code = item.Code }) : Url.Action("PatientForm", "ViewForms", new { code = item.Code });
+
+                                                                        <button type="button" class="btn btn-warning btn-xs" data-toggle="ajax-modal" data-target="#@dataTarget" data-url="@dataUrl">
+                                                                            <i class="fa fa-user-md"></i>
+                                                                            &nbsp;View Form
+                                                                        </button>
+
+                                                                    }
+                                                                    @if (item.SeenCount > 0)
+                                                                    {
+                                                                        <button type="button" class="btn btn-success btn-xs" data-toggle="ajax-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens","Modals", new { trackingId = item.TrackingId })">
+                                                                            <i class="fa fa-user-md"></i>
+                                                                            &nbsp;Seen
+                                                                            <small class="badge bg-green">@item.SeenCount</small>
+                                                                        </button>
+                                                                    }
+                                                                    <button type="button" class="btn btn-info btn-xs" data-toggle="ajax-modal" data-target="#reco-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
+                                                                        <i class="fa fa-comments"></i>
+                                                                        &nbsp;ReCo
+                                                                        @if (item.FeedbackCount > 0)
+                                                                        {
+                                                                            <small class="badge bg-blue">@item.FeedbackCount</small>
+                                                                        }
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                break;
+                                            }
                                         case "discharged":
                                             {
                                                 <div>

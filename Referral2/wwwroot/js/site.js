@@ -170,7 +170,11 @@ $(function () {
             var newBody = $('.modal-body', data);
             placeholderElement.find('.modal-body').replaceWith(newBody);
             var validation = $('span.text-danger').text();
-            if (validation == '') {
+            if (formId == 'reco-modal') {
+                console.log('chat sent');
+                $('#chat').val('');
+            }
+            else if (validation == '') {
                 placeholderElement.find('.modal').modal('hide');
                 if (formId == 'update-doctor-modal') {
                     //placeholderElement.find('.modal').modal('hide');
@@ -254,10 +258,26 @@ $(function () {
 
     //-------------------- DASHBOARD ----------------------------
 
+    
+
+    //-------------------- END -----------------------------------
+
+
+});
+
+
+
+
+
+
+//----------------------- FUNCTIONS --------------------------
+
+function DashboardAPI(level) {
+
     var bar_chart = $('#barChart');
 
     if ($('div.chart').length > 0) {
-        $.when(GetDashboardValues()).done(function (output) {
+        $.when(GetDashboardValues(level)).done(function (output) {
             var areaChartData = {
                 labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
                 datasets: [
@@ -324,18 +344,7 @@ $(function () {
             });
         });
     }
-
-    //-------------------- END -----------------------------------
-
-
-});
-
-
-
-
-
-
-//----------------------- FUNCTIONS --------------------------
+}
 
 function Test() {
     console.log('wat');
@@ -382,8 +391,8 @@ function getMdFiltered() {
     });
 }
 
-function GetDashboardValues() {
-    var urlss = "/NoReload/DashboardValues?level=" + "doctor";
+function GetDashboardValues(level) {
+    var urlss = "/NoReload/DashboardValues?level=" + level;
     return $.ajax({
         url: urlss, 
         type: 'get',

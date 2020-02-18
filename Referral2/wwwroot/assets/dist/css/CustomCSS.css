@@ -62,13 +62,13 @@ table thead th{
     background-color: #fcf8e3;
 }
 
-/*.content {
+.consolidated {
     position: fixed;
     top: auto;
     left: 1%;
     bottom: auto;
     right: 1%;
-}*/
+}
 
 .table-add{
     text-align:right;
@@ -149,18 +149,6 @@ a{
     color: #FFF;
 }
 
-
-.referral-footer {
-    position: absolute;
-    border: 0;
-    width: 100%;
-    color: #FFF;
-    white-space: nowrap;
-    line-height: 40px !important;
-    background-color: #2F4054;
-    vertical-align: central;
-}
-
 .bg-gradient-warning, btn-warning {
     color: #FFF !important;
 }
@@ -185,6 +173,12 @@ a{
 .patient-color {
     font-weight: bold;
     color: #28A745;
+}
+
+.custom-float-right{
+    position: absolute !important;
+    top: 5% !important;
+    right: 2% !important;
 }
 
 .md-color {
@@ -231,3 +225,32 @@ a{
 .badge-bg{
     background-color: #F18B3C !important;
 }
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+footer {
+    background-color: #2F4054;
+    margin-top: 50px;
+    color: #FFF;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    line-height: 40px;
+    width: 100%;
+    overflow: hidden;
+    vertical-align: central;
+}
+
+/*
+.referral-footer {
+    position: fixed;
+    bottom: 0;
+    border: 0;
+    width: 100%;
+    white-space: nowrap;
+    line-height: 40px !important;
+    background-color: 
+}*/

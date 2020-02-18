@@ -29,7 +29,7 @@
             </li>
             <!-- REFERRAL -->
             <li >
-                <a class="dropdown-item nav-link" asp-area="" asp-controller="sa" asp-action="sd">
+                <a class="dropdown-item nav-link" asp-area="" asp-controller="Account" asp-action="AccessDenied">
                     <i class="far fa-file"></i>
                     &nbsp;Referral
                 </a>
@@ -65,44 +65,52 @@
                 </a>
             </li>
 
-            <!-- Level two dropdown-->
-            <li class="dropdown-submenu dropdown-hover">
-                <a href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle  nav-link">
-                    <i class="fas fa-arrows-alt-h"></i>
-                    Daily Referral
+            <li>
+                <a class="dropdown-item  nav-link" asp-controller="Admin" asp-action="DailyReferral">
+                    <i class="fa fa-hospital"></i>&nbsp;
+                    Daily Hospital
                 </a>
-                <ul class="dropdown-menu border-0 shadow">
-                    <li>
-                        <a tabindex="-1" class="dropdown-item nav-link" asp-controller="Admin" asp-action="DailyReferral">
-                            <i class="fa fa-hospital"></i>&nbsp;
-                            Hospital
-                        </a>
-                    </li>
-
-                    <!-- Level three dropdown-->
-                    <li class="dropdown-submenu">
-                        <a href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle nav-link">
-                            <i class="fa fa-user"></i>&nbsp;
-                            Patient
-                        </a>
-                        <ul aria-labelledby="dropdownSubMenu3" class="dropdown-menu border-0 shadow">
-                            <li>
-                                <a class="dropdown-item nav-link" asp-action="PatientIncoming">
-                                    <i class="nav-icon fa fa-sign-in-alt"></i>&nbsp;    
-                                    Incoming
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item nav-link">
-                                    <i class="nav-icon fa fa-sign-out-alt"></i>
-                                    Outgoing
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
             </li>
 
+            <!-- Level two dropdown-->
+            @*
+        <li class="dropdown-submenu dropdown-hover">
+            <a href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle  nav-link">
+                <i class="fas fa-arrows-alt-h"></i>
+                Daily Referral
+            </a>
+            <ul class="dropdown-menu border-0 shadow">
+                <li>
+                    <a tabindex="-1" class="dropdown-item nav-link" asp-controller="Admin" asp-action="DailyReferral">
+                        <i class="fa fa-hospital"></i>&nbsp;
+                        Hospital
+                    </a>
+                </li>
+
+                <!-- Level three dropdown-->
+                <li class="dropdown-submenu">
+                    <a href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle nav-link">
+                        <i class="fa fa-user"></i>&nbsp;
+                        Patient
+                    </a>
+                    <ul aria-labelledby="dropdownSubMenu3" class="dropdown-menu border-0 shadow">
+                        <li>
+                            <a class="dropdown-item nav-link" asp-action="PatientIncoming">
+                                <i class="nav-icon fa fa-sign-in-alt"></i>&nbsp;
+                                Incoming
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item nav-link">
+                                <i class="nav-icon fa fa-sign-out-alt"></i>
+                                Outgoing
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+            *@
             <li>
                 <a class="dropdown-item nav-link" asp-action="Consolidated">
                     <i class="far fa-file-archive"></i>&nbsp;

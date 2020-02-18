@@ -1,11 +1,11 @@
-﻿@model IEnumerable<FeedbackViewModel>
+﻿@model ChatsModel
 @{ 
     var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 }
 
 <div class="modal fade" id="reco-modal">
     <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
+        <div class="modal-content clearfix">
             <div class="card card-success card-outline with-border direct-chat direct-chat-primary">
                 <div class="card-header with-border">
                     <h3 class="card-title">
@@ -22,56 +22,50 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="direct-chat-messages" id="@ViewBag.Code">
-                        <div class="reco-body">
-                            @foreach (var item in Model)
-                            {
-                                if (item.MdId.Equals(int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier))))
-                                {
-                                    <div class="direct-chat-msg right">
-                                        <div class="direct-chat-info clearfix">
-                                            <span class="direct-chat-name pull-right">@item.MdName</span>
-                                            <span class="direct-chat-timestamp pull-left">10 Jan 12:01 pm</span>
-                                        </div>
-                                        <!-- /.direct-chat-info -->
-                                        <img class="direct-chat-img" title="Talisay District Hospital" src="~/assets/dist/img/MDFemale.jpg" alt="Message User Image"><!-- /.direct-chat-img -->
-                                        <div class="direct-chat-text">
-                                            @item.Message
-                                        </div>
-                                        <!-- /.direct-chat-text -->
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="direct-chat-msg left">
-                                        <div class="direct-chat-info clearfix">
-                                            <span class="direct-chat-name pull-left">@item.MdName</span>
-                                            <span class="direct-chat-timestamp pull-right">08 Jan 05:01 pm</span>
-                                        </div>
-                                        <!-- /.direct-chat-info -->
-                                        <img class="direct-chat-img" title="Vicente Sotto Memorial Medical Center" src="~/assets/dist/img/MDFemale.jpg" alt="Message User Image"><!-- /.direct-chat-img -->
-                                        <div class="direct-chat-text">
-                                            @item.Message
-                                        </div>
-                                    </div>
-                                }
-                            }
-                        </div>
-                    </div>
+                    @await Html.PartialAsync("~/Views/Modals/_Chats.cshtml", Model.Chats)
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer ">
                     <form asp-controller="Modals" asp-action="ViewReco" method="post" id="feedback-form">
-                        <input type="hidden" name="MdId" value="@userId" autocomplete="off">
-                        <input class="code" type="hidden" name="Code" id="code" autocomplete="off" value="@ViewBag.Code">
+                        <input type="hidden" asp-for="Sender" value="@userId" autocomplete="off">
+                        <input class="code" type="hidden" asp-for="Code" id="code" autocomplete="off" value="@ViewBag.Code">
                         <div class="input-group">
-                            <input type="text" name="Message" required placeholder="Type Message..." class="form-control message" autocomplete="off">
+                            <input type="text" asp-for="Message" id="chat" required placeholder="Type Message..." class="form-control message" autocomplete="off">
                             <span class="input-group-btn">
-                                <button class="btn btn-success btn-flat" data-save="modal">Send</button>
+                                <button class="btn btn-success btn-flat" id="send-message" data-save="modal">Send</button>
                             </span>
                         </div>
                     </form>
+                    <div class="clearfix"></div>
                 </div>
+                <div class="clearfix"></div>
             </div>
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        var send = $('#send-message');
+
+        send.on('click', function () {
+            var mdName = 'Dr. @User.FindFirstValue(ClaimTypes.GivenName) @User.FindFirstValue(ClaimTypes.Surname)';
+            var chatTime = '@DateTime.Now.ToString("d, MMM h:mm tt", System.Globalization.CultureInfo.InvariantCulture)';
+            var message = $('#chat').val();
+            var chatRight = $('<div class="direct-chat-msg right"></div>');
+            var chatInfo = $('<div class="direct-chat-info clearfix"></div>');
+            var spanMd = $('<span class="direct-chat-name fa-pull-right" id="md_name">' + mdName + '</span>');
+            var spanTime = $('<span class="direct-chat-timestamp fa-pull-left">' + chatTime + '</span>');
+            var pics = $('<img class="direct-chat-img" title="Talisay District Hospital" src="/assets/dist/img/MDMale.jpg" alt="Message User Image">');
+            var divMessage = $('<div class="direct-chat-text" id="message_content">' + message + '</div>');
+            chatInfo.append(spanMd);
+            chatInfo.append(spanTime);
+            chatRight.append(chatInfo);
+            chatRight.append(pics);
+            chatRight.append(divMessage);
+            $('.reco-body').append(chatRight);
+        });
+
+        
+    })
+</script>

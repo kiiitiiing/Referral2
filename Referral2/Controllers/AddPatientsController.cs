@@ -1,14 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Reflection;
-using System.Resources;
-using System.Globalization;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Session;
 using Referral2.Models;
 using Referral2.Data;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -17,7 +10,6 @@ using System.Security.Claims;
 using Referral2.Models.ViewModels.Doctor;
 using Microsoft.Extensions.Options;
 using Referral2.Models.ViewModels;
-using Microsoft.Extensions.Logging;
 
 namespace Referral2.Controllers
 {

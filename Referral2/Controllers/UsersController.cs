@@ -34,13 +34,23 @@ namespace Referral2.Controllers
         {
             ViewBag.CurrentSearch = nameSearch;
             ViewBag.Facilities = new SelectList(_context.Facility.Where(x => x.ProvinceId.Equals(UserProvince())),"Id","Name");
+            var logins = _context.Login.Where(x => x.Login1.Date.Equals(DateTime.Now.Date));
             var onlineUsers = await _context.User
                 .Where(x => x.LoginStatus.Contains("login") && x.Level.Equals(_roles.Value.DOCTOR) && x.LastLogin.Date.Equals(DateTime.Now.Date) && x.FacilityId.Equals(UserFacility()))
+                .Select(x => new WhosOnlineModel
+                {
+                    DoctorName = GlobalFunctions.GetMDFullName(x),
+                    FacilityAbrv = x.Facility.Abbrevation,
+                    Contact = x.Contact,
+                    Department = x.Department.Description,
+                    LoginStatus = logins.Where(i => i.UserId.Equals(x.Id)).OrderByDescending(i => i.Login1).First().Status.Equals("login"),
+                    LoginTime = logins.Where(i => i.UserId.Equals(x.Id)).OrderByDescending(i => i.Login1).First().Login1
+                })
                 .ToListAsync();
 
             if(!string.IsNullOrEmpty(nameSearch))
             {
-                onlineUsers.Where(x => x.Firstname.Contains(nameSearch) || x.Middlename.Contains(nameSearch) || x.Lastname.Contains(nameSearch));
+                onlineUsers.Where(x => x.DoctorName.Contains(nameSearch));
             }
             if(facilitySearch != 0)
             {

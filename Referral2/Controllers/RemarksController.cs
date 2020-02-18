@@ -55,7 +55,9 @@ namespace Referral2.Controllers
                 //UPDATE TRACKING
                 var tracking = await _context.Tracking.FirstOrDefaultAsync(x => x.Code.Equals(model.Code));
                 tracking.Status = _status.Value.REFERRED;
-                tracking.DepartmentId = UserDepartment;
+                tracking.ReferredFrom = UserFacility;
+                tracking.ReferredTo = model.FacilityId;
+                tracking.DepartmentId = model.DepartmentId;
                 tracking.DateAccepted = default;
                 tracking.DateArrived = default;
                 tracking.DateSeen = default;

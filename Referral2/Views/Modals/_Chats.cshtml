@@ -1,0 +1,38 @@
+﻿@model List<FeedbackViewModel>
+
+    <div class="direct-chat-messages" id="@ViewBag.Code">
+        <div class="reco-body">
+            @foreach (var item in Model)
+            {
+                if (item.MdId.Equals(int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier))))
+                {
+                    <div class="direct-chat-msg right">
+                        <div class="direct-chat-info clearfix">
+                            <span class="direct-chat-name fa-pull-right" id="md_name">@item.MdName</span>
+                            <span class="direct-chat-timestamp fa-pull-left" id="chat_time">@item.TimeSent.ToString("d, MMM h:mm tt",System.Globalization.CultureInfo.InvariantCulture)</span>
+                        </div>
+                        <!-- /.direct-chat-info -->
+                        <img class="direct-chat-img" title="Talisay District Hospital" src="~/assets/dist/img/MDMale.jpg" alt="Message User Image"><!-- /.direct-chat-img -->
+                        <div class="direct-chat-text" id="message_content">
+                            @item.Message
+                        </div>
+                        <!-- /.direct-chat-text -->
+                    </div>
+                }
+                else
+                {
+                    <div class="direct-chat-msg left">
+                        <div class="direct-chat-info clearfix">
+                            <span class="direct-chat-name pull-left">@item.MdName</span>
+                            <span class="direct-chat-timestamp pull-right">@item.TimeSent.ToString("d, MMM h:mm tt", System.Globalization.CultureInfo.InvariantCulture)</span>
+                        </div>
+                        <!-- /.direct-chat-info -->
+                        <img class="direct-chat-img" title="Vicente Sotto Memorial Medical Center" src="~/assets/dist/img/MDMale.jpg" alt="Message User Image"><!-- /.direct-chat-img -->
+                        <div class="direct-chat-text">
+                            @item.Message
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>

@@ -3,14 +3,14 @@
     <div class="modal fade" id="refer-other-modal">
         <div class="modal-dialog modal-sm" role="document">
             <div class="modal-content">
+                <div class="card-header">
+                    <h4>
+                        <i class="fas fa-directions"></i>&nbsp;
+                        REFER TO OTHER FACILITY
+                    </h4>
+                </div>
                 <form asp-action="ReferOther" id="refer-other-form">
                     <input type="hidden" asp-for="Code" />
-                    <div class="card-header">
-                        <h4>
-                            <i class="fas fa-directions"></i>&nbsp;
-                            REFER TO OTHER FACILITY
-                        </h4>
-                    </div>
                     <div class="modal-body">
                         <div class="form-group">
                             <label>SELECT FACILITY:</label>
@@ -27,17 +27,17 @@
                             <span class="text-danger" asp-validation-for="DepartmentId"></span>
                         </div>
                     </div>
-                    <div class="modal-footer justify-content-end">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">
-                            <i class="fa fa-times"></i>&nbsp;
-                            Cancel
-                        </button>
-                        <button type="submit" class="btn btn-success">
-                            <i class="fa fa-ambulance"></i>&nbsp;
-                            Refer
-                        </button>
-                    </div>
                 </form>
+                <div class="modal-footer justify-content-end">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        <i class="fa fa-times"></i>&nbsp;
+                        Cancel
+                    </button>
+                    <button class="btn btn-success" data-save="modal">
+                        <i class="fa fa-ambulance"></i>&nbsp;
+                        Refer
+                    </button>
+                </div>
             </div>
         </div>
     </div>

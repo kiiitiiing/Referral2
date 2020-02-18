@@ -45,6 +45,7 @@ namespace Referral2.Controllers
                 activity.Status = _status.Value.REFERRED;
 
             tracking.DateSeen = DateTime.Now;
+            tracking.Status = _status.Value.SEEN;
             activity.DateSeen = DateTime.Now;
             _context.Update(tracking);
             _context.Update(activity);
@@ -76,6 +77,7 @@ namespace Referral2.Controllers
                 activity.Status = _status.Value.REFERRED;
 
             tracking.DateSeen = DateTime.Now;
+            tracking.Status = _status.Value.SEEN;
             activity.DateSeen = DateTime.Now;
             _context.Update(tracking);
             _context.Update(activity);
