@@ -508,8 +508,6 @@ namespace Referral2.Data
 
             modelBuilder.Entity<User>(entity =>
             {
-                entity.HasIndex(e => e.BarangayId)
-                    .HasName("IX_IIUser_BarangayId");
 
                 entity.HasIndex(e => e.DepartmentId)
                     .HasName("IX_IIUser_DepartmentId");
@@ -558,11 +556,6 @@ namespace Referral2.Data
                 entity.Property(e => e.Title).IsUnicode(false);
 
                 entity.Property(e => e.Username).IsUnicode(false);
-
-                entity.HasOne(d => d.Barangay)
-                    .WithMany(p => p.User)
-                    .HasForeignKey(d => d.BarangayId)
-                    .HasConstraintName("FK_User_Barangay");
 
                 entity.HasOne(d => d.Department)
                     .WithMany(p => p.User)

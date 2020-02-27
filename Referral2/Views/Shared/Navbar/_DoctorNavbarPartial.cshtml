@@ -3,7 +3,7 @@
 <ul class="navbar-nav flex-grow-1">
     <!-- DASHBOARD -->
     <li class="">
-        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
+        <a class="nav-link" asp-controller="Home" asp-action="Index">
             <i class="fa fa-home"></i>
             &nbsp;Dashboard
         </a>
@@ -16,8 +16,8 @@
         </a>
         <ul class="dropdown-menu">
             <!-- LIST OF PATIENTS -->
-            <li class="dropdown-item">
-                <a class="nav-link" asp-area="" asp-controller="ViewPatients" asp-action="ListPatients">
+            <li>
+                <a class="dropdown-item nav-link" asp-controller="ViewPatients" asp-action="ListPatients">
                     <i class="fa fa-table"></i>
                     &nbsp;List of Patients
                 </a>
@@ -25,29 +25,29 @@
             <!-- DIVIDER -->
             <li class="dropdown-divider"></li>
             <!-- ACCEPTED PATIENTS -->
-            <li class="dropdown-item">
-                <a class="nav-link" asp-area="" asp-controller="ViewPatients" asp-action="Accepted">
+            <li >
+                <a class="nav-link dropdown-item" asp-controller="ViewPatients" asp-action="Accepted">
                     <i class="fa fa-user-plus"></i>
                     &nbsp;Accepted Patients
                 </a>
             </li>
             <!-- DISCHARGED/TRANSFERED PATIENTS -->
-            <li class="dropdown-item">
-                <a class="nav-link" asp-area="" asp-controller="ViewPatients" asp-action="Discharged">
+            <li >
+                <a class="nav-link dropdown-item" asp-controller="ViewPatients" asp-action="Discharged">
                     <i class="fa fa-ambulance"></i>
                     &nbsp;Discharged/Transfered Patients
                 </a>
             </li>
             <!-- CANCELLED PATIENTS -->
-            <li class="dropdown-item">
-                <a class="nav-link" asp-area="" asp-controller="ViewPatients" asp-action="Cancelled">
+            <li >
+                <a class="nav-link dropdown-item" asp-controller="ViewPatients" asp-action="Cancelled">
                     <i class="fa fa-user-times"></i>
                     &nbsp;Cancelled Patients
                 </a>
             </li>
             <!-- ARCHIVED PATIENTS -->
-            <li class="dropdown-item">
-                <a class="nav-link" asp-area="" asp-controller="ViewPatients" asp-action="Archived">
+            <li >
+                <a class="nav-link dropdown-item" asp-controller="ViewPatients" asp-action="Archived">
                     <i class="fa fa-archive"></i>
                     &nbsp;Archived Patients
                 </a>
@@ -55,8 +55,8 @@
             <!-- DIVIDER -->
             <li class="dropdown-divider"></li>
             <!-- TRACK PATIENTS -->
-            <li class="dropdown-item">
-                <a class="nav-link" asp-area="" asp-controller="ViewPatients" asp-action="Track">
+            <li >
+                <a class="nav-link dropdown-item" asp-controller="ViewPatients" asp-action="Track">
                     <i class="fa fa-chart-line"></i>
                     &nbsp;Track Patients
                 </a>
@@ -76,30 +76,30 @@
         </a>
         <ul class="dropdown-menu">
             <!-- INCOMING -->
-            <li class="dropdown-item">
-                <a class="nav-link" asp-area="" asp-controller="ViewPatients" asp-action="Incoming">
+            <li>
+                <a class="nav-link dropdown-item" asp-controller="ViewPatients" asp-action="Incoming">
                     <i class="fa fa-ambulance"></i>
                     &nbsp;Incoming
                 </a>
             </li>
             <!-- REFERRED PATIENTS  -->
-            <li class="dropdown-item">
-                <a class="nav-link" asp-area="" asp-controller="ViewPatients" asp-action="Referred">
+            <li>
+                <a class="nav-link dropdown-item" asp-controller="ViewPatients" asp-action="Referred">
                     <i class="fas fa-user"></i>
                     &nbsp;Referred Patients
                 </a>
             </li>
             <li class="dropdown-divider"></li>
             <!-- INCOMING REFERRAL REPORT -->
-            <li class="dropdown-item">
-                <a class="nav-link" asp-area="" asp-controller="Report" asp-action="IncomingReport">
+            <li>
+                <a class="nav-link dropdown-item" asp-controller="Report" asp-action="IncomingReport">
                     <i class="fas fa-sign-in-alt"></i>
                     &nbsp;Incoming Referral Report
                 </a>
             </li>
             <!-- OUTGOING REFERRAL REPORT -->
-            <li class="dropdown-item">
-                <a class="nav-link" asp-area="" asp-controller="Report" asp-action="OutgoingReport">
+            <li>
+                <a class="nav-link dropdown-item" asp-controller="Report" asp-action="OutgoingReport">
                     <i class="fa fa-sign-out-alt"></i>
                     &nbsp;Outgoing Referral Report
                 </a>
@@ -108,7 +108,7 @@
     </li>
     <!-- WHO'S ONLINE -->
     <li class="nav-item">
-        <a class="nav-link" asp-area="" asp-controller="Users" asp-action="WhosOnline">
+        <a class="nav-link" asp-controller="Users" asp-action="WhosOnline">
             <i class="nav-icon fa fa-user-md"></i>
             &nbsp;Who's Online
         </a>
@@ -145,7 +145,7 @@
             </li>
             <!-- LOGOUT -->
             <li >
-                <a class="dropdown-item nav-link" data-target="modal" asp-area="" asp-controller="Account" asp-action="Logout">
+                <a class="dropdown-item nav-link" data-target="modal" asp-controller="Account" asp-action="Logout">
                     <i class="fa fa-sign-out-alt"></i>
                     &nbsp;Logout
                 </a>
@@ -154,7 +154,7 @@
             @if (User.FindFirstValue("RealRole").Equals("admin"))
             {
                 <li >
-                    <a class="dropdown-item nav-link" data-target="modal" asp-area="" asp-controller="Account" asp-action="BackAsAdmin">
+                    <a class="dropdown-item nav-link" data-target="modal" asp-controller="Account" asp-action="BackAsAdmin">
                         <i class="fa fa-user-secret"></i>
                         &nbsp;Back as Admin
                     </a>

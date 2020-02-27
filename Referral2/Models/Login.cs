@@ -16,8 +16,8 @@ namespace Referral2.Models
         [Required]
         [StringLength(255)]
         public string Status { get; set; }
-        public DateTime? CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
 
         [ForeignKey(nameof(UserId))]
         [InverseProperty("Login")]

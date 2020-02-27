@@ -15,6 +15,15 @@ namespace Referral2
             return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(input.ToLower());
         }
 
+        public static string FirstToUpper(string text)
+        {
+            text = text.Trim().ToLower();
+
+            text = text.First().ToString().ToUpper() + text.Substring(1);
+
+            return text;
+        }
+
         public static string ComputeTimeFrame(double minutes)
         {
             var min = Math.Floor(minutes);

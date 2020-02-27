@@ -1,4 +1,4 @@
-﻿@model IEnumerable<TimeFrameViewModel>
+﻿@model PaginatedList<TimeFrameViewModel>
 
 @{
     ViewData["Title"] = "Referral Time Frame";
@@ -66,9 +66,10 @@
                             <tbody>
                                 @foreach (var item in Model)
                                 {
+                                    var timeReferred = item.TimeReferred.ToString("MMM d, yyyy h:mm tt", System.Globalization.CultureInfo.InvariantCulture);
                                     <tr>
                                         <td class="custom-warning">@item.Code</td>
-                                        <td class="text-muted">@item.TimeReferred</td>
+                                        <td class="text-muted">@timeReferred</td>
                                         <td class="text-right text-danger">
                                             <span>@item.Seen.ToString("#.##")</span>
                                         </td>
@@ -96,6 +97,20 @@
                         </span>
                     </div>
                 }
+            </div>
+            <div class="card-footer">
+                @await Html.PartialAsync("~/Views/Shared/PartialViews/_PageList.cshtml", new PageListModel
+           {
+               Action = "TimeFrame",
+               HasNextPage = Model.HasNextPage,
+               HasPreviousPage = Model.HasPreviousPage,
+               PageIndex = Model._pageIndex,
+               TotalPages = Model._totalPages,
+               Parameters = new Dictionary<string, string>
+                   {
+                       { "daterange", dateRange }
+                   }
+           })
             </div>
         </div>
     </div>

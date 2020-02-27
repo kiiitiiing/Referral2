@@ -283,25 +283,25 @@ function DashboardAPI(level) {
                 datasets: [
                     {
                         label: 'Accepted',
-                        backgroundColor: '#26B99A',
+                        backgroundColor: '#26B99A',/*
                         borderColor: 'rgba(60,141,188,0.8)',
                         pointRadius: false,
                         pointColor: '#3b8bba',
                         pointStrokeColor: 'rgba(60,141,188,1)',
                         pointHighlightFill: '#fff',
-                        pointHighlightStroke: 'rgba(60,141,188,1)',
-                        data: [output.accepted[0], output.accepted[1], output.accepted[2], output.accepted[3], output.accepted[4], output.accepted[5], output.accepted[6], output.accepted[7], output.accepted[8], output.accepted[9], output.accepted[10], output.accepted[11]]
+                        pointHighlightStroke: 'rgba(60,141,188,1)',*/
+                        data: output.accepted
                     },
                     {
                         label: 'Redirected',
-                        backgroundColor: '#03586A',
+                        backgroundColor: '#03586A',/*
                         borderColor: 'rgba(210, 214, 222, 1)',
                         pointRadius: false,
                         pointColor: 'rgba(210, 214, 222, 1)',
                         pointStrokeColor: '#c1c7d1',
                         pointHighlightFill: '#fff',
-                        pointHighlightStroke: 'rgba(220,220,220,1)',
-                        data: [output.redirected[0], output.redirected[1], output.redirected[2], output.redirected[3], output.redirected[4], output.redirected[5], output.redirected[6], output.redirected[7], output.redirected[8], output.redirected[9], output.redirected[10], output.redirected[11]]
+                        pointHighlightStroke: 'rgba(220,220,220,1)',*/
+                        data: output.redirected
                     },
                 ]
             };
@@ -339,8 +339,8 @@ function DashboardAPI(level) {
 
             var barChart = new Chart(barChartCanvas, {
                 type: 'bar',
-                data: barChartData,
-                options: barChartOptions
+                data: barChartData/*,
+                options: barChartOptions*/
             });
         });
     }

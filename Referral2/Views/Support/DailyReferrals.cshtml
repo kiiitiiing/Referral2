@@ -34,14 +34,14 @@
                         <div class="card-footer">
                             <div class="form-group">
                                 <!-- FILTER -->
-                                <button type="submit" value="Filter" class="btn btn-block btn-success">
+                                <button type="submit" class="btn btn-block btn-success">
                                     <i class="fa fa-filter"></i>
                                     &nbsp;Filter Result
                                 </button>
-                                <button value="Filter" class="btn btn-block btn-warning">
+                                <a asp-action="DailyReferrals" asp-route-export="@true" asp-route-daterange="@dateRange" class="btn btn-block btn-warning">
                                     <i class="fa fa-file-excel"></i>
                                     &nbsp;Export Data
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </form>
@@ -85,22 +85,18 @@
                                 <tbody>
                                     @foreach (var item in Model)
                                     {
-                                        var seen = item.OutSeen - (item.OutAccepted + item.OutRedirected);
-                                        seen = seen < 0 ? 0 : seen;
-                                        var unseen = item.OutTotal - seen;
-                                        var incomingTotal = item.InAccepted + item.InRedirected + item.InSeen;
                                         <tr>
                                             <td style="font-size:0.9em; white-space: nowrap;">@item.DoctorName</td>
                                             <td class="text-center">@item.OutAccepted</td>
                                             <td class="text-center">@item.OutRedirected</td>
-                                            <td class="text-center">@seen</td>
-                                            <td class="text-center">@unseen</td>
+                                            <td class="text-center">@item.OutSeen</td>
+                                            <td class="text-center">@item.OutUnSeen</td>
                                             <td class="text-center">@item.OutTotal</td>
 
                                             <td class="text-center">@item.InAccepted</td>
                                             <td class="text-center">@item.InRedirected</td>
                                             <td class="text-center">@item.InSeen</td>
-                                            <td class="text-center">@incomingTotal</td>
+                                            <td class="text-center">@item.InTotal</td>
                                         </tr>
                                     }
                                 </tbody>
@@ -108,38 +104,19 @@
                         </div>
                     </div>
                     <div class="card-footer">
-                        @if (Model._totalPages > 1)
+                        @await Html.PartialAsync("~/Views/Shared/PartialViews/_PageList.cshtml", new PageListModel
                         {
-                            var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
-                            var nextDisabled = !Model.HasNextPage ? "disabled" : "";
-                            <ul class="pagination" style="justify-content:center!important;">
-                                <li>
-                                    <a asp-action="DailyReferrals"
-                                       asp-route-page="@(Model._pageIndex - 1)"
-                                       class="btn btn-default @prevDisabled">
-                                        «
-                                    </a>
-                                </li>
-                                @for (int x = 1; x <= Model._totalPages; x++)
-                                {
-                                    var activeClass = x == Model._pageIndex ? "btn-primary" : "btn-default";
-                                    <li>
-                                        <a asp-action="DailyReferrals"
-                                           asp-route-page="@x"
-                                           class="btn @activeClass">
-                                            @x
-                                        </a>
-                                    </li>
-                                }
-                                <li>
-                                    <a asp-action="DailyReferrals"
-                                       asp-route-page="@(Model._pageIndex + 1)"
-                                       class="btn btn-default @nextDisabled">
-                                        »
-                                    </a>
-                                </li>
-                            </ul>
-                        }
+                            Action = "DailyReferrals",
+                            HasNextPage = Model.HasNextPage,
+                            HasPreviousPage = Model.HasPreviousPage,
+                            PageIndex = Model._pageIndex,
+                            TotalPages = Model._totalPages,
+                            Parameters = new Dictionary<string, string>
+                            {
+                                {"page",Model._pageIndex.ToString() },
+                                {"daterange", dateRange }
+                            }
+                        })
                     </div>
                 </div>
             </div>

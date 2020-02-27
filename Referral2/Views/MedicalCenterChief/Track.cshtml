@@ -10,10 +10,6 @@
     var discharged = "disabled";
     var transpo = ListContainer.TranspoMode;
     bool seenReject = false;
-    if (Model.Status == "referred")
-        seenReject = true;
-    else if (Model.Status == "rejected")
-        seenReject = true;
 }
 
 <div class="content">
@@ -51,10 +47,16 @@
             <div class="col-md-9">
                 @if (Model != null)
                 {
+                    var headerclass = Model.Pregnant ? "bg-pregnant" : "card-custom-bg";
+                    int ctr = 0;
                     var seenCount = Model.SeenCount;
                     var callerCount = Model.CallerCount;
                     var recoCount = Model.ReCoCount;
 
+                    if (Model.Status == "referred")
+                        seenReject = true;
+                    else if (Model.Status == "rejected")
+                        seenReject = true;
                     switch (Model.Status)
                     {
                         case "referred":
@@ -118,9 +120,9 @@
                                 break;
                             }
                     }
-                <div style="border:2px solid #7E7E7E" class="card card-outline">
-                    <!-- DAILY USERS HEADER -->
-                    @if(Model.Seen && seenReject)
+                    <div style="border:2px solid #7E7E7E" class="card card-outline">
+                        <!-- DAILY USERS HEADER -->
+                        @if (Model.Seen && seenReject)
                         {
                             referred = "complete";
                             seen = "active";
@@ -129,80 +131,82 @@
                             admitted = "disabled";
                             discharged = "disabled";
                         }
-                    <div class="card-header panel-success">
-                        <span class="patientTitle">
-                            <i class="fa fa-wheelchair"></i>
-                            &nbsp;@Model.PatientName
-                            <small class="text-sm text-muted">[@Model.PatientSex, @Model.PatientAge] from @Model.PatientAddress</small><br />
-                        </span>
-                        <span class="text-success">Referred by:</span>
-                        <strong class="text-info">@Model.ReferredBy.ToUpper()</strong><br />
-                        <span class="text-success">Patient Code:</span>
-                        <span class="code-color" id="code-holder">@Model.Code</span>
-                        <span id="status-holder" hidden>@Model.Status</span>
-                    </div>
-                    <!-- DAILY USERS BODY -->
-                    <div class="card-body">
-                        <div id="code-holder" hidden>@Model.Code</div>
-                        <!-- BS-WIZARD START -->
-                        <div class="row bs-wizard" style="border-bottom:0;">
-
-                            <div class="col-sm-2 bs-wizard-step @referred">
-                                <!-- REFERRED -->
-                                <div class="text-center bs-wizard-stepnum">
-                                    Referred
-                                </div>
-                                <div class="progress"><div class="progress-bar"></div></div>
-                                <a href="javascript:void(0)" class="bs-wizard-dot" title="Referred"></a>
-                            </div>
-
-                            <div class="col-sm-2 bs-wizard-step @seen">
-                                <!-- SEEN -->
-                                <div class="text-center bs-wizard-stepnum">Seen</div>
-                                <div class="progress"><div class="progress-bar"></div></div>
-                                <a href="javascript:void(0)" class="bs-wizard-dot"></a>
-                            </div>
-
-                            <div class="col-sm-2 bs-wizard-step @accepted">
-                                <!-- ACCEPTED -->
-                                <div class="text-center bs-wizard-stepnum">Accepted</div>
-                                <div class="progress"><div class="progress-bar"></div></div>
-                                <a href="javascript:void(0)" class="bs-wizard-dot"></a>
-                            </div>
-
-                            <div class="col-sm-2 bs-wizard-step @arrived">
-                                <!-- ARRIVED -->
-                                <div class="text-center bs-wizard-stepnum">
-                                    Arrived
-                                </div>
-                                <div class="progress"><div class="progress-bar"></div></div>
-                                <a href="javascript:void(0)" class="bs-wizard-dot"></a>
-                            </div>
-                            <div class="col-sm-2 bs-wizard-step @admitted">
-                                <!-- ADMITTED -->
-                                <div class="text-center bs-wizard-stepnum">Admitted</div>
-                                <div class="progress"><div class="progress-bar"></div></div>
-                                <a href="javascript:void(0)" class="bs-wizard-dot"></a>
-                            </div>
-                            <div class="col-xs-2 bs-wizard-step @discharged">
-                                <!-- DISCHARGED -->
-                                <div class="text-center bs-wizard-stepnum">Discharged</div>
-                                <div class="progress"><div class="progress-bar"></div></div>
-                                <a href="javascript:void(0)" class="bs-wizard-dot"></a>
-                            </div>
+                        <div class="card-header @headerclass">
+                            <span class="patientTitle">
+                                <i class="fa fa-wheelchair"></i>
+                                &nbsp;@Model.PatientName
+                                <small class="text-sm text-muted">[@Model.PatientSex, @Model.PatientAge] from @Model.PatientAddress</small><br />
+                            </span>
+                            <span class="text-success">Referred by:</span>
+                            <strong class="text-info">@Model.ReferredBy.ToUpper()</strong><br />
+                            <span class="text-success">Patient Code:</span>
+                            <span class="code-color" id="code-holder">@Model.Code</span>
+                            <span id="status-holder" hidden>@Model.Status</span>
                         </div>
-                        <!-- TABLE START-->
-                        <div class="tracking-activities col-md-12">
-                            <div class="table-responsive">
-                                <table>
-                                    <tbody>
-                                        @foreach (var item2 in Model.Activities)
+                        <!-- DAILY USERS BODY -->
+                        <div class="card-body">
+                            <div id="code-holder" hidden>@Model.Code</div>
+                            <!-- BS-WIZARD START -->
+                            <div class="row bs-wizard" style="border-bottom:0;">
+
+                                <div class="col-sm-2 bs-wizard-step @referred">
+                                    <!-- REFERRED -->
+                                    <div class="text-center bs-wizard-stepnum">
+                                        Referred
+                                    </div>
+                                    <div class="progress"><div class="progress-bar"></div></div>
+                                    <a href="javascript:void(0)" class="bs-wizard-dot" title="Referred"></a>
+                                </div>
+
+                                <div class="col-sm-2 bs-wizard-step @seen">
+                                    <!-- SEEN -->
+                                    <div class="text-center bs-wizard-stepnum">Seen</div>
+                                    <div class="progress"><div class="progress-bar"></div></div>
+                                    <a href="javascript:void(0)" class="bs-wizard-dot"></a>
+                                </div>
+
+                                <div class="col-sm-2 bs-wizard-step @accepted">
+                                    <!-- ACCEPTED -->
+                                    <div class="text-center bs-wizard-stepnum">Accepted</div>
+                                    <div class="progress"><div class="progress-bar"></div></div>
+                                    <a href="javascript:void(0)" class="bs-wizard-dot"></a>
+                                </div>
+
+                                <div class="col-sm-2 bs-wizard-step @arrived">
+                                    <!-- ARRIVED -->
+                                    <div class="text-center bs-wizard-stepnum">
+                                        Arrived
+                                    </div>
+                                    <div class="progress"><div class="progress-bar"></div></div>
+                                    <a href="javascript:void(0)" class="bs-wizard-dot"></a>
+                                </div>
+                                <div class="col-sm-2 bs-wizard-step @admitted">
+                                    <!-- ADMITTED -->
+                                    <div class="text-center bs-wizard-stepnum">Admitted</div>
+                                    <div class="progress"><div class="progress-bar"></div></div>
+                                    <a href="javascript:void(0)" class="bs-wizard-dot"></a>
+                                </div>
+                                <div class="col-xs-2 bs-wizard-step @discharged">
+                                    <!-- DISCHARGED -->
+                                    <div class="text-center bs-wizard-stepnum">Discharged</div>
+                                    <div class="progress"><div class="progress-bar"></div></div>
+                                    <a href="javascript:void(0)" class="bs-wizard-dot"></a>
+                                </div>
+                            </div>
+                            <!-- TABLE START-->
+                            <div class="tracking-activities col-md-12">
+                                <div class="table-responsive">
+                                    <table>
+                                        <tbody>
+                                            @foreach (var item2 in Model.Activities)
                                             {
-                                                switch (item2.Status)
-                                                {
-                                                    case "rejected":
-                                                        {
-                                                            <tr>
+                                                var trClass = ctr == 0 ? "" : "toggle toggle" + Model.PatientId;
+                                                var trStyle = ctr == 0 ? "" : "display: none;";
+                                                <tr class="@trClass" style="@trStyle">
+                                                    @switch (item2.Status)
+                                                    {
+                                                        case "rejected":
+                                                            {
                                                                 <td class="table-date">
                                                                     <span class="text-muted">@item2.DateAction</span>
                                                                 </td>
@@ -215,20 +219,20 @@
                                                                     to other facility.<br />
                                                                     <span class="text-warning">Remarks: @item2.Remarks</span>
                                                                 </td>
-                                                            </tr>
-                                                            break;
-                                                        }
-                                                    case "travel":
-                                                        {
-                                                            var other = "";
-                                                            var transpoId = int.Parse(item2.Remarks[0].ToString()) - 1;
-                                                            var remarks = transpo[transpoId];
-                                                            if (transpoId == 4)
-                                                            {
-                                                                other = item2.Remarks.Substring(item2.Remarks.LastIndexOf(" ")).Trim();
-                                                                remarks = "Others - ";
+
+                                                                break;
                                                             }
-                                                            <tr>
+                                                        case "travel":
+                                                            {
+                                                                var other = "";
+                                                                var transpoId = int.Parse(item2.Remarks[0].ToString()) - 1;
+                                                                var remarks = transpo[transpoId];
+                                                                if (transpoId == 4)
+                                                                {
+                                                                    other = item2.Remarks.Substring(item2.Remarks.LastIndexOf(" ")).Trim();
+                                                                    remarks = "Others - ";
+                                                                }
+
                                                                 <td class="table-date">
                                                                     <span class="text-muted">@item2.DateAction</span>
                                                                 </td>
@@ -237,12 +241,12 @@
                                                                     has departed by
                                                                     <span class="md-color">@remarks@other</span>
                                                                 </td>
-                                                            </tr>
-                                                            break;
-                                                        }
-                                                    case "referred":
-                                                        {
-                                                            <tr>
+
+                                                                break;
+                                                            }
+                                                        case "referred":
+                                                            {
+
                                                                 <td class="table-date">
                                                                     <span class="text-muted">@item2.DateAction</span>
                                                                 </td>
@@ -265,12 +269,12 @@
                                                                         <span class="patient-color">@item2.PatientName</span>
                                                                     </td>
                                                                 }
-                                                            </tr>
-                                                            break;
-                                                        }
-                                                    case "accepted":
-                                                        {
-                                                            <tr>
+
+                                                                break;
+                                                            }
+                                                        case "accepted":
+                                                            {
+
                                                                 <td class="table-date">
                                                                     <span class="text-muted">@item2.DateAction</span>
                                                                 </td>
@@ -283,12 +287,12 @@
                                                                     <br />
                                                                     <span class="text-warning">Remarks: @item2.Remarks</span>
                                                                 </td>
-                                                            </tr>
-                                                            break;
-                                                        }
-                                                    case "arrived":
-                                                        {
-                                                            <tr>
+
+                                                                break;
+                                                            }
+                                                        case "arrived":
+                                                            {
+
                                                                 <td class="table-date">
                                                                     <span class="text-muted">@item2.DateAction</span>
                                                                 </td>
@@ -299,12 +303,12 @@
                                                                     <br />
                                                                     <span class="text-warning">Remarks: @item2.Remarks</span>
                                                                 </td>
-                                                            </tr>
-                                                            break;
-                                                        }
-                                                    case "admitted":
-                                                        {
-                                                            <tr>
+
+                                                                break;
+                                                            }
+                                                        case "admitted":
+                                                            {
+
                                                                 <td class="table-date">
                                                                     <span class="text-muted">@item2.DateAction</span>
                                                                 </td>
@@ -315,12 +319,12 @@
                                                                     <br />
                                                                     <span class="text-warning">Remarks: @item2.Remarks</span>
                                                                 </td>
-                                                            </tr>
-                                                            break;
-                                                        }
-                                                    case "discharged":
-                                                        {
-                                                            <tr>
+
+                                                                break;
+                                                            }
+                                                        case "discharged":
+                                                            {
+
                                                                 <td class="table-date">
                                                                     <span class="text-muted">@item2.DateAction</span>
                                                                 </td>
@@ -331,103 +335,116 @@
                                                                     <br />
                                                                     <span class="text-warning">Remarks: @item2.Remarks</span>
                                                                 </td>
-                                                            </tr>
-                                                            break;
-                                                        }
-                                                    case "calling":
-                                                    {
-                                                        <tr>
-                                                            <td class="table-date">
-                                                                <span class="text-muted">@item2.DateAction</span>
-                                                            </td>
-                                                            <td>
-                                                                <span class="md-color">@item2.ActionMd</span>
-                                                                of
-                                                                <span class="hospital-color">@item2.FacilityTo</span>
-                                                                is requesting a call from
-                                                                <span class="hospital-color">@item2.FacilityFrom</span>.
-                                                            </td>
-                                                        </tr>
-                                                        break;
+
+                                                                break;
+                                                            }
+                                                        case "calling":
+                                                            {
+
+                                                                <td class="table-date">
+                                                                    <span class="text-muted">@item2.DateAction</span>
+                                                                </td>
+                                                                <td>
+                                                                    <span class="md-color">@item2.ActionMd</span>
+                                                                    of
+                                                                    <span class="hospital-color">@item2.FacilityTo</span>
+                                                                    is requesting a call from
+                                                                    <span class="hospital-color">@item2.FacilityFrom</span>.
+                                                                </td>
+
+                                                                break;
+                                                            }
+                                                        case "cancelled":
+                                                            {
+
+                                                                <td class="table-date">
+                                                                    <span class="text-muted">@item2.DateAction</span>
+                                                                </td>
+                                                                <td>
+                                                                    <span class="patient-color">@item2.PatientName</span>
+                                                                    was cancelled by
+                                                                    <span class="md-color">@item2.ActionMd</span>
+                                                                    <br />
+                                                                    <span class="text-warning">Remarks: @item2.Remarks</span>
+                                                                </td>
+
+                                                                break;
+                                                            }
                                                     }
-                                                    case "cancelled":
-                                                        {
-                                                        <tr>
-                                                            <td class="table-date">
-                                                                <span class="text-muted">@item2.DateAction</span>
-                                                            </td>
-                                                            <td>
-                                                                <span class="patient-color">@item2.PatientName</span>
-                                                                was cancelled by
-                                                                <span class="md-color">@item2.ActionMd</span>
-                                                                <br />
-                                                                <span class="text-warning">Remarks: @item2.Remarks</span>
-                                                            </td>
-                                                        </tr>
-                                                            break;
-                                                        }
+                                                </tr>
+                                                @if (ctr == 0)
+                                                {
+                                                    ctr = 1;
                                                 }
                                             }
-                                    </tbody>
-                                </table>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                @if (Model.Activities.Count() > 1)
+                                {
+                                    <div style="border-top: 1px solid #ccc;">
+                                        <div class="text-center">
+                                            <a href="#toggle" data-id="@Model.PatientId">View More</a> <small class="text-muted">(@Model.Activities.Count())</small>
+                                        </div>
+                                    </div>
+                                }
                             </div>
                         </div>
-                    </div>
-                    @{
+                        @{
                             var dataTarget = Model.Pregnant ? "print-pregnant-form-modal" : "normal-form-modal";
-                            var dataUrl = Model.Pregnant ? Url.Action("PrintablePregnantForm","ViewForms", new { code = Model.Code }) : Url.Action("PrintableNormalForm", "ViewForms", new { code = Model.Code });
-                    }
+                            var dataUrl = Model.Pregnant ? Url.Action("PrintablePregnantForm", "ViewForms", new { code = Model.Code }) : Url.Action("PrintableNormalForm", "ViewForms", new { code = Model.Code });
+                        }
                     <div class="card-footer">
                         <button class="btn btn-xs bg-gradient-warning" data-target="#@dataTarget" data-toggle="ajax-modal" data-url="@dataUrl">
                             <i class="fa fa-folder"></i>
                             &nbsp;View Form
                         </button>
                         @if (seenCount > 0)
-                            {
-                        <button type="button" class="btn btn-success btn-xs" data-toggle="ajax-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens", "Modals", new { trackingId = Model.TrackingId })">
-                            <i class="fa fa-user-md"></i>
-                            &nbsp;Seen
-                            <small class="badge bg-green">@seenCount</small>
+                        {
+                            <button type="button" class="btn btn-success btn-xs" data-toggle="ajax-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens", "Modals", new { trackingId = Model.TrackingId })">
+                                <i class="fa fa-user-md"></i>
+                                &nbsp;Seen
+                                <small class="badge bg-green">@seenCount</small>
 
-                        </button>
-                            }
-                        @if (Model.Status.Equals("accepted") && Model.Travel)
-                            {
-                        <button type="button" class="btn btn-success btn-xs" data-toggle="ajax-modal" data-target="#small-modal" data-url="@Url.Action("Travel", "Remarks", new { id = Model.TrackingId })">
-                            <i class="fa fa-ambulance"></i>
-                            &nbsp;Travel
-                        </button>
-                            }
+                            </button>
+                        }
+                        @*if (Model.Status.Equals("accepted") && Model.Travel)
+                        {
+                            <button type="button" class="btn btn-success btn-xs" data-toggle="ajax-modal" data-target="#travel-modal" data-url="@Url.Action("Travel", "Remarks", new { id = Model.TrackingId })">
+                                <i class="fa fa-ambulance"></i>
+                                &nbsp;Travel
+                            </button>
+                        }*@
                         @if (callerCount > 0)
-                            {
-                        <button class="btn btn-xs bg-gradient-primary">
-                            <i class="fa fa-phone"></i>
-                            &nbsp;Caller
+                        {
+                            <button class="btn btn-xs bg-gradient-primary" data-toggle="ajax-modal" data-target="#calling-modal" data-url="@Url.Action("ViewCalls","Modals", new { code = Model.Code })">
+                                <i class="fa fa-phone"></i>
+                                &nbsp;Caller
 
-                            <small class="badge bg-blue">@callerCount</small>
+                                <small class="badge bg-blue">@callerCount</small>
 
-                        </button>
-                            }
+                            </button>
+                        }
 
                         <button type="button" class="btn btn-info btn-xs" data-toggle="ajax-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = Model.Code })">
                             <i class="fa fa-comments"></i>
                             &nbsp;ReCo
                             @if (recoCount > 0)
-                                {
-                            <small class="badge bg-blue">@recoCount</small>
-                                }
+                            {
+                                <small class="badge bg-blue">@recoCount</small>
+                            }
                         </button>
                     </div>
-                </div>
+                    </div>
                 }
                 else
                 {
-                <div class="alert alert-warning">
-                    <span class="text-lg">
-                        <i class="fa fa-exclamation-triangle"></i>
-                        &nbsp;Referral code couldn't be found!
-                    </span>
-                </div>
+                    <div class="alert alert-warning">
+                        <span class="text-lg">
+                            <i class="fa fa-exclamation-triangle"></i>
+                            &nbsp;Referral code couldn't be found!
+                        </span>
+                    </div>
                 }
             </div>
         </div>
@@ -449,12 +466,23 @@
 </div>
 
 <script>
-    $('body').on('click', '.refer_modal', function () {
-        var referId = this.value;
-        var url = "/AddPatients/Refer/" + referId;
-        $("#refer_content").html("Loading..............");
-        $.get(url, function (result) {
-            $("#refer_content").html(result);
-        })
+    $(document).ready(function () {
+        $('body').on('click', '.refer_modal', function () {
+            var referId = this.value;
+            var url = "/AddPatients/Refer/" + referId;
+            $("#refer_content").html("Loading..............");
+            $.get(url, function (result) {
+                $("#refer_content").html(result);
+            })
+        });
+
+        $("a[href='#toggle']").on('click', function () {
+            var id = $(this).data('id');
+            $('.toggle' + id).toggle("fast");
+            var txt = ($(this).html() == 'View More') ? 'View Less' : 'View More';
+            $(this).html(txt);
+        });
+
+        $('[data-toggle="tooltip"]').tooltip();
     });
 </script>

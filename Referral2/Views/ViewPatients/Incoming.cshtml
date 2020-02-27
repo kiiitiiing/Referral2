@@ -81,7 +81,7 @@
                                 {
                                     var dateAction = item.DateAction.ToString("MMM dd, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
                                     var currentUserFacility = int.Parse(User.FindFirstValue("Facility"));
-                                    var currentUserDepartment = int.Parse(User.FindFirstValue("Department"));
+                                    var currentUserDepartment = string.IsNullOrEmpty(User.FindFirstValue("Department"))? 0 : int.Parse(User.FindFirstValue("Department"));
 
                                     switch (item.Status)
                                     {

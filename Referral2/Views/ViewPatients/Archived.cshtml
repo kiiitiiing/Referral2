@@ -35,19 +35,19 @@
             <div class="card-body">
                 @if (Model.Count() > 0)
                 {
-                    <table class="table table-striped">
+                    <table class="table table-striped" width="100%">
                         <thead>
-                            <tr>
-                                <th>
+                            <tr class="bg-gray">
+                                <th width="25%">
                                     <p>Referring Facility</p>
                                 </th>
-                                <th>
+                                <th width="25%">
                                     <p>Patient Name/Code</p>
                                 </th>
-                                <th>
+                                <th width="25%">
                                     <p>Date Archived</p>
                                 </th>
-                                <th>
+                                <th width="25%">
                                     <p>Reason</p>
                                 </th>
                             </tr>
@@ -55,36 +55,36 @@
                         <tbody>
                             @foreach (var item in Model)
                             {
-                                if(item.Type)
-                                {
-                                    types = "Pregnant";
-                                    dataTarget = "print-pregnant-form-modal";
-                                    dataUrl = Url.Action("PrintablePregnantForm", "ViewForms", new { code = item.Code });
-                                }
-                                else
-                                {
-                                    types = "Non-Pregnant";
-                                    dataTarget = "normal-form-modal";
-                                    dataUrl =  Url.Action("PrintableNormalForm", "ViewForms", new { code = item.Code });
-                                }
+                                var facility = item.ReferringFacility.Length > 25 ? new string(item.ReferringFacility.Take(25).ToArray()) + "..." : item.ReferringFacility;
+                                var reason = string.IsNullOrEmpty(item.Reason) ? "N/A" : item.Reason;
                                 <tr>
-                                    <td class="facility-color">
-                                        @item.ReferringFacility<br />
-                                        <p class="small text-muted">@types</p>
+                                    <td class="facility-color" title="@item.ReferringFacility">
+                                        @facility<br />
+                                        <p class="small text-muted">@item.Type</p>
                                     </td>
                                     <td>
-                                        <a href="#" data-toggle="ajax-modal" data-target="#@dataTarget" data-url="@dataUrl">
-                                            @item.PatientName
-                                        </a><br />
+                                        @if (item.Type.Equals("Non-Pregnant"))
+                                        {
+                                            <a class="text-info" style="cursor:pointer;" data-toggle="ajax-modal" data-target="#normal-form-modal" data-url="@Url.Action("PrintableNormalForm","ViewForms", new { code = item.Code })">
+                                                @item.PatientName
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <a class="text-info" style="cursor:pointer;" data-toggle="ajax-modal" data-target="#print-pregnant-form-modal" data-url="@Url.Action("PrintablePregnantForm","ViewForms", new { code = item.Code })">
+                                                @item.PatientName
+                                            </a>
+                                        }
+                                        <br />
                                         <span class="small text-muted">
                                             @item.Code
                                         </span>
                                     </td>
                                     <td>
-                                        <span>@item.DateArchive</span>
+                                        <span>@item.DateArchive.ToString("MMMM d, yyyy h:mm tt",System.Globalization.CultureInfo.InvariantCulture)</span>
                                     </td>
                                     <td>
-                                        @item.Reason
+                                        @reason
                                     </td>
                                 </tr>
                             }

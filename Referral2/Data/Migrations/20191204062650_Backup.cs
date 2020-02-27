@@ -211,7 +211,6 @@ namespace Referral2.Data.Migrations
                     Title = table.Column<string>(unicode: false, maxLength: 50, nullable: true),
                     Contact = table.Column<string>(unicode: false, maxLength: 50, nullable: false),
                     Email = table.Column<string>(unicode: false, maxLength: 50, nullable: false),
-                    BarangayId = table.Column<int>(nullable: true),
                     MuncityId = table.Column<int>(nullable: true),
                     ProvinceId = table.Column<int>(nullable: false),
                     AccreditationNo = table.Column<string>(unicode: false, maxLength: 255, nullable: true),
@@ -230,12 +229,6 @@ namespace Referral2.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_User", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_User_Barangay",
-                        column: x => x.BarangayId,
-                        principalTable: "Barangay",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_User_Department",
                         column: x => x.DepartmentId,

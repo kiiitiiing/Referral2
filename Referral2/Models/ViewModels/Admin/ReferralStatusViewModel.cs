@@ -7,7 +7,7 @@ namespace Referral2.Models.ViewModels.Admin
 {
     public partial class ReferralStatusViewModel
     {
-        public string DateReferred { get; set; }
+        public DateTime DateReferred { get; set; }
         public string FacilityFrom { get; set; }
         public string FacilityTo { get; set; }
         public string Department { get; set; }

@@ -231,7 +231,7 @@
     </div>
 
     <!-- MODAL END -->
-    <div class="container">
+    <div class="container set-height">
         <partial name="_CookieConsentPartial" />
         <main role="main" class="pb-3">
             @RenderBody()
@@ -241,9 +241,7 @@
     @if (User.Identity.IsAuthenticated)
     {
         <footer class="referral-footer">
-            <div class="container">
-                <p class="text-center">All Rights Reserved 2020 | Version 2.1</p>
-            </div>
+            <p class="text-center">All Rights Reserved 2020 | Version 2.1</p>
         </footer>
     }
     <script type="text/javascript">

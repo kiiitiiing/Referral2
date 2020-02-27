@@ -35,22 +35,22 @@
             <div class="card-body">
                 @if (Model.Count() > 0)
                 {
-                    <table class="table table-striped">
-                        <thead class="bg-gray-light">
+                    <table class="table table-striped" width="100%">
+                        <thead class="bg-gray">
                             <tr>
-                                <th>
+                                <th width="20%">
                                     <p>Referring Facility</p>
                                 </th>
-                                <th>
+                                <th width="25%">
                                     <p>Patient Name/Code</p>
                                 </th>
-                                <th>
+                                <th width="22%">
                                     <p>Date Accepted</p>
                                 </th>
-                                <th>
+                                <th width="13%">
                                     <p>Current Status</p>
                                 </th>
-                                <th>
+                                <th width="20%">
                                     <p>Action</p>
                                 </th>
                             </tr>
@@ -60,33 +60,27 @@
                             {
                                 var status = item.Status;
                                 var dateAction = item.DateAction.ToString("MMMM dd, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+                                var facility = item.ReferringFacility.Length > 25 ? new string(item.ReferringFacility.Take(25).ToArray()) + "..." : item.ReferringFacility;
                                 <tr>
                                     <!-- REFERRING FACILITY -->
                                     <td>
-                                        <span class="facility-color">
-                                            @item.ReferringFacility
+                                        <span class="facility-color" title="@item.ReferringFacility">
+                                            @facility
                                         </span>
                                         <br />
-                                        @if (item.Type.Equals("pregnant"))
-                                        {
-                                            <p class="small text-muted">Pregnant</p>
-                                        }
-                                        else
-                                        {
-                                            <p class="small text-muted">Non-Pregnant</p>
-                                        }
+                                        <p class="small text-muted">@item.Type</p>
                                     </td>
                                     <!-- PATIENT NAME -->
                                     <td>
-                                        @if (item.Type.Equals("normal"))
+                                        @if (item.Type.Equals("Non-Pregnant"))
                                         {
-                                            <a href="#" data-toggle="ajax-modal" data-target="#normal-form-modal" data-url="@Url.Action("PrintableNormalForm","ViewForms", new { code = item.PatientCode })">
+                                            <a class="text-info" style="cursor:pointer;" data-toggle="ajax-modal" data-target="#normal-form-modal" data-url="@Url.Action("PrintableNormalForm","ViewForms", new { code = item.PatientCode })">
                                                 @item.PatientName
                                             </a>
                                         }
                                         else
                                         {
-                                            <a href="#" data-toggle="ajax-modal" data-target="#print-pregnant-form-modal" data-url="@Url.Action("PrintablePregnantForm","ViewForms", new { code = item.PatientCode })">
+                                            <a class="text-info" style="cursor:pointer;" data-toggle="ajax-modal" data-target="#print-pregnant-form-modal" data-url="@Url.Action("PrintablePregnantForm","ViewForms", new { code = item.PatientCode })">
                                                 @item.PatientName
                                             </a>
                                         }
@@ -107,9 +101,9 @@
                                         @if (status.Equals("referred"))
                                         {
                                             //reco
-                                            <button class="btn btn-sm btn-info" value="O">
-                                                <i class="fa fa-comments"></i>
-                                            </button>
+                                        <button type="button" class="btn btn-sm btn-info" title="ReCo" data-toggle="ajax-modal" data-target="#arrived-modal" data-url="@Url.Action("ViewReco","Modals",new { code = item.PatientCode})">
+                                            <i class="fa fa-comments"></i>
+                                        </button>
                                         }
                                         else if (status.Equals("accepted"))
                                         {

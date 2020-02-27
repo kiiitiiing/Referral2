@@ -12,7 +12,6 @@ namespace Referral2.Models
         {
             Facility = new HashSet<Facility>();
             Patient = new HashSet<Patient>();
-            User = new HashSet<User>();
         }
 
         [Key]
@@ -37,7 +36,5 @@ namespace Referral2.Models
         public virtual ICollection<Facility> Facility { get; set; }
         [InverseProperty("Barangay")]
         public virtual ICollection<Patient> Patient { get; set; }
-        [InverseProperty("Barangay")]
-        public virtual ICollection<User> User { get; set; }
     }
 }

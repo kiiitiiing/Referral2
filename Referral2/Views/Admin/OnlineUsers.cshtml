@@ -42,16 +42,16 @@
                         <tbody>
                             @foreach (var item in Model)
                             {
-                                var timeLogin = item.UserLoginTime.ToString("hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+                                var timeLogin = item.UserLoginTime.ToString("h:mm tt", System.Globalization.CultureInfo.InvariantCulture);
                                 var test = facility == item.FacilityName ? "" : item.FacilityName;
                                 var status = item.UserStatus.Equals("login off") ? "Off Duty" : "On Duty";
                                 <tr>
-                                    <td class="custom-warning">@test</td>
+                                    <td class="custom-warning text-bold">@test</td>
                                     <td class="text-success">@item.UserFullName</td>
                                     <td class="text-danger">@item.UserLevel</td>
                                     <td class="text-danger">@item.UserDepartment</td>
-                                    <td>@status</td>
-                                    <td>@timeLogin</td>
+                                    <td style="white-space:nowrap;">@status</td>
+                                    <td style="white-space:nowrap;">@timeLogin</td>
                                 </tr>
                                 facility = item.FacilityName;
                             }

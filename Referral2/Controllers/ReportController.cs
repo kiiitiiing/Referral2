@@ -97,7 +97,7 @@ namespace Referral2.Controllers
                 ViewBag.Total = tracking.Count();
             }
 
-            return View(await PaginatedList<IncomingReportViewModel>.CreateAsync(tracking.AsNoTracking(), page ?? 1, size));
+            return View(await PaginatedList<IncomingReportViewModel>.CreateAsync(tracking.OrderBy(x=>x.Facility), page ?? 1, size));
         }
         // GET OUTGOING REPORT
         public async Task<IActionResult> OutgoingReport(string daterange, int? page, int? facility, int? department)
@@ -153,7 +153,7 @@ namespace Referral2.Controllers
                 ViewBag.Total = outgoing.Count();
             }
 
-            return View(await PaginatedList<OutgoingReportViewModel>.CreateAsync(outgoing.AsNoTracking(), page ?? 1, size));
+            return View(await PaginatedList<OutgoingReportViewModel>.CreateAsync(outgoing.OrderBy(x=>x.Code), page ?? 1, size));
         }
         public async Task<IActionResult> NormalFormPdf(string code)
         {
@@ -164,7 +164,7 @@ namespace Referral2.Controllers
 
         public async Task<IActionResult> PregnantFromPdf(string code)
         {
-            var pregnantForm = await _context.PatientForm.SingleOrDefaultAsync(x => x.Code.Equals(code));
+            var pregnantForm = await _context.PregnantForm.SingleOrDefaultAsync(x => x.Code.Equals(code));
             var file = SetPDF(pregnantForm);
             return File(file, "application/pdf");
         }
@@ -180,7 +180,7 @@ namespace Referral2.Controllers
                 Orientation = Orientation.Portrait,
                 PaperSize = PaperKind.A4,
                 Margins = new MarginSettings { Top = 1.54, Bottom = 1.34, Left = 1.34, Right = 1.34, Unit = Unit.Centimeters },
-                DocumentTitle = "Normal patient form"
+                DocumentTitle = GlobalFunctions.GetFullName(form.Patient)
             };
             var objectSettings = new ObjectSettings
             {
@@ -205,13 +205,13 @@ namespace Referral2.Controllers
                 Orientation = Orientation.Portrait,
                 PaperSize = PaperKind.A4,
                 Margins = new MarginSettings { Top = 1.54, Bottom = 1.34, Left = 1.34, Right = 1.34, Unit = Unit.Centimeters },
-                DocumentTitle = "Normal patient form"
+                DocumentTitle = GlobalFunctions.GetFullName(form.PatientWoman)
             };
             var objectSettings = new ObjectSettings
             {
                 PagesCount = true,
-                //HtmlContent = NormalPdf(form),
-                WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "css", "site.css") }
+                HtmlContent = PregnantPdf(form),
+                WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "assets", "dist", "css", "custom-adminlte.css") }
             };
 
             var pdf = new HtmlToPdfDocument()
@@ -432,19 +432,229 @@ namespace Referral2.Controllers
             return pdf.ToString();
         }
 
+        public string PregnantPdf(PregnantForm form)
+        {
+            var pdf = new StringBuilder();
+            pdf.Append(@"
+                <html>
+                    <head></head>
+                    <body>
+                        <div>
+                            <center>    
+                                <h4>
+                                    BEmONC/ CEmONC REFERRAL FORM
+                                </h4>
+                            </center>
+                        </div>
+                        <div>");
+            pdf.AppendFormat(@"
+                <table>
+                    <tbody>
+                        <tr><td> </td></tr>
+                        <tr><td> </td></tr>
+                        <tr>
+                            <td colspan = '5''><b>Patient Code:</b> <span class='item-color'>{0}</th>
+                        </tr>
+                        <tr><td> </td></tr>
+                        <tr>
+                            <td colspan = '5'><b>REFERRAL RECORD</b> </th>
+                        </tr>
+                        <tr>
+                            <td><b>Who is Referring</b> </td>
+                            <td colspan = '3'><b>Record Number:</b> <span class='item-color'>{1}</span></td>
+                            <td colspan = '1'><b>Referred Date:</b> <span class='item-color'>{2}</span></td>
+                        </tr>
+                        <tr>
+                            <td colspan = '4'><b>Name of referring MD/HCW:</b> <span class='item-color'>{3}</span></td>
+                            <td colspan = '1'><b>Arrival Date:</b> <span class='item-color'>{4}</span></td>
+                        </tr>
+                        <tr>
+                            <td colspan = '5'><b>Contact # of referring MD/HCW:</b> <span class='item-color'>{5}</span></td>
+                        </tr>
+                        <tr>
+                            <td colspan='5'><b>Facility:</b> <span class='item-color'>{6}</span></td>
+                        </tr>
+                        <tr>
+                            <td colspan = '5'><b>Facility Contact #:</b> <span class='item-color'>{7}</span></td>
+                        </tr>
+                        <tr>
+                            <td colspan = '5'><b>Accompanied by the Health Worker:</b> <span class='item-color'>{8}</span></td>
+                        </tr>
+                        <tr>
+                            <td colspan = '4'><b>Referred To:</b> <span class='item-color'>{9}</span></td>
+                            <td colspan = '1'><b>Department:</b> <span class='item-color'>{10}</span></td>
+                        </tr>
+                        <tr>
+                            <td colspan = '5'><b>Address:</b> <span class='item-color'>{11}</span></td>
+                        </tr>
+                        <tr><td></td></tr>
+                    </tbody>
+                </table>",
+                form.Code,
+                form.RecordNo,
+                form.ReferredDate.ToString("MMMM d, yyyy hh:mm tt",CultureInfo.InvariantCulture),
+                GlobalFunctions.GetMDFullName(form.ReferredByNavigation),
+                form.ArrivalDate == default ? "" : form.ArrivalDate.ToString("MMMM d, yyyy hh:mm tt", CultureInfo.InvariantCulture),
+                form.ReferredByNavigation.Contact,
+                form.ReferringFacilityNavigation.Name,
+                form.ReferringFacilityNavigation.Contact,
+                form.HealthWorker,
+                form.ReferredToNavigation.Name,
+                form.Department.Description,
+                GlobalFunctions.GetAddress(form.ReferredToNavigation));
+
+            pdf.AppendFormat(@"
+            <table class='table table-bordered'>
+                <tbody>
+                    <tr class='bg-gray-light'>
+                        <td colspan = '4'><b>WOMAN</b></ th>
+                    </ tr>
+                    <tr>
+                        <td colspan='3'><b>Name:</b> <span class='text-success'>{0}</span></td>
+                    </tr>
+                    <tr>
+                        <td><b>Age:</b> <span class='text-success'>{1}</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan = '4'><b>Address:</b> <span class='text-success'>{2}</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan = '4'>
+                            <b>Main Reason for Referral:</b>    
+                            <br>
+                            <span class='text-success'>{3}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan = '4'>
+                            <b>Major Findings(Clinica and BP, Temp, Lab)</b>
+                            <br>
+                            <span class='text-success'>{4}</span>
+                        </td>
+                    </tr>
+                    <tr class='bg-gray-light'>
+                        <td colspan = '4'><b>Treatments Give Time</b></td>
+                    </tr>
+                    <tr>
+                        <td colspan = '4'><b>Before Referral:</b> <span class='text-success'>{5}</span> - <span class='woman_before_given_time'>{6}</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan = '4'><b>During Transport:</b> <span class='text-success'>{7}</span> - <span class='woman_transport_given_time'>{8}</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan = '4'>
+                            <b>Information Given to the Woman and Companion About the Reason for Referral</b>
+                            <br>
+                            <span class='text-success'>{9}</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>",
+            GlobalFunctions.GetFullName(form.PatientWoman),
+            GlobalFunctions.ComputeAge(form.PatientWoman.DateOfBirth),
+            GlobalFunctions.GetAddress(form.PatientWoman),
+            form.WomanReason,
+            form.WomanMajorFindings,
+            ((DateTime)form.WomanBeforeGivenTime) == default ? "" : ((DateTime)form.WomanBeforeGivenTime).ToString("MMMM d, yyyy hh:mm tt", CultureInfo.InvariantCulture),
+            form.WomanBeforeTreatment,
+            ((DateTime)form.WomanTransportGivenTime) == default ? "" : ((DateTime)form.WomanTransportGivenTime).ToString("MMMM d, yyyy hh:mm tt", CultureInfo.InvariantCulture),
+            form.WomanDuringTransport,
+            form.WomanInformationGiven);
+
+
+            if(form.PatientBabyId != null)
+            {
+                var baby = _context.Baby.SingleOrDefault(x => x.BabyId == form.PatientBabyId);
+                pdf.AppendFormat(@"
+                <table class='table table-bordered'>
+                    <tbody>
+                        <tr class='bg-gray-light'>
+                            <td><b>BABY</b></ th>
+                        </ tr>
+                        <tr>
+                            <td><b>Name:</b> <span class='text-success'>{0}</span></td>
+                        </tr>
+                        <tr>
+                            <td><b>Date of Birth:</b> <span class='text-success'>{1}</span></td>
+                        </tr>
+                        <tr>
+                            <td><b>Birth Weigth:</b> <span class='text-success'>{2}</span></td>
+                        </tr>
+                        <tr>
+                            <td><b>Gestational Age:</b> <span class='text-success'>{3}</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b>Main Reason for Referral:</b>    
+                                <br>
+                                <span class='text-success'>{4}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b>Major Findings(Clinica and BP, Temp, Lab)</b>
+                                <br>
+                                <span class='text-success'>{5}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Last (Breast) Feed (Time):</b> <span class='text-success'>{6}</span></td>
+                        </tr>
+                        <tr class='bg-gray-light'>
+                            <td><b>Treatments Give Time</b></td>
+                        </tr>
+                        <tr>
+                            <td><b>Before Referral:</b> <span class='text-success'>{7}</span> - <span class='text-success'>{8}</span></td>
+                        </tr>
+                        <tr>
+                            <td><b>During Transport:</b> <span class='text-success'>{9}</span> - <span class='text-success'>{10}</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b>Information Given to the Woman and Companion About the Reason for Referral</b>
+                                <br>
+                                <span class='text-success'>{11}</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>",
+                GlobalFunctions.GetFullName(form.PatientBaby),
+                form.PatientBaby.DateOfBirth.ToString("MMMM d, yyyy hh:mm tt", CultureInfo.InvariantCulture),
+                baby.Weight,
+                baby.GestationalAge,
+                form.BabyReason,
+                form.BabyMajorFindings,
+                ((DateTime)form.BabyLastFeed) == default ? "" : ((DateTime)form.BabyLastFeed).ToString("MMMM d, yyyy hh:mm tt", CultureInfo.InvariantCulture),
+                form.WomanBeforeTreatment,
+                ((DateTime)form.WomanBeforeGivenTime) == default ? "" : ((DateTime)form.WomanBeforeGivenTime).ToString("MMMM d, yyyy hh:mm tt", CultureInfo.InvariantCulture),
+                form.WomanDuringTransport,
+                ((DateTime)form.WomanTransportGivenTime) == default ? "" : ((DateTime)form.WomanTransportGivenTime).ToString("MMMM d, yyyy hh:mm tt", CultureInfo.InvariantCulture),
+                form.WomanInformationGiven);
+            }
+
+
+            pdf.Append(@"
+                        </div>
+                    </body>
+                </html>");
+
+            return pdf.ToString();
+        }
+
 
 
         private Task<IEnumerable<SelectDepartment>> AvailableDepartments(int facilityId)
         {
             var availableDepartments = _context.User
-                .Where(x => x.FacilityId.Equals(facilityId) && x.Level.Equals(_roles.Value.DOCTOR))
-                .DistinctBy(x=>x.DepartmentId)
+                .Where(x => x.FacilityId.Equals(facilityId) && x.Level.Equals(_roles.Value.DOCTOR) && x.DepartmentId != null)
+                .Select(x=>x.DepartmentId)
+                .Distinct()
                 .Select(x => new SelectDepartment
                 {
-                    DepartmentId = (int)x.DepartmentId,
-                    DepartmentName = x.Department.Description
+                    DepartmentId = (int)x,
+                    DepartmentName = _context.Department.SingleOrDefault(c=> c.Id == x).Description
                 });
-            return Task.FromResult(availableDepartments);
+            return Task.FromResult(availableDepartments.AsEnumerable());
         }
         public int UserId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
         public int UserFacility => int.Parse(User.FindFirstValue("Facility"));

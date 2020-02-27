@@ -105,7 +105,7 @@ namespace Referral2.Controllers
 
         public async Task<IActionResult> PrintablePregnantForm(string code)
         {
-            var form = await _context.PregnantForm.SingleOrDefaultAsync(x => x.Code.Equals(code));
+            var form = _context.PregnantForm.FirstOrDefault(x => x.Code.Equals(code));
 
             Baby baby = null;
 

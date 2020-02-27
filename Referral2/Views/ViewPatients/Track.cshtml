@@ -47,6 +47,7 @@
             <div class="col-md-9">
                 @if (Model != null)
                 {
+                    var headerclass = Model.Pregnant ? "bg-pregnant" : "card-custom-bg";
                     int ctr = 0;
                     var seenCount = Model.SeenCount;
                     var callerCount = Model.CallerCount;
@@ -130,7 +131,7 @@
                             admitted = "disabled";
                             discharged = "disabled";
                         }
-                        <div class="card-header panel-success">
+                        <div class="card-header @headerclass">
                             <span class="patientTitle">
                                 <i class="fa fa-wheelchair"></i>
                                 &nbsp;@Model.PatientName
@@ -393,47 +394,47 @@
                             var dataTarget = Model.Pregnant ? "print-pregnant-form-modal" : "normal-form-modal";
                             var dataUrl = Model.Pregnant ? Url.Action("PrintablePregnantForm","ViewForms", new { code = Model.Code }) : Url.Action("PrintableNormalForm", "ViewForms", new { code = Model.Code });
                         }
-                        <div class="card-footer">
-                            <button class="btn btn-xs bg-gradient-warning" data-target="#@dataTarget" data-toggle="ajax-modal" data-url="@dataUrl">
-                                <i class="fa fa-folder"></i>
-                                &nbsp;View Form
+                    <div class="card-footer">
+                        <button class="btn btn-xs bg-gradient-warning" data-target="#@dataTarget" data-toggle="ajax-modal" data-url="@dataUrl">
+                            <i class="fa fa-folder"></i>
+                            &nbsp;View Form
+                        </button>
+                        @if (seenCount > 0)
+                        {
+                            <button type="button" class="btn btn-success btn-xs" data-toggle="ajax-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens", "Modals", new { trackingId = Model.TrackingId })">
+                                <i class="fa fa-user-md"></i>
+                                &nbsp;Seen
+                                <small class="badge bg-green">@seenCount</small>
+
                             </button>
-                            @if (seenCount > 0)
-                            {
-                                <button type="button" class="btn btn-success btn-xs" data-toggle="ajax-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens", "Modals", new { trackingId = Model.TrackingId })">
-                                    <i class="fa fa-user-md"></i>
-                                    &nbsp;Seen
-                                    <small class="badge bg-green">@seenCount</small>
-
-                                </button>
-                            }
-                            @if (Model.Status.Equals("accepted") && Model.Travel)
-                            {
-                                <button type="button" class="btn btn-success btn-xs" data-toggle="ajax-modal" data-target="#small-modal" data-url="@Url.Action("Travel", "Remarks", new { id = Model.TrackingId })">
-                                    <i class="fa fa-ambulance"></i>
-                                    &nbsp;Travel
-                                </button>
-                            }
-                            @if (callerCount > 0)
-                            {
-                                <button class="btn btn-xs bg-gradient-primary">
-                                    <i class="fa fa-phone"></i>
-                                    &nbsp;Caller
-
-                                    <small class="badge bg-blue">@callerCount</small>
-
-                                </button>
-                            }
-
-                            <button type="button" class="btn btn-info btn-xs" data-toggle="ajax-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = Model.Code })">
-                                <i class="fa fa-comments"></i>
-                                &nbsp;ReCo
-                                @if (recoCount > 0)
-                                {
-                                    <small class="badge bg-blue">@recoCount</small>
-                                }
+                        }
+                        @*if (Model.Status.Equals("accepted") && Model.Travel)
+                        {
+                            <button type="button" class="btn btn-success btn-xs" data-toggle="ajax-modal" data-target="#travel-modal" data-url="@Url.Action("Travel", "Remarks", new { id = Model.TrackingId })">
+                                <i class="fa fa-ambulance"></i>
+                                &nbsp;Travel
                             </button>
-                        </div>
+                        }*@
+                        @if (callerCount > 0)
+                        {
+                            <button class="btn btn-xs bg-gradient-primary" data-toggle="ajax-modal" data-target="#calling-modal" data-url="@Url.Action("ViewCalls","Modals", new { code = Model.Code })">
+                                <i class="fa fa-phone"></i>
+                                &nbsp;Caller
+
+                                <small class="badge bg-blue">@callerCount</small>
+
+                            </button>
+                        }
+
+                        <button type="button" class="btn btn-info btn-xs" data-toggle="ajax-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = Model.Code })">
+                            <i class="fa fa-comments"></i>
+                            &nbsp;ReCo
+                            @if (recoCount > 0)
+                            {
+                                <small class="badge bg-blue">@recoCount</small>
+                            }
+                        </button>
+                    </div>
                     </div>
                 }
                 else

@@ -7,20 +7,23 @@
     var dateRange = startDate.ToString("dd/MM/yyyy") + " - " + endDate.ToString("dd/MM/yyyy");
 }
     <div style="
-    position:absolute;
-    left: 1%;
-    right: 1%;">
-        <form asp-action="ConsolidatedMcc" method="post">
+     width: 97.5vw;
+    position: relative;
+    left: 45%;
+    right: 45%;
+    margin-left: -45vw;
+    margin-right: -45vw;">
+        <form asp-action="Consolidated" method="post">
             <div class="row" style="margin-top: -0.5%; margin-bottom: 1%">
                 <div class="col-md-4">
                     <input class="form-control form-control-sm" type="text" value="@dateRange" id="daterange" name="daterange" autocomplete="off">
                 </div>
                 <div class="col-md-6">
                     <div class="input-group-btn">
-                        <button type="submit" class="btn btn-info btn-flat">Filter</button>
-                        <a href="http://203.177.67.126/doh/referral/excel/incoming" type="button" name="from_the_start" class="btn btn-warning btn-flat"><i class="fa fa-file-excel-o"></i> Incoming (Excel)</a>
-                        <a href="http://203.177.67.126/doh/referral/excel/outgoing" type="button" name="from_the_start" class="btn btn-success btn-flat"><i class="fa fa-file-excel-o"></i> Outgoing (Excel)</a>
-                        <a href="http://203.177.67.126/doh/referral/excel/all" type="button" name="from_the_start" class="btn btn-primary btn-flat"><i class="fa fa-file-excel-o"></i> All (Excel)</a>
+                        <button type="submit" class="btn btn-sm btn-info">Filter</button>
+                        <a asp-action="Consolidated" asp-route-inexport="@true" asp-route-daterange="@dateRange" class="btn btn-sm btn-warning"><i class="fa fa-file-excel-o"></i> Incoming (Excel)</a>
+                        <a asp-action="Consolidated" asp-route-outexport="@true" asp-route-daterange="@dateRange" class="btn btn-sm btn-success"><i class="fa fa-file-excel-o"></i> Outgoing (Excel)</a>
+                        <a asp-action="Consolidated" asp-route-export="@true" asp-route-daterange="@dateRange" class="btn btn-sm  btn-primary"><i class="fa fa-file-excel-o"></i> All (Excel)</a>
                     </div>
                 </div>
             </div>
@@ -28,7 +31,7 @@
 
         @foreach (var items in Model)
         {
-            <div class="card card-outline card-success">
+            <div class="card card-outline card-success card-outline-tabs">
                 <div class="card-body">
                     <ul class="nav nav-tabs" id="custom-content-above-tab" role="tablist">
                         <li class="nav-item">
@@ -41,7 +44,7 @@
                                 Outgoing
                             </a>
                         </li>
-                        <li class="fa-pull-right">
+                        <li class="custom-float-right">
                             @startDate.ToString("MMMM (yyyy)") to @endDate.ToString("MMMM (yyyy)")
                         </li>
                     </ul>
@@ -68,8 +71,9 @@
                                            asp-route-facility="@items.FacilitId"
                                            asp-route-startDate="@ViewBag.StartDate"
                                            asp-route-endDate="@ViewBag.EndDate"
+                                           asp-route-type="incoming"
                                            target="_blank">
-                                            <label class="badge badge-warning">
+                                            <label class="badge badge-warning" style="cursor: pointer;">
                                                 Viewed Only
                                                 <span class="badge bg-red">
                                                     @items.InViewed
@@ -109,7 +113,7 @@
                                         Hospital Level
                                     </strong>
                                     <p>
-                                        <label class="badge badge-success">Hospital <span class="badge bg-red">@items.InHorizontal</span></label>
+                                        <label class="badge badge-success">Horizontal <span class="badge bg-red">@items.InHorizontal</span></label>
                                         <label class="badge badge-success">Vertical <span class="badge bg-red">@items.InVertical</span></label>
                                     </p>
                                 </div>
@@ -268,7 +272,7 @@
                                                 {
                                                     if (!string.IsNullOrEmpty(item.ItemName))
                                                     {
-                                                        <label><span class="badge bg-maroon">@item.NoItem</span> @item.ItemName</label><br />
+                                                        <label>@item.ItemName</label><br />
                                                     }
                                                 }
                                             }
@@ -299,7 +303,19 @@
                                     <p>
                                         <label class="badge badge-warning">Outgoing <span class="badge bg-red">@items.OutOutgoing</span></label>
                                         <label class="badge badge-warning">Accepted <span class="badge bg-red">@items.OutAccepted</span></label>
-                                        <label class="badge badge-warning">Viewed Only <span class="badge bg-red">@items.OutViewed</span></label>
+                                        <a asp-action="ViewedOnly"
+                                           asp-route-facility="@items.FacilitId"
+                                           asp-route-startDate="@ViewBag.StartDate"
+                                           asp-route-endDate="@ViewBag.EndDate"
+                                           asp-route-type="outgoing"
+                                           target="_blank">
+                                            <label class="badge badge-warning" style="cursor: pointer;">
+                                                Viewed Only
+                                                <span class="badge bg-red">
+                                                    @items.OutViewed
+                                                </span>
+                                            </label>
+                                        </a>
                                         <label class="badge badge-warning">Redirected  <span class="badge bg-red">@items.OutRedirected</span></label>
                                         <label class="badge badge-warning">Archived  <span class="badge bg-red">@items.OutArchived</span></label>
                                         <br />
@@ -355,7 +371,7 @@
                                         Hospital Level
                                     </strong>
                                     <p>
-                                        <label class="badge badge-success">Hospital <span class="badge bg-red">@items.OutHorizontal</span></label>
+                                        <label class="badge badge-success">Horizontal <span class="badge bg-red">@items.OutHorizontal</span></label>
                                         <label class="badge badge-success">Vertical <span class="badge bg-red">@items.OutVertical</span></label>
                                     </p>
                                 </div>
@@ -514,7 +530,7 @@
                                                 {
                                                     if (!string.IsNullOrEmpty(item.ItemName))
                                                     {
-                                                        <label><span class="badge bg-maroon">@item.NoItem</span> @item.ItemName</label><br />
+                                                        <label>@item.ItemName</label><br />
                                                     }
                                                 }
                                             }

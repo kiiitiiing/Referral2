@@ -29,19 +29,19 @@
         <form method="post" action="">
             <input type="hidden" name="_token" value="" autocomplete="off" />
             <div class="card-body">
-                <table class="table table-striped">
+                <table class="table table-striped" width="100%">
                     <thead>
-                        <tr>
-                            <th>
+                        <tr class="bg-gray">
+                            <th width="25%">
                                 <p>Referring Facility</p>
                             </th>
-                            <th>
+                            <th width="25%">
                                 <p>Patient Name/Code</p>
                             </th>
-                            <th>
+                            <th width="25%">
                                 <p>Date Cancelled</p>
                             </th>
-                            <th>
+                            <th width="25%">
                                 <p>Reason</p>
                             </th>
                         </tr>
@@ -50,24 +50,17 @@
                         @foreach (var item in Model)
                         {
                             var dateCancelled = item.DateCancelled.ToString("MMMM dd, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
-                            
+                            var facility = item.ReferringFacility.Length > 25 ? new string(item.ReferringFacility.Take(25).ToArray()) +"..." : item.ReferringFacility;
                             <tr>
                                 <td>
-                                    <span class="facility-color">
-                                        @item.ReferringFacility
+                                    <span class="facility-color" title="@item.ReferringFacility">
+                                        @facility
                                     </span>
                                     <br />
-                                    @if (item.PatientType.Equals("pregnant"))
-                                        {
-                                            <p class="small text-muted">Pregnant</p>
-                                        }
-                                        else
-                                        {
-                                            <p class="small text-muted">Non-Pregnant</p>
-                                        }
+                                    <p class="small text-muted">@item.PatientType</p>
                                 </td>
                                 <td>
-                                    @if (item.Type.Equals("normal"))
+                                    @if (item.PatientType.Equals("Non-Pregnant"))
                                     {
                                         <a href="#" data-toggle="ajax-modal" data-target="#normal-form-modal" data-url="@Url.Action("PrintableNormalForm","ViewForms", new { code = item.PatientCode })">
                                             @item.PatientName

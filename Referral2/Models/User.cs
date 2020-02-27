@@ -53,7 +53,6 @@ namespace Referral2.Models
         [StringLength(50)]
         [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
-        public int? BarangayId { get; set; }
         public int? MuncityId { get; set; }
         public int ProvinceId { get; set; }
         [StringLength(255)]
@@ -78,9 +77,6 @@ namespace Referral2.Models
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 
-        [ForeignKey(nameof(BarangayId))]
-        [InverseProperty("User")]
-        public virtual Barangay Barangay { get; set; }
         [ForeignKey(nameof(DepartmentId))]
         [InverseProperty("User")]
         public virtual Department Department { get; set; }

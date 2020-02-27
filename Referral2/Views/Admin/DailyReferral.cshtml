@@ -33,7 +33,7 @@
                                 </button>
                             </div>
                             <div class="form-group">
-                                <a class="btn btn-block btn-sm bg-gradient-orange">
+                                <a asp-action="DailyReferral" asp-route-export="@true" asp-route-daterange="@dateRange" class="btn btn-block btn-sm bg-gradient-orange">
                                     <i class="far fa-file-excel"></i>&nbsp;
                                     Export Data
                                 </a>
@@ -82,8 +82,6 @@
                                     @foreach (var item in Model)
                                     {
                                         var facility = item.Facility.Length > 25 ? new string(item.Facility.Take(25).ToArray()) + "..." : item.Facility;
-                                        var totalFrom = item.AcceptedFrom + item.RedirectedFrom + item.SeenFrom;
-                                        var totalTo = item.AcceptedTo + item.RedirectedTo + item.SeenTo + item.UnseenTo;
                                         <tr>
                                             <th style="text-align: left;white-space: nowrap;" title="@item.Facility">
                                                 @facility
@@ -92,12 +90,12 @@
                                             <td class="text-center">@item.RedirectedTo</td>
                                             <td class="text-center">@item.SeenTo</td>
                                             <td class="text-center">@item.UnseenTo</td>
-                                            <td class="text-center">@totalTo</td>
+                                            <td class="text-center">@item.IncomingTotal</td>
 
                                             <td class="text-center">@item.AcceptedFrom</td>
                                             <td class="text-center">@item.RedirectedFrom</td>
                                             <td class="text-center">@item.SeenFrom</td>
-                                            <td class="text-center">@totalFrom</td>
+                                            <td class="text-center">@item.OutgoingTotal</td>
                                         </tr>
                                     }
                                 </tbody>

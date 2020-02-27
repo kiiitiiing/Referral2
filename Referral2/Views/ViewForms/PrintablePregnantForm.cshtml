@@ -4,12 +4,12 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="title-form">BEmONC/ CEmONC REFERRAL FORM</div>
-                <div class="modal-body">
+                <div class="modal-body printablePregnantForm">
                     @await Html.PartialAsync("~/Views/Shared/_pregnantForm.cshtml", Model)
                     <div class="clearfix"></div>
                 </div>
                 <div class="modal-footer justify-content-end">
-                    <a href="" target="_blank" class="btn-refer-pregnant btn btn-success ">
+                    <a asp-controller="Report" asp-action="PregnantFromPdf" asp-route-code="@Model.Code" target="_blank" class="btn-refer-pregnant btn btn-success ">
                         <i class="fa fa-print"></i>
                         &nbsp;Print Form
                     </a>

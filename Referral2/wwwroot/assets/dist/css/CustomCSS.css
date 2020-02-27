@@ -10,7 +10,6 @@ body {
     font-size: 14px !important;
 }
 
-
 #showMore{
     display:none;
 }
@@ -188,6 +187,7 @@ a{
 
 .facility-color {
     color: #ff8456;
+    white-space: nowrap;
 }
 
 
@@ -229,6 +229,16 @@ a{
 html {
     position: relative;
     min-height: 100%;
+}
+
+
+
+.set-height {
+    margin-bottom: 40px !important;
+}
+
+.printablePregnantForm span {
+    color: #1E8A29 !important;
 }
 
 footer {

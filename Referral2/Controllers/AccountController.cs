@@ -276,7 +276,6 @@ namespace Referral2.Controllers
                 new Claim("Department", user.DepartmentId.ToString()),
                 new Claim("Province", user.ProvinceId.ToString()),
                 new Claim("Muncity", user.MuncityId.ToString()),
-                new Claim("Barangay", user.BarangayId.ToString()),
                 new Claim("RealRole", user.Level),
                 new Claim("RealFacility", user.FacilityId.ToString())
             };
@@ -306,7 +305,6 @@ namespace Referral2.Controllers
                 new Claim("Department", user.DepartmentId.ToString()),
                 new Claim("Province", user.ProvinceId.ToString()),
                 new Claim("Muncity", user.MuncityId.ToString()),
-                new Claim("Barangay", user.BarangayId.ToString()),
                 new Claim("RealRole", user.Level)
             };
 

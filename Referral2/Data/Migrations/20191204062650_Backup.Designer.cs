@@ -997,9 +997,6 @@ namespace Referral2.Data.Migrations
                         .HasMaxLength(255)
                         .IsUnicode(false);
 
-                    b.Property<int?>("BarangayId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Contact")
                         .IsRequired()
                         .HasColumnType("varchar(50)")
@@ -1109,9 +1106,6 @@ namespace Referral2.Data.Migrations
                         .IsUnicode(false);
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BarangayId")
-                        .HasName("IX_IIUser_BarangayId");
 
                     b.HasIndex("DepartmentId")
                         .HasName("IX_IIUser_DepartmentId");

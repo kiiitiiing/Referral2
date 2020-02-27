@@ -17,14 +17,12 @@ namespace Referral2.Models
         public string Code { get; set; }
         public int ReferringFacility { get; set; }
         public int ReferredBy { get; set; }
-        [Required]
         [StringLength(50)]
         public string RecordNo { get; set; }
         public DateTime ReferredDate { get; set; }
         public int ReferredTo { get; set; }
         public int DepartmentId { get; set; }
         public DateTime ArrivalDate { get; set; }
-        [Required]
         [StringLength(50)]
         public string HealthWorker { get; set; }
         public int PatientWomanId { get; set; }

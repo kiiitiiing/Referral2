@@ -21,6 +21,7 @@ namespace Referral2.Models.ViewModels.ViewPatients
         public string ReferredBy { get; set; }
         public string ReferredTo { get; set; }
         public int? ReferredToId { get; set; }
+        public int? ReferredFromId { get; set; }
         public bool Pregnant { get; set; }
         public bool Seen { get; set; }
         public string Code { get; set; }

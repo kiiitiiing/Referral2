@@ -5,7 +5,7 @@
 
     var startDate = ViewBag.StartDate;
     var endDate = ViewBag.EndDate;
-    var dateRange = startDate.ToString("MMMM dd, yyyy") + " - " + @endDate.ToString("MMMM dd, yyyy");
+    var dateRange = startDate.ToString("yyyy/MM/dd") + " - " + endDate.ToString("yyyy/MM/dd");
     void SetBgColor(string status)
     {
         if (status.Equals("accepted") || status.Equals("arrived"))
@@ -21,8 +21,8 @@
 
 
 
-<div class="card card-outline">
-    <div class="card-header card-success">
+<div class="card card-outline card-success">
+    <div class="card-header">
         @await Html.PartialAsync("~/Views/Shared/PartialViews/_DateFilter.cshtml", new SearchModel
             {
                 Action = "ReferralStatus"
@@ -31,7 +31,7 @@
             Referral Status
             <br />
             <small class="text-success">
-                @dateRange
+                @startDate.ToString("MMMM dd, yyyy") - @endDate.ToString("MMMM dd, yyyy")
             </small>
         </h4>
     </div>
@@ -40,7 +40,7 @@
         {
 
             <div class="table-responsive">
-                <table class="table table-hover table-bordered">
+                <table class="table table-hover table-bordered" style="font-size: 14px;">
                     <!-- TABLE HEADER -->
                     <thead>
                         <tr class="bg-black">
@@ -58,8 +58,11 @@
                             var facilityFrom = item.FacilityFrom.Length > 25 ? new string(item.FacilityFrom.Take(25).ToArray()) + "..." : item.FacilityFrom;
                             var facilityTo = item.FacilityTo.Length > 25 ? new string(item.FacilityTo.Take(25).ToArray()) + "..." : item.FacilityTo;
                             SetBgColor(item.Status);
+
+                            var dateReferred = item.DateReferred.ToString("MMM dd, hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+
                             <tr class="@bgColor">
-                                <td class="text-success">@item.DateReferred</td>
+                                <td class="text-success">@dateReferred</td>
                                 <td class="custom-warning" title="@item.FacilityFrom">@facilityFrom</td>
                                 <td class="custom-warning" title="@item.FacilityTo">@facilityTo</td>
                                 <td class="text-maroon">@item.Department</td>

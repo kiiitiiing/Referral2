@@ -55,6 +55,8 @@ namespace Referral2.Services
 
             if (user == null)
                 return (false, user);
+            /*else//Added temporarily
+                return (true, user);*/
 
             var result = _hashPassword.VerifyHashedPassword(user, user.Password, password);
 
@@ -107,7 +109,6 @@ namespace Referral2.Services
                 newUser.Level = _roles.Value.SUPPORT;
                 newUser.DepartmentId = null;
                 newUser.Title = null;
-                newUser.BarangayId = facility.BarangayId;
                 newUser.MuncityId = facility.MuncityId;
                 newUser.ProvinceId = facility.ProvinceId;
                 newUser.Designation = model.Designation;
@@ -145,7 +146,6 @@ namespace Referral2.Services
                 newUser.Level = model.Level;
                 newUser.DepartmentId = model.Department;
                 newUser.Title = null;
-                newUser.BarangayId = facility.BarangayId;
                 newUser.MuncityId = facility.MuncityId;
                 newUser.ProvinceId = facility.ProvinceId;
                 newUser.Designation = model.Designation;

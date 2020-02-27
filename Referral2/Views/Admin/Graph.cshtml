@@ -1,9 +1,11 @@
-﻿@model IEnumerable<GraphValuesModel>
+﻿@model List<GraphValuesModel>
 
 @{
 	ViewData["Title"] = "Graph";
-	var startDate = ViewBag.StartDate;
-	var endDate = ViewBag.EndDate;
+	string[] facilities = null;
+	int[] incoming = null;
+	int[] accepted = null;
+	int[] outgoing = null;
 }
 
 <link href="~/assets/plugins/chart.js/Chart.min.css" rel="stylesheet" />
@@ -16,50 +18,74 @@
 			</div>
 
 
-			<button id="randomizeData">Randomize Data</button>
-			<button id="addDataset">Add Dataset</button>
-			<button id="removeDataset">Remove Dataset</button>
-			<button id="addData">Add Data</button>
-			<button id="removeData">Remove Data</button>
+			@foreach (var item in Model)
+			{
+				<input type="text" class="facilityName" value="@item.Facility" hidden />
+				<input type="hidden" class="incoming" value="@item.Incoming" />
+				<input type="hidden" class="accepted" value="@item.Accepted" />
+				<input type="hidden" class="outgoing" value="@item.Outgoing" />
+				<input type="hidden" class="total" value="@item.Total" />
+			}
 		</div>
 	</div>
 </div>
 <script>
-    string[] fac;
-    var MONTHS =
-        [
-			'January', 'February', 'March', 'April', 'May', 'June', 'July'
-		];
-	var color = Chart.helpers.color;
-	var horizontalBarChartData = {
-		labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+    var Facilities = [];
+    var Incoming = [];
+    var Accepted = [];
+    var Outgoing = [];
+    var IncomingBG = [];
+    var AcceptedBG = [];
+    var OutgoingBG = [];
+    var fac = $('.facilityName');
+    var inc = $('.incoming');
+    var acc = $('.accepted');
+	var out = $('.outgoing');
+	for(var i = 0; i < fac.length; i++){
+        Facilities[i] = ($(fac[i]).val());
+        Incoming[i] = ($(inc[i]).val());
+        Accepted[i] = ($(acc[i]).val());
+        Outgoing[i] = ($(out[i]).val());
+        //IncomingBG = '#0000FF';
+        //AcceptedBG = '#0000FF';
+        //OutgoingBG = '#0000FF';
+    }
+	window.chartColors = {
+      red: 'rgb(255, 99, 132)',
+      orange: 'rgb(255, 159, 64)',
+      yellow: 'rgb(255, 205, 86)',
+      green: 'rgb(45, 201, 12)',
+      blue: 'rgb(54, 162, 235)',
+      purple: 'rgb(153, 102, 255)',
+      grey: 'rgb(201, 203, 207)'
+    };
+    var thicc = 3;
+    var Total = $('.total');
+    var x = 0;
+    var color = Chart.helpers.color;
+    var horizontalBarChartData = {
+        labels: Facilities,
 		datasets: [{
-			label: 'Dataset 1',
-			backgroundColor: color(window.chartColors.red).alpha(0.5).rgbString(),
-			borderColor: window.chartColors.red,
-			borderWidth: 1,
-			data: [
-				randomScalingFactor(),
-				randomScalingFactor(),
-				randomScalingFactor(),
-				randomScalingFactor(),
-				randomScalingFactor(),
-				randomScalingFactor(),
-				randomScalingFactor()
-			]
+			label: 'Incoming',
+            backgroundColor: color(window.chartColors.blue).alpha(1).rgbString(),
+            borderColor: window.chartColors.blue,
+            borderWidth: 1,
+			barThickness: thicc,
+            data: Incoming
 		}, {
-			label: 'Dataset 2',
-			backgroundColor: color(window.chartColors.blue).alpha(0.5).rgbString(),
-			borderColor: window.chartColors.blue,
-			data: [
-				randomScalingFactor(),
-				randomScalingFactor(),
-				randomScalingFactor(),
-				randomScalingFactor(),
-				randomScalingFactor(),
-				randomScalingFactor(),
-				randomScalingFactor()
-			]
+			label: 'Accepted',
+			backgroundColor: color(window.chartColors.red).alpha(1).rgbString(),
+			borderColor: window.chartColors.red,
+            borderWidth: 1,
+			barThickness: thicc,
+			data: Accepted
+		}, {
+			label: 'Outgoing',
+			backgroundColor: color(window.chartColors.green).alpha(1).rgbString(),
+			borderColor: window.chartColors.green,
+            borderWidth: 1,
+			barThickness: thicc,
+			data: Outgoing
 		}]
 
 	};
@@ -78,74 +104,18 @@
 					}
 				},
 				responsive: true,
-				legend: {
+                legend: {
+                    display: true,
 					position: 'bottom',
 				},
 				title: {
 					display: true,
-					text: 'E REFERRAL REPORT FROM '+'@startDate.ToString("MMMM").ToUppper()'+' TO '+'@endDate.ToString("MMMM").ToUppper()' + ' OF '+'@startDate.ToString("yyyy")'
+                    text: 'E REFERRAL REPORT IN JANUARY to SEPTEMBER of 2019',
+					fontSize: 30
 				}
 			}
 		});
 
-	};
+    };
 
-	document.getElementById('randomizeData').addEventListener('click', function () {
-		var zero = Math.random() < 0.2 ? true : false;
-		horizontalBarChartData.datasets.forEach(function (dataset) {
-			dataset.data = dataset.data.map(function () {
-				return zero ? 0.0 : randomScalingFactor();
-			});
-
-		});
-		window.myHorizontalBar.update();
-	});
-
-	var colorNames = Object.keys(window.chartColors);
-
-	document.getElementById('addDataset').addEventListener('click', function () {
-		var colorName = colorNames[horizontalBarChartData.datasets.length % colorNames.length];
-		var dsColor = window.chartColors[colorName];
-		var newDataset = {
-			label: 'Dataset ' + (horizontalBarChartData.datasets.length + 1),
-			backgroundColor: color(dsColor).alpha(0.5).rgbString(),
-			borderColor: dsColor,
-			data: []
-		};
-
-		for (var index = 0; index < horizontalBarChartData.labels.length; ++index) {
-			newDataset.data.push(randomScalingFactor());
-		}
-
-		horizontalBarChartData.datasets.push(newDataset);
-		window.myHorizontalBar.update();
-	});
-
-	document.getElementById('addData').addEventListener('click', function () {
-		if (horizontalBarChartData.datasets.length > 0) {
-			var month = MONTHS[horizontalBarChartData.labels.length % MONTHS.length];
-			horizontalBarChartData.labels.push(month);
-
-			for (var index = 0; index < horizontalBarChartData.datasets.length; ++index) {
-				horizontalBarChartData.datasets[index].data.push(randomScalingFactor());
-			}
-
-			window.myHorizontalBar.update();
-		}
-	});
-
-	document.getElementById('removeDataset').addEventListener('click', function () {
-		horizontalBarChartData.datasets.pop();
-		window.myHorizontalBar.update();
-	});
-
-	document.getElementById('removeData').addEventListener('click', function () {
-		horizontalBarChartData.labels.splice(-1, 1); // remove the label first
-
-		horizontalBarChartData.datasets.forEach(function (dataset) {
-			dataset.data.pop();
-		});
-
-		window.myHorizontalBar.update();
-	});
 </script>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace Referral2.Models.ViewModels.Forms
 {
@@ -9,7 +10,8 @@ namespace Referral2.Models.ViewModels.Forms
             Code = form.Code;
             ReferringMd = GlobalFunctions.GetMDFullName(form.ReferredByNavigation);
             RecordNumber = form.RecordNo;
-            DateReferred = form.ReferredDate.ToString("dd/MM/yyyy");
+            DateReferred = form.ReferredDate.ToString("MMMM d, yyyy h:mm tt",CultureInfo.InvariantCulture);
+            DateArrived = form.ArrivalDate != default ? form.ArrivalDate.ToString("MMMM d, yyyy h:mm tt", CultureInfo.InvariantCulture) : "";
             ReferringMdContact = form.ReferredByNavigation.Contact;
             Facility = form.ReferringFacilityNavigation == null ? "" : form.ReferringFacilityNavigation.Name;
             FacilityContact = form.ReferringFacilityNavigation == null ? "" : form.ReferringFacilityNavigation.Contact;

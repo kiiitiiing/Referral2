@@ -472,21 +472,6 @@
                                 <small class="badge bg-blue">@recoCount</small>
                             }
                         </button>
-                        <button type="button" class="btn btn-xs btn-danger" data-toggle="ajax-modal" data-target="#issues-modal" data-url="@Url.Action("Issues","Remarks", new { id = item.TrackingId })">
-                            <i class="fa fa-exclamation-triangle"></i>
-                            &nbsp;Issue and Concern
-                            @if (item.IssueCount > 0)
-                            {
-                                <small class="badge bg-gradient-red">@item.IssueCount</small>
-                            }
-                        </button>
-                        @if (!item.Status.Equals("cancelled") && !item.Status.Equals("discharged"))
-                        {
-                            <button type="button" class="btn btn-xs btn-default" data-toggle="ajax-modal" data-target="#cancel-modal" data-url="@Url.Action("CancelRemark","Remarks", new { code = item.Code })">
-                                <i class="fa fa-times"></i>
-                                &nbsp;Cancel
-                            </button>
-                        }
                     </div>
                 </div>
             }

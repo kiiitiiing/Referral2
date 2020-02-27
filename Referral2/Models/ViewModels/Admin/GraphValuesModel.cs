@@ -11,6 +11,6 @@ namespace Referral2.Models.ViewModels.Admin
         public int Incoming { get; set; }
         public int Accepted { get; set; }
         public int Outgoing { get; set; }
-        public int Total { get; set; }
+        public int Total { get { return Incoming + Accepted + Outgoing; } }
     }
 }

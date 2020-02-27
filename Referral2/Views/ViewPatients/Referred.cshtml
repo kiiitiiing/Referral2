@@ -172,6 +172,7 @@
                 var seenCount = item.SeenCount;
                 var callerCount = item.CallerCount;
                 var recoCount = item.ReCoCount;
+                var referredBy = item.Walkin ? "WALK IN" : item.ReferredBy.ToUpper();
                 int ctr = 0;
                 seen = "disabled";
                 accepted = "disabled";
@@ -189,7 +190,7 @@
                             <small class="text-sm text-muted">[@item.PatientSex, @item.PatientAge] from @item.PatientAddress</small><br />
                         </span>
                         <span class="text-success">Referred by:</span>
-                        <strong class="text-info">@item.ReferredBy.ToUpper()</strong><br />
+                        <strong class="text-info">@referredBy</strong><br />
                         <span class="text-success">Patient Code:</span>
                         <span class="code-color" id="code-holder">@item.Code</span>
                         <span id="status-holder" hidden>@item.Status</span>
@@ -496,62 +497,62 @@
                         var dataTarget = item.Pregnant ? "print-pregnant-form-modal" : "normal-form-modal";
                         var dataUrl = item.Pregnant ? Url.Action("PrintablePregnantForm", "ViewForms", new { code = item.Code }) : Url.Action("PrintableNormalForm", "ViewForms", new { code = item.Code });
                     }
-                    <div class="card-footer card-custom-bg">
-                        <button class="btn btn-xs bg-gradient-warning" data-target="#@dataTarget" data-toggle="ajax-modal" data-url="@dataUrl">
-                            <i class="fa fa-folder"></i>
-                            &nbsp;View Form
+                <div class="card-footer card-custom-bg">
+                    <button class="btn btn-xs bg-gradient-warning" data-target="#@dataTarget" data-toggle="ajax-modal" data-url="@dataUrl">
+                        <i class="fa fa-folder"></i>
+                        &nbsp;View Form
+                    </button>
+                    @if (seenCount > 0)
+                    {
+                        <button type="button" class="btn btn-success btn-xs" data-toggle="ajax-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens", "Modals", new { trackingId = item.TrackingId })">
+                            <i class="fa fa-user-md"></i>
+                            &nbsp;Seen
+
+                            <small class="badge bg-green">@seenCount</small>
+
                         </button>
-                        @if (seenCount > 0)
-                        {
-                            <button type="button" class="btn btn-success btn-xs" data-toggle="ajax-modal" data-target="#seen-modal" data-url="@Url.Action("ViewSeens", "Modals", new { trackingId = item.TrackingId })">
-                                <i class="fa fa-user-md"></i>
-                                &nbsp;Seen
-
-                                <small class="badge bg-green">@seenCount</small>
-
-                            </button>
-                        }
-                        @if (item.Status.Equals("accepted") && item.Travel)
-                        {
-                            <button type="button" class="btn btn-success btn-xs" data-toggle="ajax-modal" data-target="#travel-modal" data-url="@Url.Action("Travel", "Remarks", new { id = item.TrackingId })">
-                                <i class="fa fa-ambulance"></i>
-                                &nbsp;Travel
-                            </button>
-                        }
-                        @if (callerCount > 0)
-                        {
-                            <button class="btn btn-xs bg-gradient-primary">
-                                <i class="fa fa-phone"></i>
-                                &nbsp;Caller
-
-                                <small class="badge bg-blue">@callerCount</small>
-
-                            </button>
-                        }
-                        <button type="button" class="btn btn-info btn-xs" data-toggle="ajax-modal" data-target="#reco-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
-                            <i class="fa fa-comments"></i>
-                            &nbsp;ReCo
-                            @if (recoCount > 0)
-                            {
-                                <small class="badge bg-blue">@recoCount</small>
-                            }
+                    }
+                    @if (item.Status.Equals("accepted") && item.Travel)
+                    {
+                        <button type="button" class="btn btn-success btn-xs" data-toggle="ajax-modal" data-target="#travel-modal" data-url="@Url.Action("Travel", "Remarks", new { id = item.TrackingId })">
+                            <i class="fa fa-ambulance"></i>
+                            &nbsp;Travel
                         </button>
-                        <button type="button" class="btn btn-xs btn-danger" data-toggle="ajax-modal" data-target="#issues-modal" data-url="@Url.Action("Issues","Remarks", new { id = item.TrackingId })">
-                            <i class="fa fa-exclamation-triangle"></i>
-                            &nbsp;Issue and Concern
-                            @if (item.IssueCount > 0)
-                            {
-                                <small class="badge bg-gradient-red">@item.IssueCount</small>
-                            }
+                    }
+                    @if (callerCount > 0)
+                    {
+                        <button class="btn btn-xs bg-gradient-primary" data-toggle="ajax-modal" data-target="#calling-modal" data-url="@Url.Action("ViewCalls","Modals", new { code = item.Code })">
+                            <i class="fa fa-phone"></i>
+                            &nbsp;Caller
+
+                            <small class="badge bg-blue">@callerCount</small>
+
                         </button>
-                        @if (!item.Status.Equals("cancelled") && !item.Status.Equals("discharged"))
+                    }
+                    <button type="button" class="btn btn-info btn-xs" data-toggle="ajax-modal" data-target="#reco-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
+                        <i class="fa fa-comments"></i>
+                        &nbsp;ReCo
+                        @if (recoCount > 0)
                         {
-                            <button type="button" class="btn btn-xs btn-default" data-toggle="ajax-modal" data-target="#cancel-modal" data-url="@Url.Action("CancelRemark","Remarks", new { code = item.Code })">
-                                <i class="fa fa-times"></i>
-                                &nbsp;Cancel
-                            </button>
+                            <small class="badge bg-blue">@recoCount</small>
                         }
-                    </div>
+                    </button>
+                    <button type="button" class="btn btn-xs btn-danger" data-toggle="ajax-modal" data-target="#issues-modal" data-url="@Url.Action("Issues","Remarks", new { id = item.TrackingId })">
+                        <i class="fa fa-exclamation-triangle"></i>
+                        &nbsp;Issue and Concern
+                        @if (item.IssueCount > 0)
+                        {
+                            <small class="badge bg-gradient-red">@item.IssueCount</small>
+                        }
+                    </button>
+                    @if (!item.Status.Equals("cancelled") && !item.Status.Equals("discharged"))
+                    {
+                        <button type="button" class="btn btn-xs btn-default" data-toggle="ajax-modal" data-target="#cancel-modal" data-url="@Url.Action("CancelRemark","Remarks", new { code = item.Code })">
+                            <i class="fa fa-times"></i>
+                            &nbsp;Cancel
+                        </button>
+                    }
+                </div>
                 </div>
             }
         }

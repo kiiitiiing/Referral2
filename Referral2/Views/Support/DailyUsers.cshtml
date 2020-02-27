@@ -31,14 +31,14 @@
                         <div class="card-footer">
                             <div class="form-group">
                                 <!-- FILTER -->
-                                <button type="submit" value="Filter" class="btn btn-block btn-success">
+                                <button type="submit" class="btn btn-block btn-success">
                                     <i class="fa fa-filter"></i>
                                     &nbsp;Filter Result
                                 </button>
-                                <button value="Filter" class="btn btn-block btn-warning">
+                                <a asp-action="DailyUsers" asp-route-export="@true" asp-route-date="@ViewBag.Date.ToString("dd/MM/yyyy")" class="btn btn-block btn-warning">
                                     <i class="fa fa-file-excel"></i>
                                     &nbsp;Export Data
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </form>
@@ -118,7 +118,12 @@
                             HasNextPage = Model.HasNextPage,
                             HasPreviousPage = Model.HasPreviousPage,
                             PageIndex = Model._pageIndex,
-                            TotalPages = Model._totalPages
+                            TotalPages = Model._totalPages,
+                            Parameters = new Dictionary<string, string>
+                            {
+                                {"page",Model._pageIndex.ToString() },
+                                {"date", ViewBag.Date.ToString("dd/MM/yyyy") }
+                            }
                         })
                     </div>
                 </div>

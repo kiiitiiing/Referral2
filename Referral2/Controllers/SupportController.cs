@@ -15,6 +15,9 @@ using Referral2.Services;
 using Microsoft.Extensions.Options;
 using Referral2.Models.ViewModels;
 using System.Diagnostics;
+using System.IO;
+using OfficeOpenXml;
+using System.Globalization;
 
 namespace Referral2.Controllers
 {
@@ -105,7 +108,7 @@ namespace Referral2.Controllers
             return View();
         }
         // GET: DAILY REFERRALS
-        public async Task<IActionResult> DailyReferrals(string daterange, int? page)
+        public async Task<IActionResult> DailyReferrals(string daterange, int? page, bool export)
         {
             StartDate = DateTime.Now;
             EndDate = DateTime.Now;
@@ -138,7 +141,7 @@ namespace Referral2.Controllers
                 );
             var activities = _context.Activity.Where(x => x.DateReferred >= StartDate && x.DateReferred <= EndDate);
             var trackings = _context.Tracking.Where(x => x.DateReferred >= StartDate && x.DateReferred <= EndDate);
-            var seens = _context.Seen.Where(x => x.CreatedAt >= StartDate && x.CreatedAt <= EndDate);
+            var seens = _context.Seen.Where(x => x.Tracking.DateReferred >= StartDate && x.Tracking.DateReferred <= EndDate);
 
             var users = _context.User
                 .Where(x => x.FacilityId.Equals(UserFacility) && x.Level.Equals(_roles.Value.DOCTOR))
@@ -147,46 +150,171 @@ namespace Referral2.Controllers
                 {
                     DoctorName = i.Firstname + " " + i.Middlename + " " + i.Lastname,
                     OutAccepted = activities.Where(x => x.ReferringMd.Equals(i.Id) && x.Status.Equals(_status.Value.ACCEPTED)).Count(),
-                    OutRedirected = tract.Where(x => x.ReferredFrom.Equals(UserFacility) && x.ReferringMd.Equals(i.Id) && x.Status.Equals(_status.Value.REJECTED)).Count(),
+                    OutRedirected = tract.Where(x => x.ReferringMd.Equals(i.Id) && x.Status.Equals(_status.Value.REJECTED)).Count(),
                     OutSeen = trackings.Where(x => x.ReferringMd.Equals(i.Id) && x.DateSeen == default).Count(),
-                    OutTotal = trackings.Where(x => x.ReferringMd.Equals(i.Id)).Count(),
+                    OutTotal = trackings.Where(x => x.ReferringMd.Equals(i.Id)).Select(x=>x.Code).Distinct().Count(),
                     InAccepted = tract.Where(x => x.ReferredTo.Equals(UserFacility) && x.ActionMd.Equals(i.Id) && x.Status.Equals(_status.Value.ACCEPTED)).Count(),
                     InRedirected = tract.Where(x => x.ReferredTo.Equals(UserFacility) && x.ActionMd.Equals(i.Id) && x.Status.Equals(_status.Value.REJECTED)).Count(),
                     InSeen = seens.Where(x=>x.UserMd.Equals(i.Id)).GroupBy(x=>x.TrackingId).Select(x=>x.Key).Count(),
                 });
-            return View(await PaginatedList<DailyReferralSupport>.CreateAsync(users.AsNoTracking(), page ?? 1, size));
+
+            if(export)
+            {
+                string name = $"DailyReferral-{DateTime.Now.ToString("yyyy-MM-dd")}.xlsx";
+                return File(ExportDailyReferrals(users), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", name);
+            }
+
+            return View(await PaginatedList<DailyReferralSupport>.CreateAsync(users.OrderBy(x=>x.DoctorName), page ?? 1, size));
+        }
+
+        private MemoryStream ExportDailyReferrals(IEnumerable<DailyReferralSupport> model)
+        {
+            var stream = new MemoryStream();
+
+            using (var package = new ExcelPackage(stream))
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Sheet1");
+
+                for (int x = 1; x <= 10; x++)
+                {
+                    if (x <= 8)
+                    {
+                        worksheet.Cells["A" + x + ":J" + x].Merge = true;
+                        worksheet.Cells["A" + x + ":J" + x].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                    }
+                    worksheet.Cells["A" + x + ":J" + x].Style.Font.Bold = true;
+                }
+                worksheet.Cells["A9:A10"].Merge = true;
+                worksheet.Cells["A9:A10"].Value = "Name of Hospital";
+                worksheet.Cells["B9:E9"].Merge = true;
+                worksheet.Cells["B9:E9"].Value = "Number of Outgoing Referrals";
+                worksheet.Cells["F9:F10"].Merge = true;
+                worksheet.Cells["F9"].Value = "TOTAL";
+                worksheet.Cells["F9"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                worksheet.Cells["F9"].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                worksheet.Cells["G9:I9"].Merge = true;
+                worksheet.Cells["G9"].Value = "Number of Incoming Referrals";
+                worksheet.Cells["J9:J10"].Merge = true;
+                worksheet.Cells["J9"].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                worksheet.Cells["J9"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                worksheet.Cells["J9"].Value = "TOTAL";
+                worksheet.Cells["A2"].Value = "Monitoring Tool for Central Visayas Electronic Health Referral System";
+                worksheet.Cells["A3"].Value = "Form 2";
+                worksheet.Cells["A4"].Value = "DAILY REPORT FOR REFERRALS";
+                worksheet.Cells["A6"].Value = "Name of Hospital: " + _context.Facility.Find(UserFacility).Name;
+                worksheet.Cells["A6"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Justify;
+                worksheet.Cells["A7"].Value = "Date: " + StartDate.ToString("MMMM d, yyyy")+" - "+EndDate.ToString("MMMM d, yyyy");
+                worksheet.Cells["A7"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Justify;
+                worksheet.Cells["A8"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                worksheet.Cells["A8"].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                worksheet.Cells["F8"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                worksheet.Cells["B8"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                worksheet.Cells["I8"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                worksheet.Cells["I8"].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                worksheet.Cells["B10"].Value = "Accepted";
+                worksheet.Cells["C10"].Value = "Redirected";
+                worksheet.Cells["D10"].Value = "Seen";
+                worksheet.Cells["E10"].Value = "Unseen";
+                worksheet.Cells["G10"].Value = "Accepted";
+                worksheet.Cells["H10"].Value = "Redirected";
+                worksheet.Cells["I10"].Value = "Seen";
+
+                worksheet.Cells["A11"].LoadFromCollection(model.ToList(), false).AutoFitColumns();
+                package.Save();
+            }
+
+            stream.Position = 0;
+
+            return stream;
         }
         // GET: DAILY USERS
-        public async Task<IActionResult> DailyUsers(string date, int? page)
+        public async Task<IActionResult> DailyUsers(string date, int? page, bool export)
         {
             StartDate = DateTime.Now.Date;
             EndDate = StartDate.AddDays(1).AddSeconds(-1);
             if (date != null)
             {
-                page = 1;
                 StartDate = DateTime.Parse(date);
                 EndDate = StartDate.AddDays(1).AddSeconds(-1);
             }
             ViewBag.Date = StartDate;
 
             var logins = _context.Login
-                .Where(x => x.CreatedAt >= StartDate.Date && x.CreatedAt <= EndDate)
-                .OrderByDescending(x => x.UpdatedAt);
+                .Where(x => x.CreatedAt >= StartDate.Date && x.CreatedAt <= EndDate);
 
             var dailyUsers = _context.User
                 .Where(x => x.FacilityId.Equals(UserFacility) && x.Level.Equals(_roles.Value.DOCTOR))
+                .OrderBy(x=>x.Lastname)
                 .Select(i => new DailyUsersViewModel
                 {
                     MDName = GlobalFunctions.GetFullLastName(i),
-                    OnDuty = i.LastLogin != default? logins.Where(x => x.UserId == i.Id && x.Login1 >= StartDate && x.Login1 <= EndDate).First().Status : "",
+                    OnDuty = i.LastLogin != default ? logins.Where(x => x.UserId == i.Id && x.Login1 >= StartDate && x.Login1 <= EndDate).First().Status : "",
                     LoggedIn = i.LastLogin != default ? logins.Where(x => x.UserId == i.Id && x.Login1 >= StartDate && x.Login1 <= EndDate).First().Login1 != default : false,
                     LoginTime = logins.Where(x => x.UserId == i.Id && x.Login1 >= StartDate && x.Login1 <= EndDate).First().Login1,
-                    LogoutTime = logins.Where(x => x.UserId == i.Id && x.Logout != default).First().Logout
+                    LogoutTime = logins.Where(x => x.UserId == i.Id && x.Logout != default).OrderByDescending(x => x.UpdatedAt).First().Logout
                 });
 
             int size = 20;
 
-            return View(await PaginatedList<DailyUsersViewModel>.CreateAsync(dailyUsers.AsNoTracking(), page ?? 1, size));
+            if(export)
+            {
+                string name = $"DailyUser-{DateTime.Now.ToString("yyyy-MM-dd")}.xlsx";
+                return File(ExportDailyUsers(dailyUsers.ToList()), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", name);
+            }
+
+            return View(await PaginatedList<DailyUsersViewModel>.CreateAsync(dailyUsers.OrderBy(x=>x.MDName), page ?? 1, size));
+        }
+        private MemoryStream ExportDailyUsers(List<DailyUsersViewModel> model)
+        {
+            var stream = new MemoryStream();
+
+            using (var package = new ExcelPackage(stream))
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Sheet1");
+
+                for (int x = 1; x <= 9; x++)
+                {
+                    if (x <= 8)
+                    {
+                        worksheet.Cells["A" + x + ":F" + x].Merge = true;
+                        worksheet.Cells["A" + x + ":F" + x].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                    }
+                    worksheet.Cells["A" + x + ":F" + x].Style.Font.Bold = true;
+                }
+                worksheet.Cells["A2"].Value = "Monitoring Tool for Central Visayas Electronic Health Referral System";
+                worksheet.Cells["A2"].AutoFitColumns();
+                worksheet.Cells["A3"].Value = "Form 1";
+                worksheet.Cells["A4"].Value = "DAILY REPORT FOR AVAILABLE USERS";
+                worksheet.Cells["A6"].Value = "Name of Hospital: " + _context.Facility.Find(UserFacility).Name;
+                worksheet.Cells["A6"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Justify;
+                worksheet.Cells["A7"].Value = "Date: " + StartDate.ToString("MMMM d, yyyy");
+                worksheet.Cells["A7"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Justify;
+                worksheet.Cells["A8"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                worksheet.Cells["B9:F9"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                worksheet.Cells["A9"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Justify;
+                worksheet.Cells["A9"].Value = "Name of User";
+                worksheet.Cells["B9"].Value = "On Duty";
+                worksheet.Cells["C9"].Value = "Off Duty";
+                worksheet.Cells["D9"].Value = "Login";
+                worksheet.Cells["E9"].Value = "Logout";
+                worksheet.Cells["F9"].Value = "Remarks";
+
+                for(int r = 0; r < model.Count(); r++)
+                {
+                    worksheet.Cells["A" + (r + 10)].AutoFitColumns();
+                    worksheet.Cells["A" + (r + 10)].Value = model[r].MDName;
+                    worksheet.Cells["B" + (r + 10)].Value = model[r].OnDuty == "login" ? "✓" : "";
+                    worksheet.Cells["C" + (r + 10)].Value = model[r].OnDuty == "login off" ? "" : "✓";
+                    worksheet.Cells["D" + (r + 10)].Value = model[r].LoginTime.ToString("h:mm tt", CultureInfo.InvariantCulture);
+                    worksheet.Cells["E" + (r + 10)].Value = model[r].LogoutTime.ToString("h:mm tt", CultureInfo.InvariantCulture);
+                    worksheet.Cells["F" + (r + 10)].Value = "";
+                }
+                package.Save();
+            }
+
+            stream.Position = 0;
+
+            return stream;
         }
 
         public string LoginStatus(Login login)
@@ -288,7 +416,7 @@ namespace Referral2.Controllers
             }
             int size = 10;
 
-            return View(await PaginatedList<SupportManageViewModel>.CreateAsync(doctors.AsNoTracking(), page ?? 1, size));
+            return View(await PaginatedList<SupportManageViewModel>.CreateAsync(doctors.OrderByDescending(x=>x.DoctorName), page ?? 1, size));
         }
         // GET: DASHBOARD
         public IActionResult SupportDashboard()
