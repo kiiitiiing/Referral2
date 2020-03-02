@@ -37,8 +37,8 @@
                     <tbody>
                         @foreach (var item in Model)
                         {
-                            var lastLogin = item.LastLogin.ToString("MMM d, yyyy h:mm tt", System.Globalization.CultureInfo.InvariantCulture);
-                            if (lastLogin.Equals(default))
+                            var lastLogin = item.LastLogin.GetDate("MMM d, yyyy h:mm tt");
+                            if (item.LastLogin.Equals(default))
                             {
                                 lastLogin = "Never login";
                             }

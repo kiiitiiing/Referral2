@@ -1,4 +1,4 @@
-﻿@model IEnumerable<IncomingReferralViewModel>
+﻿@model PaginatedList<IncomingReferralViewModel>
 
 @{
     ViewData["Title"] = "Incoming Referrals";
@@ -7,29 +7,29 @@
 <div class="col-md-12">
     <div class="card card-success card-outline">
         <div class="card-header with-border">
-            <h3>Incoming Referrals</h3>
+            <h4>Incoming Referrals</h4>
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-striped table-hover table-bordered">
+                <table class="table table-striped table-hover table-bordered" width="100%" style="font-size: 14px;">
                     <thead>
                         <tr class="bg-black">
-                            <th>Patient Name</th>
-                            <th>Referring Facility</th>
-                            <th>Department</th>
-                            <th>Date Referred</th>
-                            <th>Status</th>
+                            <th width="19%">Patient Name</th>
+                            <th width="46%">Referring Facility</th>
+                            <th width="9%">Department</th>
+                            <th width="19%">Date Referred</th>
+                            <th width="7%">Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var item in Model)
                         {
                             <tr>
-                                <td><span class="text-primary text-bold">@item.PatientName</span></td>
-                                <td><span class="facility">@item.ReferringFacility</span></td>
-                                <td><span class="facility">@item.Department</span></td>
-                                <td><span class="text-success">@item.DateReferred.ToString("MMMM d, yyyy h:mm tt",System.Globalization.CultureInfo.InvariantCulture)</span></td>
-                                <td><span class="text-success">@item.Status</span></td>
+                                <td><span class="text-primary text-bold">@item.PatientName.NameToUpper()</span></td>
+                                <td><span class="facility-color">@item.ReferringFacility</span></td>
+                                <td><span class="facility-color">@item.Department</span></td>
+                                <td><span class="text-success">@item.DateReferred.GetDate("MMMM d, yyyy h:mm tt")</span></td>
+                                <td><span class="text-success">@item.Status.FirstToUpper()</span></td>
                             </tr>
                         }
                     </tbody>
@@ -37,7 +37,18 @@
             </div>
         </div>
         <div class="card-footer">
-
+            @await Html.PartialAsync("~/Views/Shared/PartialViews/_PageList.cshtml", new PageListModel
+               {
+                   Action = "IncomingReport",
+                   HasNextPage = Model.HasNextPage,
+                   HasPreviousPage = Model.HasPreviousPage,
+                   PageIndex = Model._pageIndex,
+                   TotalPages = Model._totalPages,
+                   Parameters = new Dictionary<string, string>
+                   {
+                       { "search", "" }
+                   }
+               })
         </div>
     </div>
 </div>

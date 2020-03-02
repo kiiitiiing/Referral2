@@ -6,6 +6,13 @@
     var endDate = ViewBag.EndDate;
     var dateRange = startDate.ToString("dd/MM/yyyy") + " - " + endDate.ToString("dd/MM/yyyy");
 }
+    <style>
+        label{
+            padding: 6px 12px;
+            font-size: 14px;
+            height: 50px !important;
+        }
+    </style>
     <div style="
      width: 97.5vw;
     position: relative;
@@ -14,7 +21,7 @@
     margin-left: -45vw;
     margin-right: -45vw;">
         <form asp-action="Consolidated" method="post">
-            <div class="row" style="margin-top: -0.5%; margin-bottom: 1%">
+            <div class="row" style="margin-top: -0.5%; margin-bottom: 1% ">
                 <div class="col-md-4">
                     <input class="form-control form-control-sm" type="text" value="@dateRange" id="daterange" name="daterange" autocomplete="off">
                 </div>
@@ -31,6 +38,7 @@
 
         @foreach (var items in Model)
         {
+            var logo = string.IsNullOrEmpty(items.FacilityLogo) ? "DOHLOGO.png" : items.FacilityLogo;
             <div class="card card-outline card-success card-outline-tabs">
                 <div class="card-body">
                     <ul class="nav nav-tabs" id="custom-content-above-tab" role="tablist">
@@ -44,7 +52,7 @@
                                 Outgoing
                             </a>
                         </li>
-                        <li class="custom-float-right">
+                        <li class="text-bold text-primary custom-float-right">
                             @startDate.ToString("MMMM (yyyy)") to @endDate.ToString("MMMM (yyyy)")
                         </li>
                     </ul>
@@ -55,7 +63,7 @@
                                 <!-- HOSPITAL SIDE -->
                                 <div class="col-md-4">
                                     <div class="title-form">
-                                        <img class="img-circle profile-user-img" src="~/assets/hospitallogos/@items.FacilityLogo" />
+                                        <img class="img-circle profile-user-img" src="~/assets/hospitallogos/@logo" />
                                         <br />
                                         @items.FacilityName
                                     </div>
@@ -291,7 +299,7 @@
                                 <!-- HOSPITAL SIDE -->
                                 <div class="col-md-4">
                                     <div class="title-form">
-                                        <img class="img-circle profile-user-img" src="~/assets/hospitallogos/@items.FacilityLogo" />
+                                        <img class="img-circle profile-user-img" src="~/assets/hospitallogos/@logo" />
                                         <br />
                                         @items.FacilityName
                                     </div>

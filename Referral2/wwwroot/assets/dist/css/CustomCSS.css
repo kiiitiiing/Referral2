@@ -1,5 +1,36 @@
+
+
 .container-auth-bg {
-    background-image: url('../img/backdrop.png'),radial-gradient(#CCC,#DDD);
+    background-image: url('../img/backdrop.png'),radial-gradient(#CCC,#DDD) !important;
+}
+
+.bg-gradient-yellow{
+    color: #FFF !important;
+}
+
+.dropdown-menu{
+    font-size: 14px !important;
+}
+
+a.dropdown-item{
+    line-height: 20px !important;
+}
+
+.custom-nav {
+    display: -webkit-flex;
+    -webkit-flex-direction: row;
+    -webkit-align-items: center;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 0;
+    line-height: 20px;
+}
+
+nav{
+    border: 0 !important;
+    padding: 0 !important;
+    line-height: 40px !important;
 }
 
 body {
@@ -142,9 +173,9 @@ a{
     color: #F39C2B !important;
 }
 
-.title-info, title-desc{
+.title-info, .title-desc{
     font-weight: bold;
-    font-size: 1.2em;
+    font-size: 15px;
     color: #FFF;
 }
 
@@ -176,8 +207,8 @@ a{
 
 .custom-float-right{
     position: absolute !important;
-    top: 5% !important;
-    right: 2% !important;
+    top: 20px !important;
+    right: 20px !important;
 }
 
 .md-color {

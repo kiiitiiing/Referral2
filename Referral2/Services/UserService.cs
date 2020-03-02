@@ -58,21 +58,21 @@ namespace Referral2.Services
             /*else//Added temporarily
                 return (true, user);*/
 
-            var result = _hashPassword.VerifyHashedPassword(user, user.Password, password);
-
-
-            if (result.Equals(PasswordVerificationResult.Success))
-            {
-                user.LoginStatus = "login";
-                user.LastLogin = DateTime.Now;
-                user.UpdatedAt = DateTime.Now;
-                user.Status = "active";
-                _context.Update(user);
-                return (true, user);
-            }
-
             else
-                return (false, user);
+            {
+                var result = _hashPassword.VerifyHashedPassword(user, user.Password, password);
+                if (result.Equals(PasswordVerificationResult.Success))
+                {
+                    user.LoginStatus = "login";
+                    user.LastLogin = DateTime.Now;
+                    user.UpdatedAt = DateTime.Now;
+                    _context.Update(user);
+                    return (true, user);
+                }
+                else
+                    return (false, user);
+            }
+            
         }
 
         public void ChangePasswordAsync(User user, string newPassword)
@@ -134,9 +134,9 @@ namespace Referral2.Services
                 var facility = _context.Facility.First(x => x.Id.Equals(facilityId));
                 User newUser = new User();
                 string hashedPass = _hashPassword.HashPassword(newUser, model.Password);
-                newUser.Firstname = GlobalFunctions.FixName(model.Firstname);
-                newUser.Middlename = GlobalFunctions.FixName(model.Middlename);
-                newUser.Lastname = GlobalFunctions.FixName(model.Lastname);
+                newUser.Firstname = model.Firstname.FixName();
+                newUser.Middlename = model.Middlename.FixName();
+                newUser.Lastname = model.Lastname.FixName();
                 newUser.Contact = model.ContactNumber;
                 newUser.Email = model.Email;
                 newUser.FacilityId = facilityId;

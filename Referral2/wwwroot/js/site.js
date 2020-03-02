@@ -23,6 +23,15 @@ $(function () {
         });
     }
 
+    var supReport = $('span.supReport');
+
+    if (supReport.length > 0) {
+        $.when(GetSupportReport()).done(function (output) {
+            supReport.text("");
+            supReport.text(output);
+        });
+    }
+
     //----------------------- TRY-----------------------------------
     
 
@@ -59,53 +68,11 @@ $(function () {
 
     //---------------------- ADDRESS CHANGE -------------------------
 
-    //---------------------- ACCEPT MODAL ---------------------------
-    
-
-    //---------------------- ACCEPT MODAL ---------------------------
 
 
     //---------------------- MODALS ---------------------------------
 
     var placeholderElement = $('#modal-placeholders');
-
-
-    var smallModal = $('#small-modal');
-    var smallContent = $('#small-content');
-    var largeModal = $('#large-modal')
-    var largeContent = $('#large-content')
-
-    $('a[data-toggle="small-modal"]').click(function (event) {
-        var url = $(this).data('url');
-        CallSmallModal(url);
-    });
-
-
-    $('button[data-toggle="small-modal"]').click(function (event) {
-        var url = $(this).data('url');
-        CallSmallModal(url);
-    });
-
-    $('a[data-toggle="large-modal"]').click(function (event) {
-        var url = $(this).data('url');
-        CallLargeModel(url);
-    });
-
-    function CallLargeModel(url) {
-        $.get(url).done(function (data) {
-            largeModal.modal('show');
-            largeContent.empty();
-            largeContent.html(data);
-        });
-    }
-
-    function CallSmallModal(url) {
-        $.get(url).done(function (data) {
-            smallModal.modal('show');
-            smallContent.empty();
-            smallContent.html(data);
-        });
-    }
 
     $('button[data-toggle="ajax-modal"]').click(function (event) {
         var url = $(this).data('url');
@@ -124,48 +91,15 @@ $(function () {
             placeholderElement.find('.modal').modal('show');
         });
     });
-    //small modal sumbit
-    smallModal.on('click', 'button[data-save="modal"]', function (event) {
-        event.preventDefault();
-        var form = smallModal.find('form');
-        var actionUrl = form.attr('action');
-        var dataToSend = form.serialize();
-        $.post(actionUrl, dataToSend).done(function (data) {
-            var newBody = $(smallContent, data);
-            smallContent.replaceWith(newBody);
-            var validation = $('span.text-danger').text();
-            if (validation == '') {
-                //placeholderElement.find('.modal').modal('hide');
-                //location.reload();
-            }
-        });
-    });
-    //large modal submit
-    largeModal.on('click', 'button[data-save="modal"]', function (event) {
-        event.preventDefault();
-        console.log('here');
-        var form = largeModal.find('form');
-        var actionUrl = form.attr('action');
-        var dataToSend = form.serialize();
-        $.post(actionUrl, dataToSend).done(function (data) {
-            var newBody = $(largeContent, data);
-            largeContent.replaceWith(newBody);
-            var validation = $('span.text-danger').text();
-            if (validation == '') {
-                placeholderElement.find('.modal').modal('hide');
-                //location.reload();
-            }
-        });
-    });
 
 
     placeholderElement.on('click', 'button[data-save="modal"]', function (event) {
         event.preventDefault();
         var form = placeholderElement.find('.modal').find('form');
         var formId = placeholderElement.find('.modal').attr('id');
-        console.log(formId);
         var actionUrl = form.attr('action');
         var dataToSend = form.serialize();
+        console.log(actionUrl);
         $.post(actionUrl, dataToSend).done(function (data) {
             var newBody = $('.modal-body', data);
             placeholderElement.find('.modal-body').replaceWith(newBody);
@@ -283,24 +217,24 @@ function DashboardAPI(level) {
                 datasets: [
                     {
                         label: 'Accepted',
-                        backgroundColor: '#26B99A',/*
+                        backgroundColor: '#26B99A',
                         borderColor: 'rgba(60,141,188,0.8)',
                         pointRadius: false,
                         pointColor: '#3b8bba',
                         pointStrokeColor: 'rgba(60,141,188,1)',
                         pointHighlightFill: '#fff',
-                        pointHighlightStroke: 'rgba(60,141,188,1)',*/
+                        pointHighlightStroke: 'rgba(60,141,188,1)',
                         data: output.accepted
                     },
                     {
                         label: 'Redirected',
-                        backgroundColor: '#03586A',/*
+                        backgroundColor: '#03586A',
                         borderColor: 'rgba(210, 214, 222, 1)',
                         pointRadius: false,
                         pointColor: 'rgba(210, 214, 222, 1)',
                         pointStrokeColor: '#c1c7d1',
                         pointHighlightFill: '#fff',
-                        pointHighlightStroke: 'rgba(220,220,220,1)',*/
+                        pointHighlightStroke: 'rgba(220,220,220,1)',
                         data: output.redirected
                     },
                 ]
@@ -312,35 +246,9 @@ function DashboardAPI(level) {
             barChartData.datasets[0] = temp0;
             barChartData.datasets[1] = temp1;
 
-            var barChartOptions = {
-                responsive: true,
-                maintainAspectRatio: false,
-                datasetFill: false,
-                beginAtZero: true,
-                scales:
-                {
-                    xAxes:
-                        [{
-                            display: true
-                        }],
-                    yAxes:
-                        [{
-                            display: true,
-                            ticks:
-                            {
-                                beginAtZero: true,
-                                steps: 10,
-                                stepValue: 5,
-                                max: output.max
-                            }
-                        }],
-                },
-            };
-
             var barChart = new Chart(barChartCanvas, {
                 type: 'bar',
-                data: barChartData/*,
-                options: barChartOptions*/
+                data: barChartData
             });
         });
     }
@@ -433,7 +341,16 @@ function GetNumberNotif() {
         url: urlss,
         tpye: 'get',
         async: true
-    })
+    });
+}
+
+function GetSupportReport() {
+    var url = "/NoReload/SupportReport";
+    return $.ajax({
+        url: url,
+        type: 'get',
+        async: true
+    });
 }
 
 function GetBarangayFiltered(id) {

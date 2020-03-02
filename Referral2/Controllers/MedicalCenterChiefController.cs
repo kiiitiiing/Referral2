@@ -40,17 +40,13 @@ namespace Referral2.Controllers
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
 
-        public partial class idk
-        {
-            public double mins { get; set; }
-        }
 
         // DASHBOARD
         public IActionResult MccDashboard()
         {
             var activities = _context.Activity.Where(x => x.DateReferred.Year.Equals(DateTime.Now.Year));
             var totalDoctors = _context.User.Where(x => x.Level.Equals(_roles.Value.DOCTOR) && x.FacilityId.Equals(UserFacility)).Count();
-            var onlineDoctors = _context.User.Where(x => x.LoginStatus.Equals("login") && x.Level.Equals(_roles.Value.DOCTOR)).Count();
+            var onlineDoctors = _context.User.Where(x => x.LoginStatus.Equals("login") && x.Level.Equals(_roles.Value.DOCTOR) && x.FacilityId == UserFacility && x.LastLogin.Date == DateTime.Now.Date).Count();
             var referredPatients = _context.Tracking
                 .Where(x => x.DateReferred != default || x.DateAccepted != default || x.DateArrived != default)
                 .Where(x=>x.ReferredFrom.Equals(UserFacility)).Count();
@@ -168,6 +164,7 @@ namespace Referral2.Controllers
                             NoItem = x.Count(),
                             ItemName = x.Key
                         })
+                .OrderByDescending(x=>x.NoItem)
                 .Take(10)
                 .ToList();
             // INCOMING: TRANSPORTATIONS
@@ -876,7 +873,7 @@ namespace Referral2.Controllers
                     PatientId = t.PatientId,
                     PatientName = t.Patient.FirstName + " " + t.Patient.MiddleName + " " + t.Patient.LastName,
                     PatientSex = t.Patient.Sex,
-                    PatientAge = GlobalFunctions.ComputeAge(t.Patient.DateOfBirth),
+                    PatientAge = t.Patient.DateOfBirth.ComputeAge(),
                     PatientAddress = GlobalFunctions.GetAddress(t.Patient),
                     ReferredBy = GlobalFunctions.GetMDFullName(t.ReferringMdNavigation),
                     ReferredTo = GlobalFunctions.GetMDFullName(t.ActionMdNavigation),

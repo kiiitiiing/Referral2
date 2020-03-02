@@ -7,24 +7,48 @@ using System.Globalization;
 
 namespace Referral2
 {
-    public partial class GlobalFunctions
+    public static class GlobalFunctions
     {
-        public static string FullName;
-        public static string FixName(string input)
+        private static string FullName;
+        public static string FixName(this string input)
         {
             return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(input.ToLower());
         }
 
-        public static string FirstToUpper(string text)
+        public static string FirstToUpper(this string text)
         {
-            text = text.Trim().ToLower();
+            if (!string.IsNullOrEmpty(text))
+            {
+                text = text.Trim().ToLower();
 
-            text = text.First().ToString().ToUpper() + text.Substring(1);
+                text = text.First().ToString().ToUpper() + text.Substring(1);
 
-            return text;
+                return text;
+            }
+            else
+                return "";
         }
 
-        public static string ComputeTimeFrame(double minutes)
+        public static string NameToUpper(this string name)
+        {
+            if(!string.IsNullOrEmpty(name))
+            {
+                string[] names = name.Split(null);
+                string fullname = "";
+                foreach (var item in names)
+                {
+                    fullname += item.FirstToUpper() + " ";
+                }
+                return fullname;
+            }
+            else
+            {
+                return "";
+            }
+        }
+
+
+        public static string ComputeTimeFrame(this double minutes)
         {
             var min = Math.Floor(minutes);
             var minute = min == 0 ? "" : min + "m";
@@ -34,7 +58,7 @@ namespace Referral2
             return total;
         }
 
-        public static int ComputeAge(DateTime dob)
+        public static int ComputeAge(this DateTime dob)
         {
             var today = DateTime.Today;
 
@@ -45,12 +69,26 @@ namespace Referral2
 
             return age;
         }
+
+        public static int ComputeAge(this DateTime? dob)
+        {
+            var realDob = (DateTime)dob;
+            var today = DateTime.Today;
+
+            var age = today.Year - realDob.Year;
+
+            if (realDob.Date > today.AddYears(-age))
+                age--;
+
+            return age;
+        }
+
         public static double ArchivedTime(DateTime date)
         {
             return Convert.ToInt32(DateTime.Now.Subtract(date).TotalMinutes);
         }
 
-        public static string GetDate(DateTime date, string format)
+        public static string GetDate(this DateTime date, string format)
         {
             if (date != default)
             {
@@ -64,6 +102,25 @@ namespace Referral2
             else
                 return "";
         }
+
+        public static string GetDate(this DateTime? date, string format)
+        {
+            var realDate = (DateTime)date;
+
+            if (realDate != default)
+            {
+                if (!format.Contains("tt"))
+                {
+                    return realDate.ToString(format);
+                }
+                else
+                    return realDate.ToString(format, CultureInfo.InvariantCulture);
+            }
+            else
+                return "";
+        }
+
+
         public static string GetAddress(Facility facility)
         {
             string address = string.IsNullOrEmpty(facility.Address) ? "" : facility.Address + ", ";
@@ -86,7 +143,7 @@ namespace Referral2
         public static string GetFullName(Patient patient)
         {
             if (patient != null)
-                return CheckName(patient.FirstName) + " " + CheckName(patient.MiddleName) + " " + CheckName(patient.LastName);
+                return patient.FirstName.CheckName() + " " + patient.MiddleName.CheckName() + " " + patient.LastName.CheckName();
             else
                 return "";
         }
@@ -94,21 +151,21 @@ namespace Referral2
         public static string GetFullLastName(User user)
         {
             if (user != null)
-                return CheckName(user.Lastname) + ", " + CheckName(user.Firstname) + " " + CheckName(user.Middlename);
+                return user.Lastname.CheckName() + ", " + user.Firstname.CheckName() + " " + user.Middlename.CheckName();
             else
                 return "";
         }
         public static string GetFullLastName(Patient patient)
         {
             if (patient != null)
-                return CheckName(patient.LastName) + ", " + CheckName(patient.FirstName) + " " + CheckName(patient.MiddleName);
+                return patient.LastName.CheckName() + ", " + patient.FirstName.CheckName() + " " + patient.MiddleName.CheckName();
             else
                 return "";
         }
         public static string GetFullName(User user)
         {
             if (user != null)
-                return CheckName(user.Firstname) + " " + CheckName(user.Middlename) + " " + CheckName(user.Lastname);
+                return user.Firstname.CheckName() + " " + user.Middlename.CheckName() + " " + user.Lastname.CheckName();
             else
                 return "";
         }
@@ -116,14 +173,14 @@ namespace Referral2
         public static string GetMDFullName(User doctor)
         {
             if (doctor != null)
-                FullName = "Dr. " + CheckName(doctor.Firstname) + " " + CheckName(doctor.Middlename) + " " + CheckName(doctor.Lastname);
+                FullName = "Dr. " + doctor.Firstname.CheckName() + " " + doctor.Middlename.CheckName() + " " + doctor.Lastname.CheckName();
             else
                 FullName = "";
 
             return FullName;
         }
 
-        public static string CheckName(string name)
+        public static string CheckName(this string name)
         {
             return string.IsNullOrEmpty(name) ? "" : name;
         }

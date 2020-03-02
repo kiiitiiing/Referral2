@@ -52,7 +52,6 @@
                     <tbody>
                         @foreach (var item in Model)
                         {
-                            var dateDischarged = item.DateAction.ToString("MMMM dd, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
                             var facility = item.ReferringFacility.Length > 25 ? new string(item.ReferringFacility.Take(25).ToArray()) + "..." : item.ReferringFacility;
                             <tr>
                                 <td>
@@ -80,7 +79,7 @@
                                     </p>
                                 </td>
                                 <td>
-                                    <span>@dateDischarged</span>
+                                    <span>@item.DateAction.GetDate("MMMM dd, yyyy hh:mm tt")</span>
                                 </td>
                                 <td>
                                     @item.Status.ToUpper()

@@ -16,20 +16,24 @@
                 </div>
                 <div class="card-body">
                     <div class="direct-chat-messages" style="height:400px" id="it-group-chat">
-                        @foreach (var item in Model)
+                        @if (Model != null)
                         {
-                            var chatTime = item.MessageDate.ToString("dd MMM hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
-                            direction = item.SupportId.Equals(userId) ? "right" : "left";
-                            <div class="direct-chat-msg @direction">
-                                <div class="direct-chat-info clearfix">
-                                    <span class="direct-chat-name pull-left">@item.SupportName</span>
-                                    <span class="direct-chat-timestamp pull-right">@chatTime</span>
+                            foreach (var item in Model)
+                            {
+                                var chatTime = item.MessageDate.ToString("dd MMM hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+                                direction = item.SupportId.Equals(userId) ? "right" : "left";
+                                var reverse = direction == "right" ? "left" : "right";
+                                <div class="direct-chat-msg @direction">
+                                    <div class="direct-chat-info clearfix">
+                                        <span class="direct-chat-name fa-pull-@direction">@item.SupportName</span>
+                                        <span class="direct-chat-timestamp fa-pull-@reverse">@chatTime</span>
+                                    </div>
+                                    <img class="direct-chat-img" title="@item.SupportFacilityName" src="~/assets/dist/img/MDMale.jpg" alt="Message User Image">
+                                    <div class="direct-chat-text">
+                                        @item.Message
+                                    </div>
                                 </div>
-                                <img class="direct-chat-img" title="@item.SupportFacilityName" src="~/assets/dist/img/MDMale.jpg" alt="Message User Image">
-                                <div class="direct-chat-text">
-                                    @item.Message
-                                </div>
-                            </div>
+                            }
                         }
                     </div>
                 </div>
@@ -37,8 +41,8 @@
                     <form asp-action="Chat" method="post" id="feedbackForm">
                         <div class="input-group">
                             <input type="hidden" name="MdId" value="@userId" />
-                            <input type="hidden" name="Code" value="it-support-chat" />
-                            <input type="text" name="message" id="message" required="" placeholder="Type Message ..." class="form-control" autocomplete="off">
+                            <input type="hidden" name="Code" value="it-group-chat" />
+                            <input type="text" name="Message" id="message" required="" placeholder="Type Message ..." class="form-control" autocomplete="off">
                             <span class="input-group-btn">
                                 <button type="submit" class="btn btn-success">Send</button>
                             </span>

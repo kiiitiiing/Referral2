@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -15,6 +14,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Referral2.Helpers;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Referral2.Controllers
 {
@@ -168,10 +168,11 @@ namespace Referral2.Controllers
                     }
                 }
             }
-
+            ViewBag.Result = false;
             return View(model);
         }
 
+        [Authorize]
         public async Task<ActionResult> BackAsAdmin()
         {
             var realRole = User.FindFirstValue("RealRole");
@@ -267,13 +268,15 @@ namespace Referral2.Controllers
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.GivenName, user.Firstname+" "+user.Middlename),
+                new Claim(ClaimTypes.GivenName, user.Firstname),
                 new Claim(ClaimTypes.Surname, user.Lastname),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.MobilePhone, user.Contact),
                 new Claim(ClaimTypes.Role, level),
                 new Claim("Facility", facilityId.ToString()),
+                new Claim("FacilityName", user.Facility.Name),
                 new Claim("Department", user.DepartmentId.ToString()),
+                new Claim("DepartmentName", user.DepartmentId != null? user.Department.Description: ""),
                 new Claim("Province", user.ProvinceId.ToString()),
                 new Claim("Muncity", user.MuncityId.ToString()),
                 new Claim("RealRole", user.Level),
@@ -298,14 +301,17 @@ namespace Referral2.Controllers
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.GivenName, user.Firstname+" "+user.Middlename),
+                new Claim(ClaimTypes.GivenName, user.Firstname),
                 new Claim(ClaimTypes.Surname, user.Lastname),
                 new Claim(ClaimTypes.Role, user.Level),
                 new Claim("Facility", user.FacilityId.ToString()),
+                new Claim("FacilityName", user.Facility.Name),
                 new Claim("Department", user.DepartmentId.ToString()),
+                new Claim("DepartmentName", user.DepartmentId != null? user.Department.Description: ""),
                 new Claim("Province", user.ProvinceId.ToString()),
                 new Claim("Muncity", user.MuncityId.ToString()),
-                new Claim("RealRole", user.Level)
+                new Claim("RealRole", user.Level),
+                new Claim("RealFacility", user.FacilityId.ToString())
             };
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

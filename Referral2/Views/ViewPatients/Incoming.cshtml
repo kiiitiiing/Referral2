@@ -20,7 +20,7 @@
                         <h3 class="card-title">
                             Filter Result
                         </h3>
-                        <span class="badge fa-pull-right">
+                        <span class="badge bg-gradient-success fa-pull-right">
                             Result: @ViewBag.Total
                         </span>
                     </div>
@@ -68,9 +68,9 @@
                 <div class="card card-outline">
                     <!-- DAILY USERS HEADER -->
                     <div class="card-header with-border">
-                        <h2>
+                        <h4>
                             Incoming Patients
-                        </h2>
+                        </h4>
                     </div>
                     <!-- DAILY USERS BODY -->
                     <div class="card-body">
@@ -79,7 +79,7 @@
                             {
                                 foreach (var item in Model)
                                 {
-                                    var dateAction = item.DateAction.ToString("MMM dd, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+                                    var dateAction = item.DateAction.GetDate("MMM dd, yyyy hh:mm tt");
                                     var currentUserFacility = int.Parse(User.FindFirstValue("Facility"));
                                     var currentUserDepartment = string.IsNullOrEmpty(User.FindFirstValue("Department"))? 0 : int.Parse(User.FindFirstValue("Department"));
 
@@ -214,7 +214,7 @@
                                                                 <a href="@Url.Action("Track","ViewPatients", new { code = item.Code })" target="_blank">@item.Code</a>
                                                             </small>
                                                             <a href="#">@item.PatientName</a>
-                                                            has arrived by
+                                                            has <span class="badge bg-success">arrived</span> in
                                                             <span class="text-success">@item.ActionMd</span>'s
                                                             department
                                                         </h3>
@@ -229,7 +229,7 @@
                                                                             <small class="badge bg-green">@item.SeenCount</small>
                                                                         </button>
                                                                     }
-                                                                    <button type="button" class="btn btn-info btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
+                                                                    <button type="button" class="btn btn-info btn-xs" data-toggle="ajax-modal" data-target="#reco-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
                                                                         <i class="fa fa-comments"></i>
                                                                         &nbsp;ReCo
                                                                         @if (item.FeedbackCount > 0)
@@ -277,7 +277,7 @@
                                                                             <small class="badge bg-green">@item.SeenCount</small>
                                                                         </button>
                                                                     }
-                                                                    <button type="button" class="btn btn-info btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
+                                                                    <button type="button" class="btn btn-info btn-xs" data-toggle="ajax-modal" data-target="#reco-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
                                                                         <i class="fa fa-comments"></i>
                                                                         &nbsp;ReCo
                                                                         @if (item.FeedbackCount > 0)
@@ -307,7 +307,7 @@
                                                                 <a href="@Url.Action("Track","ViewPatients", new { code = item.Code })" target="_blank">@item.Code</a>
                                                             </small>
                                                             <a href="#">@item.PatientName</a>
-                                                            was admitted by
+                                                            was <span class="badge bg-success">admitted</span> by
                                                             <span class="text-success">@item.ActionMd</span>
                                                         </h3>
                                                         <div class="timeline-footer">
@@ -321,7 +321,7 @@
                                                                             <small class="badge bg-green">@item.SeenCount</small>
                                                                         </button>
                                                                     }
-                                                                    <button type="button" class="btn btn-info btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
+                                                                    <button type="button" class="btn btn-info btn-xs" data-toggle="ajax-modal" data-target="#reco-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
                                                                         <i class="fa fa-comments"></i>
                                                                         &nbsp;ReCo
                                                                         @if (item.FeedbackCount > 0)
@@ -343,7 +343,7 @@
                                                     <i class="fa fa-ambulance bg-gradient-blue"></i>
                                                     <div class="timeline-item" style="background-color: @bgColor !important;">
                                                         <span class="time">
-                                                            <i class="fa fa-calendar">
+                                                            <i class="fa fa-ambulance">
                                                                 &nbsp;@dateAction
                                                             </i>
                                                         </span>
@@ -404,7 +404,7 @@
                                                     <i class="fa fa-ambulance bg-gradient-blue"></i>
                                                     <div class="timeline-item" style="background-color: @bgColor !important;">
                                                         <span class="time">
-                                                            <i class="fa fa-calendar">
+                                                            <i class="fa fa-eye">
                                                                 &nbsp;@dateAction
                                                             </i>
                                                         </span>
@@ -491,14 +491,14 @@
                                                                             <small class="badge bg-green">@item.SeenCount</small>
                                                                         </button>
                                                                     }
-                                                                    <button type="button" class="btn btn-info btn-xs" data-toggle="small-modal" data-target="#seen-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
-                                                                        <i class="fa fa-comments"></i>
-                                                                        &nbsp;ReCo
-                                                                        @if (item.FeedbackCount > 0)
-                                                                        {
-                                                                            <small class="badge bg-blue">@item.FeedbackCount</small>
-                                                                        }
-                                                                    </button>
+                                                                <button type="button" class="btn btn-info btn-xs" data-toggle="ajax-modal" data-target="#reco-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
+                                                                    <i class="fa fa-comments"></i>
+                                                                    &nbsp;ReCo
+                                                                    @if (item.FeedbackCount > 0)
+                                                                    {
+                                                                        <small class="badge bg-blue">@item.FeedbackCount</small>
+                                                                    }
+                                                                </button>
                                                                 </div>
                                                             </div>
                                                         </div>

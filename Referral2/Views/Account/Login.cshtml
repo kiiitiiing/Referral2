@@ -14,7 +14,7 @@
             <label>Central Visayas Electronic Health Referral System(CVe-HRS)</label>
         </center>
         <!-- /.login-logo -->
-        <div class="card">
+        <div class="card" style="font-size: 14px;">
             <div class="card-body login-card-body">
                 <p class="login-box-msg">Sign in to start your session</p>
 
@@ -27,6 +27,7 @@
                             </div>
                         </div>
                     </div>
+                    <span class="text-danger" asp-validation-for="Username"></span>
                     <div class="input-group mb-3">
                         <input class="form-control @passwordValid" asp-for="Password" id="password" type="password" placeholder="Password">
                         <div class="input-group-append">
@@ -35,15 +36,18 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-8">
+                    <span class="text-danger" asp-validation-for="Password"></span>
+                    <div>
+                        <div class="fa-pull-left">
                             <strong>
-                                <span class="text-danger" asp-validation-for="Username"></span>
                             </strong>
                         </div>
                         <!-- /.col -->
-                        <div class="col-4">
-                            <button type="submit" class="btn btn-primary btn-block btn-flat">Sign In</button>
+                        <div class="fa-pull-right">
+                            <button id="login" class="btn btn-primary">
+                                <i class="fa fa-lock"></i>&nbsp;
+                                Sign In
+                            </button>
                         </div>
                         <!-- /.col -->
                     </div>
@@ -55,7 +59,20 @@
 
 
 <script>
-    $('#notif-modal').modal('show');
+                        
+    if ('@ViewBag.Result' != 'False') {
+        $('#notif-modal').modal('show');
+    }
+    var loginBtn = $('#login');
+    $(function () {
+        loginBtn.on('click', function () {
+            if ($('#password').val() != '') {
+                loginBtn.html('<i class="fa fa-spinner fa-spin"></i> Validating');
+                loginBtn.submit();
+            }
+        });
+    });
+
     $('#username').on('change', function () {
         $('#username').removeClass('is-invalid');
     });

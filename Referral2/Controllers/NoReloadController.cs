@@ -97,12 +97,12 @@ namespace Referral2.Controllers
             {
                 UserId = UserId,
                 Login1 = DateTime.Now,
-                Status = status == "onDuty" ? "login" : "login off",
+                Status = status == "onDuty" ? "login" : "login_off",
                 Logout = default,
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now
             };
-            currentUser.LoginStatus = status == "onDuty" ? "login" : "login off";
+            currentUser.LoginStatus = status == "onDuty" ? "login" : "login_off";
             currentUser.UpdatedAt = DateTime.Now;
             _context.Add(login);
             _context.Update(currentUser);
@@ -139,6 +139,15 @@ namespace Referral2.Controllers
             SelectAddressDepartment selectAddress = new SelectAddressDepartment(address, faciliyDepartment);
 
             return selectAddress;
+        }
+
+        public async Task<int> SupportReport()
+        {
+            var incomingCtr = await _context.Tracking
+                .Where(x=>x.Status == _status.Value.SEEN || x.Status == _status.Value.REFERRED)
+                .Where(x => x.ReferredTo == UserFacility && x.DateReferred >= DateTime.Now.AddDays(-3)).CountAsync();
+
+            return incomingCtr;
         }
 
         public async Task<string> GetFaciliyAddress(int? id)

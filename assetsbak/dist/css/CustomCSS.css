@@ -1,0 +1,266 @@
+.container-auth-bg {
+    background-image: url('../img/backdrop.png'),radial-gradient(#CCC,#DDD);
+}
+
+body {
+    background: #d2d6de;
+}
+
+.select2-results__option, nav {
+    font-size: 14px !important;
+}
+
+#showMore{
+    display:none;
+}
+
+table thead th{
+    vertical-align: middle !important;
+}
+
+.bg-white {
+    background-color: white !important;
+}
+
+.custom-alert-danger {
+    border-color: #d73925;
+    border-radius: 3px;
+    background-repeat: repeat-x;
+    background-image: linear-gradient(to bottom,#f2dede 0,#e7c3c3 100%);
+}
+
+.cust-font-10{
+    font-size: 10px !important;
+}
+
+.cust-font-14 {
+    font-size: 14px !important;
+}
+
+.custom-bg-lime {
+    color: #ADFE95 !important;
+}
+
+.custom-bg-cyan {
+    color: #C2FCFE !important;
+}
+
+.custom-warning {
+    color: #8a6d3b;
+}
+
+.custom-bg-success {
+    background-color: #dff0d8;
+}
+
+.custom-bg-danger {
+    background-color: #f2dede;
+}
+
+.custom-bg-warning {
+    background-color: #fcf8e3;
+}
+
+.consolidated {
+    position: fixed;
+    top: auto;
+    left: 1%;
+    bottom: auto;
+    right: 1%;
+}
+
+.table-add{
+    text-align:right;
+    vertical-align:middle!important;
+    font-size: 14px;
+    font-weight:bold;
+    background-color: #F5F5F5;
+}
+
+.modal-body{
+    padding: 12px!important;
+}
+
+.bg-pregnant {
+    color: #3C763D;
+    background-color: #f2dede;
+}
+
+#pregnant-form-modal span {
+    color: #1e8a2a;
+}
+
+.col-cs{
+    padding-left:3px;
+    padding-right: 3px;
+}
+
+.preg-btn{
+    display:inline-block;
+    margin: 0 auto;
+}
+
+input {
+    display: inline;
+}
+
+td{
+    padding: 8px!important;
+}
+
+label {
+    display: inline !important;
+    text-align: left!important;
+}
+
+.modal{
+    font-size: 14px!important;
+}
+
+.modal-lg{
+    max-width: 900px!important;
+}
+
+.alert-warning {
+    background-color: #F39C12 !important;
+    background-image: linear-gradient(to bottom,#fcf8e3 0,#f8efc0 100%);
+}
+
+.pregnant-bg-warning {
+    background-color: #fcf8e3;
+}
+
+a{
+    cursor:pointer;
+}
+
+.fa-eye, .fa-eye-slash{
+    cursor:pointer;
+}
+
+.title-info {
+    color: #F39C2B !important;
+}
+
+.title-info, title-desc{
+    font-weight: bold;
+    font-size: 1.2em;
+    color: #FFF;
+}
+
+.bg-gradient-warning, btn-warning {
+    color: #FFF !important;
+}
+
+#normal-form-modal span {
+    color: #e08e0b;
+}
+
+.title-form{
+    text-align: center;
+    font-size: 1.3em;
+    margin-bottom: 30px;
+    margin-top: 20px;
+}
+
+.patientTitle {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #AC2020;
+}
+
+.patient-color {
+    font-weight: bold;
+    color: #28A745;
+}
+
+.custom-float-right{
+    position: absolute !important;
+    top: 5% !important;
+    right: 2% !important;
+}
+
+.md-color {
+    font-weight: bold;
+    color: #17A2C2;
+}
+
+.facility-color {
+    color: #ff8456;
+    white-space: nowrap;
+}
+
+
+.card-custom-bg {
+    color: #3C763D;
+    background-color: #DFF0D8;
+    border-color: #D6E9C6;
+}
+
+.tracking-activities{
+    background: #EFEFEF;
+    padding: 5px;
+}
+
+.table-date{
+    white-space: nowrap;
+    vertical-align: top;
+    padding-right: 2em;
+}
+
+.code-color{
+    color: #F39C12;
+}
+
+.hospital-color{
+    font-weight: bold;
+    color: #9D7311;
+}
+
+.contact-color {
+    font-weight: bold;
+    color: #437EA9;
+}
+
+.badge-bg{
+    background-color: #F18B3C !important;
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+
+
+.set-height {
+    margin-bottom: 40px !important;
+}
+
+.printablePregnantForm span {
+    color: #1E8A29 !important;
+}
+
+footer {
+    background-color: #2F4054;
+    margin-top: 50px;
+    color: #FFF;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    line-height: 40px;
+    width: 100%;
+    overflow: hidden;
+    vertical-align: central;
+}
+
+/*
+.referral-footer {
+    position: fixed;
+    bottom: 0;
+    border: 0;
+    width: 100%;
+    white-space: nowrap;
+    line-height: 40px !important;
+    background-color: 
+}*/

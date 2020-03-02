@@ -1,18 +1,41 @@
 ﻿@model List<GraphValuesModel>
 
 @{
-	ViewData["Title"] = "Graph";
-	string[] facilities = null;
-	int[] incoming = null;
-	int[] accepted = null;
-	int[] outgoing = null;
+    ViewData["Title"] = "Graph";
+    string[] facilities = null;
+    int[] incoming = null;
+    int[] accepted = null;
+    int[] outgoing = null;
+    var startDate = ViewBag.StartDate;
+    var endDate = ViewBag.EndDate;
+    var dateRange = startDate.ToString("yyyy/MM/dd") + " - " + endDate.ToString("yyyy/MM/dd");
 }
 
 <link href="~/assets/plugins/chart.js/Chart.min.css" rel="stylesheet" />
 <script src="~/assets/dist/js/utils.js"></script>
-<div class="content">
+<div style="
+     width: 97.5vw;
+    position: relative;
+    left: 45%;
+    right: 45%;
+    margin-left: -45vw;
+    margin-right: -45vw;">
 	<div class="card card-outline card-success">
 		<div class="card-header">
+			<form asp-action="Graph" class="fa-pull-left form-inline">
+				<input class="form-control form-control-sm bg-white"
+					   id="daterange"
+					   name="daterange"
+					   readonly
+					   style="cursor:pointer;"
+					   type="text"
+					   value="@dateRange" />
+				<button type="submit" value="Search" class="btn btn-sm btn-success">
+					<i class="fa fa-search"></i>
+				</button>
+			</form>
+		</div>
+		<div class="card-body">
 			<div style="width: 100%;">
 				<canvas id="canvas"></canvas>
 			</div>
@@ -30,6 +53,16 @@
 	</div>
 </div>
 <script>
+	//datepicker
+	$(document).ready(function () {
+        $('input[name="daterange"]').daterangepicker({
+            format: 'YYYY/MM/DD',
+            startDate: '@startDate.ToString("yyyy/MM/dd")',
+            endDate: '@endDate.ToString("yyyy/MM/dd") ',
+            opens: 'right'
+        });
+    });
+	//end
     var Facilities = [];
     var Incoming = [];
     var Accepted = [];
@@ -59,7 +92,8 @@
       purple: 'rgb(153, 102, 255)',
       grey: 'rgb(201, 203, 207)'
     };
-    var thicc = 3;
+    var thicc = 6;
+    var barPercent = 1;
     var Total = $('.total');
     var x = 0;
     var color = Chart.helpers.color;
@@ -69,22 +103,25 @@
 			label: 'Incoming',
             backgroundColor: color(window.chartColors.blue).alpha(1).rgbString(),
             borderColor: window.chartColors.blue,
+            barPercentage: barPercent,
             borderWidth: 1,
-			barThickness: thicc,
+			//barThickness: thicc,
             data: Incoming
 		}, {
 			label: 'Accepted',
 			backgroundColor: color(window.chartColors.red).alpha(1).rgbString(),
 			borderColor: window.chartColors.red,
+            barPercentage: barPercent,
             borderWidth: 1,
-			barThickness: thicc,
+			//barThickness: thicc,
 			data: Accepted
 		}, {
 			label: 'Outgoing',
 			backgroundColor: color(window.chartColors.green).alpha(1).rgbString(),
 			borderColor: window.chartColors.green,
+            barPercentage: barPercent,
             borderWidth: 1,
-			barThickness: thicc,
+			//barThickness: thicc,
 			data: Outgoing
 		}]
 
@@ -110,7 +147,7 @@
 				},
 				title: {
 					display: true,
-                    text: 'E REFERRAL REPORT IN JANUARY to SEPTEMBER of 2019',
+                    text: 'E REFERRAL REPORT IN '+'@startDate.ToString("MMMM yyyy").ToUpper()'+' to '+'@endDate.ToString("MMMM yyyy").ToUpper()',
 					fontSize: 30
 				}
 			}

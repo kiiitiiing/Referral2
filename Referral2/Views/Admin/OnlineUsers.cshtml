@@ -47,8 +47,8 @@
                                 var status = item.UserStatus.Equals("login off") ? "Off Duty" : "On Duty";
                                 <tr>
                                     <td class="custom-warning text-bold">@test</td>
-                                    <td class="text-success">@item.UserFullName</td>
-                                    <td class="text-danger">@item.UserLevel</td>
+                                    <td class="text-success">@item.UserFullName.NameToUpper()</td>
+                                    <td class="text-danger">@item.UserLevel.FirstToUpper()</td>
                                     <td class="text-danger">@item.UserDepartment</td>
                                     <td style="white-space:nowrap;">@status</td>
                                     <td style="white-space:nowrap;">@timeLogin</td>

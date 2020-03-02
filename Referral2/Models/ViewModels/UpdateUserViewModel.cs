@@ -24,7 +24,6 @@ namespace Referral2.Models.ViewModels
         [Display(Name = "designation")]
         public string Designation { get; set; }
         [Required]
-        [Display(Name = "username")]
         public string Username { get; set; }
         [Display(Name = "password")]
         [DataType(DataType.Password)]

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#region REFERRENCE
+using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -24,7 +25,7 @@ using MoreLinq.Extensions;
 using System.IO;
 using OfficeOpenXml;
 using System.Drawing;
-
+#endregion
 namespace Referral2.Controllers
 {
     [Authorize(Policy = "Administrator")]
@@ -54,7 +55,7 @@ namespace Referral2.Controllers
         {
             var activities = _context.Activity.Where(x=>x.DateReferred.Year.Equals(DateTime.Now.Year));
             var totalDoctors = _context.User.Where(x => x.Level.Equals("doctor")).Count();
-            var onlineDoctors = _context.User.Where(x => x.LoginStatus.Contains("login") ).Count();
+            var onlineDoctors = _context.User.Where(x => x.LastLogin.Date == DateTime.Now.Date && x.LoginStatus.Contains("login") && x.Level == _roles.Value.DOCTOR).Count();
             var activeFacility = _context.Facility.Count();
             var referredPatients = _context.Tracking.Where(x => x.DateReferred != default || x.DateAccepted != default || x.DateArrived != default).Count();
 
@@ -63,7 +64,7 @@ namespace Referral2.Controllers
             return View(adminDashboard);
         }
 
-        // GET: ADD FACILITY
+        // GET: ADD FACILITY    
         public IActionResult AddFacility()
         {
             var provinces = _context.Province;
@@ -82,6 +83,7 @@ namespace Referral2.Controllers
                 var faciliy = await SetFacilityViewModelAsync(model);
                 await _context.AddAsync(faciliy);
                 await _context.SaveChangesAsync();
+                return PartialView();
             }
             else
             {
@@ -127,12 +129,12 @@ namespace Referral2.Controllers
             {
                 if (await _userService.RegisterSupportAsync(model))
                 {
-                    return PartialView("~/Views/Admin/AddSupport");
+                    return PartialView();
                 }
 
             }
             ViewBag.Facilities = new SelectList(_context.Facility, "Id", "Name");
-            return PartialView("~/Views/Admin/AddSupport", model);
+            return PartialView(model);
         }
 
         // CONSOLIDATED
@@ -213,12 +215,10 @@ namespace Referral2.Controllers
                         NoItem = i.Count(),
                         ItemName = i.Key == null ? "" : GlobalFunctions.GetMDFullName(doctors.SingleOrDefault(x => x.Id == i.Key))
                     })
-                    .Take(10)
                     .ToListAsync();
 
 
                 // INCOMING: DIAGNOSIS
-
                 var inDiagnosis = patientForms
                    .Where(p => p.ReferredTo == item)
                    .Select(p => p.Diagnosis)
@@ -257,7 +257,7 @@ namespace Referral2.Controllers
                              NoItem = x.Count(),
                              ItemName = x.Key
                          })
-                   .Take(10)
+                   .OrderByDescending(x=>x.NoItem)
                    .ToList();
                 // INCOMING: TRANSPORTATIONS
                 var inTransportation = await trackings
@@ -317,6 +317,7 @@ namespace Referral2.Controllers
                         NoItem = i.Count(),
                         ItemName = facilities.SingleOrDefault(x => x.Id == i.Key).Name
                     })
+                    .OrderByDescending(x=>x.NoItem)
                     .ToListAsync();
                 // OUTGOING: REFERRING DOCTOS
                 var outReferringDoc = await trackings
@@ -327,7 +328,6 @@ namespace Referral2.Controllers
                         NoItem = i.Count(),
                         ItemName = i.Key == null ? "" : GlobalFunctions.GetMDFullName(doctors.SingleOrDefault(x => x.Id == i.Key))
                     })
-                    .Take(10)
                     .ToListAsync();
 
 
@@ -350,7 +350,7 @@ namespace Referral2.Controllers
                              NoItem = x.Count(),
                              ItemName = x.Key
                          })
-                   .Take(10)
+                   .OrderByDescending(x=>x.NoItem)
                    .ToList();
 
                 // OUTGOING: REASONS
@@ -371,7 +371,7 @@ namespace Referral2.Controllers
                              NoItem = x.Count(),
                              ItemName = x.Key
                          })
-                   .Take(10)
+                   .OrderByDescending(x => x.NoItem)
                    .ToList();
                 // OUTGOING: TRANSPORTATIONS
                 var outTransportation = await trackings
@@ -443,13 +443,13 @@ namespace Referral2.Controllers
                     InIncoming = inIncoming,
                     InAccepted = inAccepted,
                     InViewed = inIncoming - inAccepted,
-                    InReferringFacilities = inReferringFac.OrderByDescending(x => x.NoItem).ToList(),
-                    InReferringDoctors = inReferringDoc.OrderByDescending(x=>x.NoItem).ToList(),
+                    InReferringFacilities = inReferringFac.OrderByDescending(x=>x.NoItem).Take(10).ToList(),
+                    InReferringDoctors = inReferringDoc.OrderByDescending(x=>x.NoItem).Take(10).ToList(),
                     InDiagnosis = inDiagnosis.Take(10).ToList(),
-                    InReason = inReason.OrderByDescending(x => x.NoItem).ToList(),
-                    InTransportation = inTransportation.OrderByDescending(x => x.NoItem).ToList(),
-                    InDepartment = inDepartment.OrderByDescending(x => x.NoItem).ToList(),
-                    InRemarks = inRemarks.OrderByDescending(x => x.NoItem).ToList(),
+                    InReason = inReason.Take(10).ToList(),
+                    InTransportation = inTransportation.OrderByDescending(x => x.NoItem).Take(10).ToList(),
+                    InDepartment = inDepartment.OrderByDescending(x => x.NoItem).Take(10).ToList(),
+                    InRemarks = inRemarks.Take(10).ToList(),
                     InAcceptance = inAcc,
                     InArrival = inArr,
                     InHorizontal = inHorizontal,
@@ -466,13 +466,13 @@ namespace Referral2.Controllers
                     OutTransport = 0,
                     OutHorizontal = outHorizontal,
                     OutVertical = outVertical,
-                    OutReferredFacility = outReferringFac.OrderByDescending(x => x.NoItem).ToList(),
-                    OutReferredDoctor = outReferringDoc.OrderByDescending(x => x.NoItem).ToList(),
-                    OutDiagnosis = outDiagnosis.OrderByDescending(x => x.NoItem).ToList(),
-                    OutReason = outReason.OrderByDescending(x => x.NoItem).ToList(),
-                    OutTransportation = outTransportation.OrderByDescending(x => x.NoItem).ToList(),
-                    OutDepartment = outDepartment.OrderByDescending(x => x.NoItem).ToList(),
-                    OutRemarks = outRemarks.OrderByDescending(x => x.NoItem).ToList()
+                    OutReferredFacility = outReferringFac.OrderByDescending(x => x.NoItem).Take(10).ToList(),
+                    OutReferredDoctor = outReferringDoc.OrderByDescending(x=>x.NoItem).Take(10).ToList(),
+                    OutDiagnosis = outDiagnosis.Take(10).ToList(),
+                    OutReason = outReason.Take(10).ToList(),
+                    OutTransportation = outTransportation.OrderByDescending(x => x.NoItem).Take(10).ToList(),
+                    OutDepartment = outDepartment.OrderByDescending(x => x.NoItem).Take(10).ToList(),
+                    OutRemarks = outRemarks.Take(10).ToList()
 
                 });
             }
@@ -480,20 +480,222 @@ namespace Referral2.Controllers
             if(export)
             {
                 string name = $"Consolidated_Report.xlsx";
-                return File(ExportConsolidated(consolidated, "all"), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", name);
+                return File(ExportConsolidated(consolidated.OrderByDescending(x => x.InIncoming).ToList(), "all"), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", name);
             }
             if (inexport)
             {
                 string name = $"Incoming_Report.xlsx";
-                return File(ExportConsolidated(consolidated, "incoming"), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", name);
+                return File(ExportConsolidated(consolidated.OrderByDescending(x => x.InIncoming).ToList(), "incoming"), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", name);
             }
             if (outexport)
             {
                 string name = $"Outgoing_Report.xlsx";
-                return File(ExportConsolidated(consolidated, "outgoing"), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", name);
+                return File(ExportConsolidated(consolidated.OrderByDescending(x => x.InIncoming).ToList(), "outgoing"), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", name);
             }
 
-            return View(consolidated);
+            return View(consolidated.OrderByDescending(x=>x.InIncoming).ToList());
+        }
+
+
+        private (ExcelWorksheet, int) IncomingWS(ExcelWorksheet worksheet, List<ConsolidatedViewModel> models, int row)
+        {
+            worksheet.Cells["B" + row].Value = "Total Incoming Referrals";
+            worksheet.Cells["E" + row].Value = "Common Sources(Facility)";
+            worksheet.Cells["F" + row].Value = "Common Referring Doctor HCW/MD (Top 10)";
+            worksheet.Cells["G" + row].Value = "Average Referral Acceptance Turnaround time";
+            worksheet.Cells["H" + row].Value = "Average Referral Arrival Turnaround Time";
+            worksheet.Cells["I" + row].Value = "Diagnoses (Top 10)";
+            worksheet.Cells["J" + row].Value = "Reasons (Top 10)";
+            worksheet.Cells["K" + row].Value = "Number of Horizontal referrals";
+            worksheet.Cells["L" + row].Value = "Number of Vertical Referrals";
+            worksheet.Cells["M" + row].Value = "Common Methods of Transportation";
+            worksheet.Cells["N" + row].Value = "Department";
+            worksheet.Cells["O" + row].Value = "Remarks";
+            worksheet.Cells["A" + row + ":O" + row].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+            worksheet.Cells["A" + row + ":O" + row].Style.Fill.BackgroundColor.SetColor(Color.Yellow);
+            foreach (var item in models)
+            {
+                row++;
+                var maxRow = row;
+                worksheet.Cells[row, 1].Value = item.FacilityName;  // FACILITY NAME
+                worksheet.Cells[row, 2].Value = item.InIncoming.ToString();    // INCOMING
+                worksheet.Cells[row, 3].Value = item.InViewed.ToString();      // VIEWED ONLY
+                worksheet.Cells[row, 4].Value = item.InAccepted.ToString();    // ACCEPTED
+                                                                               // REFERRING FACILITIES
+                var ctr1 = row;
+                foreach (var items in item.InReferringFacilities)
+                {
+                    worksheet.Cells[ctr1, 5].Value = items.ItemName + " - " + items.NoItem;
+                    ctr1++;
+                }
+                //REFERRING DOCTOR
+                maxRow = ctr1 > maxRow ? ctr1 : maxRow;
+                ctr1 = row;
+                foreach (var items in item.InReferringDoctors)
+                {
+                    worksheet.Cells[ctr1, 6].Value = items.ItemName + " - " + items.NoItem;
+                    ctr1++;
+                }
+                worksheet.Cells[row, 7].Value = item.InAcceptance.ToString("##.##") + " mins"; //AVERAGE ACCEPTANCE TIME
+                worksheet.Cells[row, 8].Value = item.InArrival.ToString("##.##") + " mins"; //AVERAGE ARRIVAL TIME
+                                                                                            //DIAGNOSES
+                maxRow = ctr1 > maxRow ? ctr1 : maxRow;
+                ctr1 = row;
+                foreach (var items in item.InDiagnosis)
+                {
+                    worksheet.Cells[ctr1, 9].Value = items.ItemName + " - " + items.NoItem;
+                    ctr1++;
+                }
+                //REASON
+                maxRow = ctr1 > maxRow ? ctr1 : maxRow;
+                ctr1 = row;
+                foreach (var items in item.InReason)
+                {
+                    worksheet.Cells[ctr1, 10].Value = items.ItemName + " - " + items.NoItem;
+                    ctr1++;
+                }
+                worksheet.Cells[row, 11].Value = "Under development this column"; // HORIZONTAL REFERRAL
+                worksheet.Cells[row, 12].Value = "Under development this column"; // VERTICAL REFERRAL
+                                                                                  //TRANSPO
+                maxRow = ctr1 > maxRow ? ctr1 : maxRow;
+                ctr1 = row;
+                foreach (var items in item.InTransportation)
+                {
+                    if (!string.IsNullOrEmpty(items.ItemName))
+                    {
+                        worksheet.Cells[ctr1, 13].Value = ListContainer.TranspoMode[int.Parse(items.ItemName[0].ToString()) - 1] + " - " + items.NoItem;
+                        ctr1++;
+                    }
+                }
+                //DEPARTMENT
+                maxRow = ctr1 > maxRow ? ctr1 : maxRow;
+                ctr1 = row;
+                foreach (var items in item.InDepartment)
+                {
+                    worksheet.Cells[ctr1, 14].Value = items.ItemName + " - " + items.NoItem;
+                    ctr1++;
+                }
+                //REMARKS
+                maxRow = ctr1 > maxRow ? ctr1 : maxRow;
+                ctr1 = row;
+                foreach (var items in item.InRemarks)
+                {
+                    worksheet.Cells[ctr1, 15].Value = items.ItemName;
+                    ctr1++;
+                }
+                maxRow = ctr1 > maxRow ? ctr1 : maxRow;
+                row = maxRow;
+            }
+
+            return (worksheet, row);
+        }
+
+        private (ExcelWorksheet, int) OutgoingWS(ExcelWorksheet worksheet, List<ConsolidatedViewModel> models, int row)
+        {
+            string underdev = "This Column is under development";
+
+            worksheet.Cells["B" + row].Value = "Total Outgoing Referrals";
+            worksheet.Cells["E" + row].Value = "Total Archived Referrals";
+            worksheet.Cells["F" + row].Value = "Total Redirected Referrals";
+            worksheet.Cells["G" + row].Value = "Common Sources(Facility)";
+            worksheet.Cells["H" + row].Value = "Common Referring Doctor HCW/MD (Top 10)";
+            worksheet.Cells["I" + row].Value = "Average Referral Viewed Only Acceptance Turnaround time ";
+            worksheet.Cells["J" + row].Value = "Average Referral Viewed Only Redirection Turnaround time ";
+            worksheet.Cells["K" + row].Value = "Average Referral Acceptance Turnaround time ";
+            worksheet.Cells["L" + row].Value = "Average Referral Redirection Turnaround Time";
+            worksheet.Cells["M" + row].Value = "Average Referral to Transport Turnaround Time";
+            worksheet.Cells["N" + row].Value = "Diagnoses for Outgoing Referral(Top 10)";
+            worksheet.Cells["O" + row].Value = "Reasons for Referral(Top 10)";
+            worksheet.Cells["P" + row].Value = "Reasons for Redirection(Top 10)";
+            worksheet.Cells["Q" + row].Value = "Number of Horizontal referrals";
+            worksheet.Cells["R" + row].Value = "Number of Vertical Referrals";
+            worksheet.Cells["S" + row].Value = "Common Methods of Transportation";
+            worksheet.Cells["T" + row].Value = "Department";
+            worksheet.Cells["U" + row].Value = "Remarks";
+            worksheet.Cells["A" + row + ":U" + row].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+            worksheet.Cells["A" + row + ":U" + row].Style.Fill.BackgroundColor.SetColor(Color.Yellow);
+
+            foreach (var item in models)
+            {
+                row++;
+                var maxRow = row;
+                worksheet.Cells[row, 1].Value = item.FacilityName;  // FACILITY NAME
+                worksheet.Cells[row, 2].Value = item.OutOutgoing.ToString();    // INCOMING
+                worksheet.Cells[row, 3].Value = item.OutViewed.ToString();      // VIEWED ONLY
+                worksheet.Cells[row, 4].Value = item.OutAccepted.ToString();    // ACCEPTED
+                worksheet.Cells[row, 5].Value = underdev;    // ARCHIVED
+                worksheet.Cells[row, 6].Value = underdev;    // REDIRECTED
+
+                // REFERRED FACILITIES
+                var ctr1 = row;
+                foreach (var items in item.OutReferredFacility)
+                {
+                    worksheet.Cells[ctr1, 7].Value = items.ItemName + " - " + items.NoItem;
+                    ctr1++;
+                }
+                //REFERRED DOCTOR
+                maxRow = ctr1 > maxRow ? ctr1 : maxRow;
+                ctr1 = row;
+                foreach (var items in item.OutReferredDoctor)
+                {
+                    worksheet.Cells[ctr1, 8].Value = items.ItemName + " - " + items.NoItem;
+                    ctr1++;
+                }
+                worksheet.Cells[row, 9].Value = underdev; //AVERAGE ACCEPTANCE TIME
+                worksheet.Cells[row, 10].Value = underdev; //AVERAGE ARRIVAL TIME
+                worksheet.Cells[row, 11].Value = underdev; //AVERAGE ACCEPTANCE TIME
+                worksheet.Cells[row, 12].Value = underdev; //AVERAGE ARRIVAL TIME
+                worksheet.Cells[row, 13].Value = underdev; //AVERAGE ARRIVAL TIME
+                                                           //DIAGNOSES
+                maxRow = ctr1 > maxRow ? ctr1 : maxRow;
+                ctr1 = row;
+                foreach (var items in item.OutDiagnosis)
+                {
+                    worksheet.Cells[ctr1, 14].Value = items.ItemName + " - " + items.NoItem;
+                    ctr1++;
+                }
+                //REASON
+                maxRow = ctr1 > maxRow ? ctr1 : maxRow;
+                ctr1 = row;
+                foreach (var items in item.OutReason)
+                {
+                    worksheet.Cells[ctr1, 15].Value = items.ItemName + " - " + items.NoItem;
+                    ctr1++;
+                }
+                worksheet.Cells[row, 16].Value = underdev; //AVERAGE ACCEPTANCE TIME
+                worksheet.Cells[row, 17].Value = underdev; //AVERAGE ARRIVAL TIME
+                worksheet.Cells[row, 18].Value = underdev; //AVERAGE ARRIVAL TIME
+                                                           //TRANSPO
+                maxRow = ctr1 > maxRow ? ctr1 : maxRow;
+                ctr1 = row;
+                foreach (var items in item.OutTransportation)
+                {
+                    if (!string.IsNullOrEmpty(items.ItemName))
+                    {
+                        worksheet.Cells[ctr1, 19].Value = ListContainer.TranspoMode[int.Parse(items.ItemName[0].ToString()) - 1] + " - " + items.NoItem;
+                        ctr1++;
+                    }
+                }
+                //DEPARTMENT
+                maxRow = ctr1 > maxRow ? ctr1 : maxRow;
+                ctr1 = row;
+                foreach (var items in item.OutDepartment)
+                {
+                    worksheet.Cells[ctr1, 20].Value = items.ItemName + " - " + items.NoItem;
+                    ctr1++;
+                }
+                //REMARKS
+                maxRow = ctr1 > maxRow ? ctr1 : maxRow;
+                ctr1 = row;
+                foreach (var items in item.OutRemarks)
+                {
+                    worksheet.Cells[ctr1, 21].Value = items.ItemName;
+                    ctr1++;
+                }
+                maxRow = ctr1 > maxRow ? ctr1 : maxRow;
+                row = maxRow;
+            }
+            return (worksheet, row);
         }
 
         public MemoryStream ExportConsolidated(List<ConsolidatedViewModel> models, string type)
@@ -504,314 +706,51 @@ namespace Referral2.Controllers
             using (var package = new ExcelPackage(stream))
             {
                 int row = 1;
-                var worksheet = package.Workbook.Worksheets.Add("Sheet1");
-                worksheet.Cells.Style.Font.Size = 11;
-                worksheet.Cells["A" + row].Value = "Name of Facility";
-                worksheet.Cells["C" + row].Value = "Total Viewed Only Referrals";
-                worksheet.Cells["D" + row].Value = "Total Accepted Referrals";
-                worksheet.Cells["A1:U" + row].Style.Font.Bold = true;
-                worksheet.Cells["A1:U" + row].Style.Font.Name = "Arial";
                 
                 if (type.Equals("all"))
                 {
-                    worksheet.Cells["B" + row].Value = "Total Outgoing Referrals";
-                    worksheet.Cells["E" + row].Value = "Total Archived Referrals";
-                    worksheet.Cells["F" + row].Value = "Total Redirected Referrals";
-                    worksheet.Cells["G" + row].Value = "Common Sources(Facility)";
-                    worksheet.Cells["H" + row].Value = "Common Referring Doctor HCW/MD (Top 10)";
-                    worksheet.Cells["I" + row].Value = "Average Referral Viewed Only Acceptance Turnaround time ";
-                    worksheet.Cells["J" + row].Value = "Average Referral Viewed Only Redirection Turnaround time ";
-                    worksheet.Cells["K" + row].Value = "Average Referral Acceptance Turnaround time ";
-                    worksheet.Cells["L" + row].Value = "Average Referral Redirection Turnaround Time";
-                    worksheet.Cells["M" + row].Value = "Average Referral to Transport Turnaround Time";
-                    worksheet.Cells["N" + row].Value = "Diagnoses for Outgoing Referral(Top 10)";
-                    worksheet.Cells["O" + row].Value = "Reasons for Referral(Top 10)";
-                    worksheet.Cells["P" + row].Value = "Reasons for Redirection(Top 10)";
-                    worksheet.Cells["Q" + row].Value = "Number of Horizontal referrals";
-                    worksheet.Cells["R" + row].Value = "Number of Vertical Referrals";
-                    worksheet.Cells["S" + row].Value = "Common Methods of Transportation";
-                    worksheet.Cells["T" + row].Value = "Department";
-                    worksheet.Cells["U" + row].Value = "Remarks";
-                    worksheet.Cells["A" + row + ":U" + row].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                    worksheet.Cells["A" + row + ":U" + row].Style.Fill.BackgroundColor.SetColor(Color.Yellow);
-
-                    foreach (var item in models)
-                    {
-                        row++;
-                        var maxRow = row;
-                        worksheet.Cells[row, 1].Value = item.FacilityName;  // FACILITY NAME
-                        worksheet.Cells[row, 2].Value = item.OutOutgoing.ToString();    // INCOMING
-                        worksheet.Cells[row, 3].Value = item.OutViewed.ToString();      // VIEWED ONLY
-                        worksheet.Cells[row, 4].Value = item.OutAccepted.ToString();    // ACCEPTED
-                        worksheet.Cells[row, 5].Value = underdev;    // ARCHIVED
-                        worksheet.Cells[row, 6].Value = underdev;    // REDIRECTED
-
-                        // REFERRED FACILITIES
-                        var ctr1 = row;
-                        foreach (var items in item.OutReferredFacility)
-                        {
-                            worksheet.Cells[ctr1, 7].Value = items.ItemName + " - " + items.NoItem;
-                            ctr1++;
-                        }
-                        //REFERRED DOCTOR
-                        maxRow = ctr1 > maxRow ? ctr1 : maxRow;
-                        ctr1 = row;
-                        foreach (var items in item.OutReferredDoctor)
-                        {
-                            worksheet.Cells[ctr1, 8].Value = items.ItemName + " - " + items.NoItem;
-                            ctr1++;
-                        }
-                        worksheet.Cells[row, 9].Value = underdev; //AVERAGE ACCEPTANCE TIME
-                        worksheet.Cells[row, 10].Value = underdev; //AVERAGE ARRIVAL TIME
-                        worksheet.Cells[row, 11].Value = underdev; //AVERAGE ACCEPTANCE TIME
-                        worksheet.Cells[row, 12].Value = underdev; //AVERAGE ARRIVAL TIME
-                        worksheet.Cells[row, 13].Value = underdev; //AVERAGE ARRIVAL TIME
-                                                                   //DIAGNOSES
-                        maxRow = ctr1 > maxRow ? ctr1 : maxRow;
-                        ctr1 = row;
-                        foreach (var items in item.OutDiagnosis)
-                        {
-                            worksheet.Cells[ctr1, 14].Value = items.ItemName + " - " + items.NoItem;
-                            ctr1++;
-                        }
-                        //REASON
-                        maxRow = ctr1 > maxRow ? ctr1 : maxRow;
-                        ctr1 = row;
-                        foreach (var items in item.OutReason)
-                        {
-                            worksheet.Cells[ctr1, 15].Value = items.ItemName + " - " + items.NoItem;
-                            ctr1++;
-                        }
-                        worksheet.Cells[row, 16].Value = underdev; //AVERAGE ACCEPTANCE TIME
-                        worksheet.Cells[row, 17].Value = underdev; //AVERAGE ARRIVAL TIME
-                        worksheet.Cells[row, 18].Value = underdev; //AVERAGE ARRIVAL TIME
-                                                                   //TRANSPO
-                        maxRow = ctr1 > maxRow ? ctr1 : maxRow;
-                        ctr1 = row;
-                        foreach (var items in item.OutTransportation)
-                        {
-                            if (!string.IsNullOrEmpty(items.ItemName))
-                            {
-                                worksheet.Cells[ctr1, 19].Value = ListContainer.TranspoMode[int.Parse(items.ItemName[0].ToString()) - 1] + " - " + items.NoItem;
-                                ctr1++;
-                            }
-                        }
-                        //DEPARTMENT
-                        maxRow = ctr1 > maxRow ? ctr1 : maxRow;
-                        ctr1 = row;
-                        foreach (var items in item.OutDepartment)
-                        {
-                            worksheet.Cells[ctr1, 20].Value = items.ItemName + " - " + items.NoItem;
-                            ctr1++;
-                        }
-                        //REMARKS
-                        maxRow = ctr1 > maxRow ? ctr1 : maxRow;
-                        ctr1 = row;
-                        foreach (var items in item.OutRemarks)
-                        {
-                            worksheet.Cells[ctr1, 21].Value = items.ItemName;
-                            ctr1++;
-                        }
-                        maxRow = ctr1 > maxRow ? ctr1 : maxRow;
-                        row = maxRow;
-                    }
+                    var worksheet = package.Workbook.Worksheets.Add("Incoming Consolidated Report");
+                    worksheet.Cells.Style.Font.Size = 11;
+                    worksheet.Cells["A" + row].Value = "Name of Facility";
+                    worksheet.Cells["C" + row].Value = "Total Viewed Only Referrals";
+                    worksheet.Cells["D" + row].Value = "Total Accepted Referrals";
+                    worksheet.Cells["A1:U" + row].Style.Font.Bold = true;
+                    worksheet.Cells["A1:U" + row].Style.Font.Name = "Arial";
+                    worksheet = IncomingWS(worksheet, models, row).Item1;
+                    worksheet.Cells.AutoFitColumns();
+                    worksheet = package.Workbook.Worksheets.Add("Outgoing Consolidated Report");
+                    worksheet = OutgoingWS(worksheet, models, row).Item1;
+                    worksheet.Cells.AutoFitColumns();
                 }
                 else if (type.Equals("incoming"))
                 {
-                    worksheet.Cells["B" + row].Value = "Total Incoming Referrals";
-                    worksheet.Cells["E" + row].Value = "Common Sources(Facility)";
-                    worksheet.Cells["F" + row].Value = "Common Referring Doctor HCW/MD (Top 10)";
-                    worksheet.Cells["G" + row].Value = "Average Referral Acceptance Turnaround time";
-                    worksheet.Cells["H" + row].Value = "Average Referral Arrival Turnaround Time";
-                    worksheet.Cells["I" + row].Value = "Diagnoses (Top 10)";
-                    worksheet.Cells["J" + row].Value = "Reasons (Top 10)";
-                    worksheet.Cells["K" + row].Value = "Number of Horizontal referrals";
-                    worksheet.Cells["L" + row].Value = "Number of Vertical Referrals";
-                    worksheet.Cells["M" + row].Value = "Common Methods of Transportation";
-                    worksheet.Cells["N" + row].Value = "Department";
-                    worksheet.Cells["O" + row].Value = "Remarks";
-                    worksheet.Cells["A" + row + ":O" + row].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                    worksheet.Cells["A" + row + ":O" + row].Style.Fill.BackgroundColor.SetColor(Color.Yellow);
-                    foreach(var item in models)
-                    {
-                        row++;
-                        var maxRow = row;
-                        worksheet.Cells[row, 1].Value = item.FacilityName;  // FACILITY NAME
-                        worksheet.Cells[row, 2].Value = item.InIncoming.ToString();    // INCOMING
-                        worksheet.Cells[row, 3].Value = item.InViewed.ToString();      // VIEWED ONLY
-                        worksheet.Cells[row, 4].Value = item.InAccepted.ToString();    // ACCEPTED
-                        // REFERRING FACILITIES
-                        var ctr1 = row;
-                        foreach (var items in item.InReferringFacilities)
-                        {
-                            worksheet.Cells[ctr1, 5].Value = items.ItemName + " - " + items.NoItem;
-                            ctr1++;
-                        }
-                        //REFERRING DOCTOR
-                        maxRow = ctr1 > maxRow ? ctr1 : maxRow;
-                        ctr1 = row;
-                        foreach(var items in item.InReferringDoctors)
-                        {
-                            worksheet.Cells[ctr1, 6].Value = items.ItemName + " - " + items.NoItem;
-                            ctr1++;
-                        }
-                        worksheet.Cells[row, 7].Value = item.InAcceptance.ToString("##.##") +" mins"; //AVERAGE ACCEPTANCE TIME
-                        worksheet.Cells[row, 8].Value = item.InArrival.ToString("##.##") + " mins"; //AVERAGE ARRIVAL TIME
-                        //DIAGNOSES
-                        maxRow = ctr1 > maxRow ? ctr1 : maxRow;
-                        ctr1 = row;
-                        foreach (var items in item.InDiagnosis)
-                        {
-                            worksheet.Cells[ctr1, 9].Value = items.ItemName + " - " + items.NoItem;
-                            ctr1++;
-                        }
-                        //REASON
-                        maxRow = ctr1 > maxRow ? ctr1 : maxRow;
-                        ctr1 = row;
-                        foreach (var items in item.InReason)
-                        {
-                            worksheet.Cells[ctr1, 10].Value = items.ItemName + " - " + items.NoItem;
-                            ctr1++;
-                        }
-                        worksheet.Cells[row, 11].Value = "Under development this column"; // HORIZONTAL REFERRAL
-                        worksheet.Cells[row, 12].Value = "Under development this column"; // VERTICAL REFERRAL
-                        //TRANSPO
-                        maxRow = ctr1 > maxRow ? ctr1 : maxRow;
-                        ctr1 = row;
-                        foreach (var items in item.InTransportation)
-                        {
-                            if(!string.IsNullOrEmpty(items.ItemName))
-                            {
-                                worksheet.Cells[ctr1, 13].Value = ListContainer.TranspoMode[int.Parse(items.ItemName[0].ToString())- 1] + " - " + items.NoItem;
-                                ctr1++;
-                            }
-                        }
-                        //DEPARTMENT
-                        maxRow = ctr1 > maxRow ? ctr1 : maxRow;
-                        ctr1 = row;
-                        foreach (var items in item.InDepartment)
-                        {
-                            worksheet.Cells[ctr1, 14].Value = items.ItemName + " - " + items.NoItem;
-                            ctr1++;
-                        }
-                        //REMARKS
-                        maxRow = ctr1 > maxRow ? ctr1 : maxRow;
-                        ctr1 = row;
-                        foreach (var items in item.InRemarks)
-                        {
-                            worksheet.Cells[ctr1, 15].Value = items.ItemName;
-                            ctr1++;
-                        }
-                        maxRow = ctr1 > maxRow ? ctr1 : maxRow;
-                        row = maxRow;
-                    }
+                    var worksheet = package.Workbook.Worksheets.Add("Incoming Consolidated Report");
+                    worksheet.Cells.Style.Font.Size = 11;
+                    worksheet.Cells["A" + row].Value = "Name of Facility";
+                    worksheet.Cells["C" + row].Value = "Total Viewed Only Referrals";
+                    worksheet.Cells["D" + row].Value = "Total Accepted Referrals";
+                    worksheet.Cells["A1:U" + row].Style.Font.Bold = true;
+                    worksheet.Cells["A1:U" + row].Style.Font.Name = "Arial";
+
+                    worksheet = IncomingWS(worksheet, models, row).Item1;
+
+                    worksheet.Cells.AutoFitColumns();
                 }
                 else
                 {
-                    worksheet.Cells["B" + row].Value = "Total Outgoing Referrals";
-                    worksheet.Cells["E" + row].Value = "Total Archived Referrals";
-                    worksheet.Cells["F" + row].Value = "Total Redirected Referrals";
-                    worksheet.Cells["G" + row].Value = "Common Sources(Facility)";
-                    worksheet.Cells["H" + row].Value = "Common Referring Doctor HCW/MD (Top 10)";
-                    worksheet.Cells["I" + row].Value = "Average Referral Viewed Only Acceptance Turnaround time ";
-                    worksheet.Cells["J" + row].Value = "Average Referral Viewed Only Redirection Turnaround time ";
-                    worksheet.Cells["K" + row].Value = "Average Referral Acceptance Turnaround time ";
-                    worksheet.Cells["L" + row].Value = "Average Referral Redirection Turnaround Time";
-                    worksheet.Cells["M" + row].Value = "Average Referral to Transport Turnaround Time";
-                    worksheet.Cells["N" + row].Value = "Diagnoses for Outgoing Referral(Top 10)";
-                    worksheet.Cells["O" + row].Value = "Reasons for Referral(Top 10)";
-                    worksheet.Cells["P" + row].Value = "Reasons for Redirection(Top 10)";
-                    worksheet.Cells["Q" + row].Value = "Number of Horizontal referrals";
-                    worksheet.Cells["R" + row].Value = "Number of Vertical Referrals";
-                    worksheet.Cells["S" + row].Value = "Common Methods of Transportation";
-                    worksheet.Cells["T" + row].Value = "Department";
-                    worksheet.Cells["U" + row].Value = "Remarks";
-                    worksheet.Cells["A" + row + ":U" + row].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                    worksheet.Cells["A" + row + ":U" + row].Style.Fill.BackgroundColor.SetColor(Color.Yellow);
+                    var worksheet = package.Workbook.Worksheets.Add("Outgoing Consolidated Report");
+                    worksheet.Cells.Style.Font.Size = 11;
+                    worksheet.Cells["A" + row].Value = "Name of Facility";
+                    worksheet.Cells["C" + row].Value = "Total Viewed Only Referrals";
+                    worksheet.Cells["D" + row].Value = "Total Accepted Referrals";
+                    worksheet.Cells["A1:U" + row].Style.Font.Bold = true;
+                    worksheet.Cells["A1:U" + row].Style.Font.Name = "Arial";
 
-                    foreach (var item in models)
-                    {
-                        row++;
-                        var maxRow = row;
-                        worksheet.Cells[row, 1].Value = item.FacilityName;  // FACILITY NAME
-                        worksheet.Cells[row, 2].Value = item.OutOutgoing.ToString();    // INCOMING
-                        worksheet.Cells[row, 3].Value = item.OutViewed.ToString();      // VIEWED ONLY
-                        worksheet.Cells[row, 4].Value = item.OutAccepted.ToString();    // ACCEPTED
-                        worksheet.Cells[row, 5].Value = underdev;    // ARCHIVED
-                        worksheet.Cells[row, 6].Value = underdev;    // REDIRECTED
+                    worksheet = OutgoingWS(worksheet, models, row).Item1;
 
-                        // REFERRED FACILITIES
-                        var ctr1 = row;
-                        foreach (var items in item.OutReferredFacility)
-                        {
-                            worksheet.Cells[ctr1, 7].Value = items.ItemName + " - " + items.NoItem;
-                            ctr1++;
-                        }
-                        //REFERRED DOCTOR
-                        maxRow = ctr1 > maxRow ? ctr1 : maxRow;
-                        ctr1 = row;
-                        foreach (var items in item.OutReferredDoctor)
-                        {
-                            worksheet.Cells[ctr1, 8].Value = items.ItemName + " - " + items.NoItem;
-                            ctr1++;
-                        }
-                        worksheet.Cells[row, 9].Value = underdev; //AVERAGE ACCEPTANCE TIME
-                        worksheet.Cells[row, 10].Value = underdev; //AVERAGE ARRIVAL TIME
-                        worksheet.Cells[row, 11].Value = underdev; //AVERAGE ACCEPTANCE TIME
-                        worksheet.Cells[row, 12].Value = underdev; //AVERAGE ARRIVAL TIME
-                        worksheet.Cells[row, 13].Value = underdev; //AVERAGE ARRIVAL TIME
-                                                                   //DIAGNOSES
-                        maxRow = ctr1 > maxRow ? ctr1 : maxRow;
-                        ctr1 = row;
-                        foreach (var items in item.OutDiagnosis)
-                        {
-                            worksheet.Cells[ctr1, 14].Value = items.ItemName + " - " + items.NoItem;
-                            ctr1++;
-                        }
-                        //REASON
-                        maxRow = ctr1 > maxRow ? ctr1 : maxRow;
-                        ctr1 = row;
-                        foreach (var items in item.OutReason)
-                        {
-                            worksheet.Cells[ctr1, 15].Value = items.ItemName + " - " + items.NoItem;
-                            ctr1++;
-                        }
-                        worksheet.Cells[row, 16].Value = underdev; //AVERAGE ACCEPTANCE TIME
-                        worksheet.Cells[row, 17].Value = underdev; //AVERAGE ARRIVAL TIME
-                        worksheet.Cells[row, 18].Value = underdev; //AVERAGE ARRIVAL TIME
-                                                                   //TRANSPO
-                        maxRow = ctr1 > maxRow ? ctr1 : maxRow;
-                        ctr1 = row;
-                        foreach (var items in item.OutTransportation)
-                        {
-                            if (!string.IsNullOrEmpty(items.ItemName))
-                            {
-                                worksheet.Cells[ctr1, 19].Value = ListContainer.TranspoMode[int.Parse(items.ItemName[0].ToString()) - 1] + " - " + items.NoItem;
-                                ctr1++;
-                            }
-                        }
-                        //DEPARTMENT
-                        maxRow = ctr1 > maxRow ? ctr1 : maxRow;
-                        ctr1 = row;
-                        foreach (var items in item.OutDepartment)
-                        {
-                            worksheet.Cells[ctr1, 20].Value = items.ItemName + " - " + items.NoItem;
-                            ctr1++;
-                        }
-                        //REMARKS
-                        maxRow = ctr1 > maxRow ? ctr1 : maxRow;
-                        ctr1 = row;
-                        foreach (var items in item.OutRemarks)
-                        {
-                            worksheet.Cells[ctr1, 21].Value = items.ItemName;
-                            ctr1++;
-                        }
-                        maxRow = ctr1 > maxRow ? ctr1 : maxRow;
-                        row = maxRow;
-                    }
+                    worksheet.Cells.AutoFitColumns();
                 }
 
-                worksheet.Cells.AutoFitColumns();
                 package.Save();
             }
 
@@ -1070,19 +1009,21 @@ namespace Referral2.Controllers
         }
 
         // GRAPH
-        public async Task<IActionResult> Graph(string year)
+        public async Task<IActionResult> Graph(string year, string daterange)
         {
-            var yearNow = DateTime.Now.Year;
-
-            if (!string.IsNullOrEmpty(year))
+            if (!string.IsNullOrEmpty(daterange))
             {
-                yearNow = int.Parse(year);
+                StartDate = DateTime.Parse(daterange.Substring(0, daterange.IndexOf(" ") + 1).Trim());
+                EndDate = DateTime.Parse(daterange.Substring(daterange.LastIndexOf(" ")).Trim());
             }
-            StartDate = new DateTime(yearNow, 1, 1);
-            EndDate = new DateTime(yearNow, 12, 31);
-            ViewBag.StartDate = StartDate.ToString("MMMM").ToUpper();
-            ViewBag.EndDate = EndDate.ToString("MMMM").ToUpper();
-            ViewBag.Year = StartDate.ToString("yyyy");
+            else
+            {
+                var dateNow = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                StartDate = new DateTime(dateNow.Year, 1, 1);
+                EndDate = new DateTime(dateNow.Year, 12, 31);
+            }
+            ViewBag.StartDate = StartDate;
+            ViewBag.EndDate = EndDate;
             var trackings = _context.Tracking
                 .Where(x => x.CreatedAt >= StartDate && x.CreatedAt <= EndDate);
             var activities = _context.Activity
@@ -1104,7 +1045,7 @@ namespace Referral2.Controllers
                 .ToListAsync();
                 
 
-            return View(facilities);
+            return View(facilities.OrderByDescending(x=>x.Incoming).ToList());
         }
 
         // GET: LOGIN AS
@@ -1159,8 +1100,8 @@ namespace Referral2.Controllers
                 {
                     UserId = x.UserId,
                     FacilityName = x.User.Facility.Name,
-                    UserFullName = GlobalFunctions.FirstToUpper(x.User.Lastname) + ", " + GlobalFunctions.FirstToUpper(x.User.Firstname),
-                    UserLevel = GlobalFunctions.FirstToUpper(x.User.Level),
+                    UserFullName = x.User.Lastname+", "+x.User.Firstname,
+                    UserLevel = x.User.Level,
                     UserDepartment = x.User.Department.Description,
                     UserStatus = x.Status,
                     UserLoginTime = x.Login1
@@ -1315,23 +1256,6 @@ namespace Referral2.Controllers
             return PartialView("~/Views/Admin/UpdateFacility.cshtml", model);
         }
 
-        private async Task<Facility> SaveFacilityAsync(FacilityViewModel model)
-        {
-            var facility = await _context.Facility.FindAsync(model.Id);
-            facility.Name = model.Name;
-            facility.Abbrevation = model.Abbrevation;
-            facility.ProvinceId = (int)model.Province;
-            facility.MuncityId = (int)model.Muncity;
-            facility.BarangayId = (int)model.Barangay;
-            facility.Address = model.Address;
-            facility.Contact = model.Contact;
-            facility.Email = model.Email;
-            facility.ChiefHospital = model.Chief;
-            facility.HospitalLevel = (int)model.Level;
-            facility.HospitalType = model.Type;
-
-            return facility;
-        }
 
         // GET: UPDATE SUPPORT
         [HttpGet]
@@ -1365,7 +1289,7 @@ namespace Referral2.Controllers
                         _userService.ChangePasswordAsync(support, model.Password);
                     _context.Update(support);
                     await _context.SaveChangesAsync();
-                    return PartialView("~/Views/Admin/UpdateSupport.cshtml", model);
+                    return PartialView();
                 }
                 else
                 {
@@ -1373,8 +1297,8 @@ namespace Referral2.Controllers
                 }
             }
             ViewBag.Status = new SelectList(ListContainer.UserStatus, "Key", "Value", support.Status);
-            ViewBag.Facility = new SelectList(facilities, "Id", "Description", support.FacilityId);
-            return PartialView("~/Views/Admin/UpdateSupport.cshtml", model);
+            ViewBag.Facility = new SelectList(facilities, "Id", "Name", support.FacilityId);
+            return PartialView(model);
         }
 
         public async Task<IActionResult> ViewedOnly(int? page, int? facility, string startDate, string endDate, string type)
@@ -1393,7 +1317,7 @@ namespace Referral2.Controllers
                     PatientId = t.PatientId,
                     PatientName = t.Patient.FirstName + " " + t.Patient.MiddleName + " " + t.Patient.LastName,
                     PatientSex = t.Patient.Sex,
-                    PatientAge = GlobalFunctions.ComputeAge(t.Patient.DateOfBirth),
+                    PatientAge = t.Patient.DateOfBirth.ComputeAge(),
                     PatientAddress = GlobalFunctions.GetAddress(t.Patient),
                     ReferredBy = GlobalFunctions.GetMDFullName(t.ReferringMdNavigation),
                     ReferredTo = GlobalFunctions.GetMDFullName(t.ActionMdNavigation),
@@ -1441,6 +1365,23 @@ namespace Referral2.Controllers
         }
 
         #region HELPERS
+        private async Task<Facility> SaveFacilityAsync(FacilityViewModel model)
+        {
+            var facility = await _context.Facility.FindAsync(model.Id);
+            facility.Name = model.Name;
+            facility.Abbrevation = model.Abbrevation;
+            facility.ProvinceId = (int)model.Province;
+            facility.MuncityId = (int)model.Muncity;
+            facility.BarangayId = (int)model.Barangay;
+            facility.Address = model.Address;
+            facility.Contact = model.Contact;
+            facility.Email = model.Email;
+            facility.ChiefHospital = model.Chief;
+            facility.HospitalLevel = (int)model.Level;
+            facility.HospitalType = model.Type;
+
+            return facility;
+        }
 
         private async Task LoginAsAsync(int facilityId, string level)
         {
@@ -1455,13 +1396,15 @@ namespace Referral2.Controllers
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.GivenName, user.Firstname+" "+user.Middlename),
+                new Claim(ClaimTypes.GivenName, user.Firstname),
                 new Claim(ClaimTypes.Surname, user.Lastname),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.MobilePhone, user.Contact),
                 new Claim(ClaimTypes.Role, level),
                 new Claim("Facility", facilityId.ToString()),
+                new Claim("FacilityName", _context.Facility.Find(facilityId).Name),
                 new Claim("Department", user.DepartmentId.ToString()),
+                new Claim("DepartmentName", user.DepartmentId != null? user.Department.Description: ""),
                 new Claim("Province", user.ProvinceId.ToString()),
                 new Claim("Muncity", user.MuncityId.ToString()),
                 new Claim("RealRole", user.Level),

@@ -10,8 +10,8 @@ namespace Referral2.Models.ViewModels.Forms
             Code = form.Code;
             ReferringMd = GlobalFunctions.GetMDFullName(form.ReferredByNavigation);
             RecordNumber = form.RecordNo;
-            DateReferred = form.ReferredDate.ToString("MMMM d, yyyy h:mm tt",CultureInfo.InvariantCulture);
-            DateArrived = form.ArrivalDate != default ? form.ArrivalDate.ToString("MMMM d, yyyy h:mm tt", CultureInfo.InvariantCulture) : "";
+            DateReferred = form.ReferredDate.GetDate("MMMM d, yyyy h:mm tt");
+            DateArrived = form.ArrivalDate != default ? form.ArrivalDate.GetDate("MMMM d, yyyy h:mm tt") : "";
             ReferringMdContact = form.ReferredByNavigation.Contact;
             Facility = form.ReferringFacilityNavigation == null ? "" : form.ReferringFacilityNavigation.Name;
             FacilityContact = form.ReferringFacilityNavigation == null ? "" : form.ReferringFacilityNavigation.Contact;
@@ -20,14 +20,14 @@ namespace Referral2.Models.ViewModels.Forms
             Department = form.Department == null ? "" : form.Department.Description;
             ReferredToAddress = GlobalFunctions.GetAddress(form.ReferredToNavigation);
             WomanName = GlobalFunctions.GetFullName(form.PatientWoman);
-            WomanAge = GlobalFunctions.ComputeAge(form.PatientWoman.DateOfBirth);
+            WomanAge = form.PatientWoman.DateOfBirth.ComputeAge();
             WomanAddress = GlobalFunctions.GetAddress(form.PatientWoman);
             WomanReason = form.WomanReason;
             WomanFindings = form.WomanMajorFindings;
             WomanBeforeTreatment = form.WomanBeforeTreatment;
-            WomanBeforeGivenTime = GlobalFunctions.GetDate((DateTime)form.WomanBeforeGivenTime, "dd/MM/yyyy");
+            WomanBeforeGivenTime = form.WomanBeforeGivenTime.GetDate("dd/MM/yyyy");
             WomanDuringTransport = form.WomanDuringTransport;
-            WomanDuringGivenTime = GlobalFunctions.GetDate((DateTime)form.WomanTransportGivenTime, "dd/MM/yyyy");
+            WomanDuringGivenTime = form.WomanTransportGivenTime.GetDate("dd/MM/yyyy");
             WomanInformationGiven = form.WomanInformationGiven;
             BabyName = form.PatientBaby == null? "" : GlobalFunctions.GetFullName(form.PatientBaby);
             BabyDob = form.PatientBaby == null ? "" : form.PatientBaby.DateOfBirth.ToString("dd/MM/yyyy");
@@ -35,11 +35,11 @@ namespace Referral2.Models.ViewModels.Forms
             BabyGestationAge = baby == null? "" : baby.GestationalAge.ToString();
             BabyReason = form.BabyReason;
             BabyFindings = form.BabyMajorFindings;
-            BabyLastFeed = GlobalFunctions.GetDate((DateTime)form.BabyLastFeed, "dd/MM/yyyy");
+            BabyLastFeed = form.BabyLastFeed.GetDate("dd/MM/yyyy");
             BabyBeforeTreatment = form.BabyBeforeTreatment;
-            BabyBeforeGivenTime = GlobalFunctions.GetDate((DateTime)form.BabyBeforeGivenTime, "dd/MM/yyyy");
+            BabyBeforeGivenTime = form.BabyBeforeGivenTime.GetDate("dd/MM/yyyy");
             BabyDuringTransport = form.BabyDuringTransport;
-            BabyDuringGivenTime = GlobalFunctions.GetDate((DateTime)form.BabyTransportGivenTime, "dd/MM/yyyy");
+            BabyDuringGivenTime = form.BabyTransportGivenTime.GetDate("dd/MM/yyyy");
             BabyInformationGiven = form.BabyInformationGiven;
         }
         public string Code { get; set; }

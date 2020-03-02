@@ -59,7 +59,6 @@
                             @foreach (var item in Model)
                             {
                                 var status = item.Status;
-                                var dateAction = item.DateAction.ToString("MMMM dd, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
                                 var facility = item.ReferringFacility.Length > 25 ? new string(item.ReferringFacility.Take(25).ToArray()) + "..." : item.ReferringFacility;
                                 <tr>
                                     <!-- REFERRING FACILITY -->
@@ -75,13 +74,13 @@
                                         @if (item.Type.Equals("Non-Pregnant"))
                                         {
                                             <a class="text-info" style="cursor:pointer;" data-toggle="ajax-modal" data-target="#normal-form-modal" data-url="@Url.Action("PrintableNormalForm","ViewForms", new { code = item.PatientCode })">
-                                                @item.PatientName
+                                                @item.PatientName.NameToUpper()
                                             </a>
                                         }
                                         else
                                         {
                                             <a class="text-info" style="cursor:pointer;" data-toggle="ajax-modal" data-target="#print-pregnant-form-modal" data-url="@Url.Action("PrintablePregnantForm","ViewForms", new { code = item.PatientCode })">
-                                                @item.PatientName
+                                                @item.PatientName.NameToUpper()
                                             </a>
                                         }
                                         <p class="small text-muted">
@@ -90,7 +89,7 @@
                                     </td>
                                     <!-- DATE ACTIVITY -->
                                     <td>
-                                        @dateAction
+                                        @item.DateAction.GetDate("MMMM dd, yyyy hh:mm tt");
                                     </td>
                                     <!-- STATUS -->
                                     <td>

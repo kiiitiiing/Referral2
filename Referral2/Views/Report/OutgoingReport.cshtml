@@ -94,11 +94,11 @@
                                         {
                                             var code = item.Code;
                                             var dateReferred = item.DateReferred.ToString("dd/MM/yy HH:mm");
-                                            var seen = GlobalFunctions.ComputeTimeFrame(item.Seen);
-                                            var accepted = GlobalFunctions.ComputeTimeFrame(item.Accepted);
-                                            var arrived = GlobalFunctions.ComputeTimeFrame(item.Arrived);
-                                            var redirected = GlobalFunctions.ComputeTimeFrame(item.Redirected);
-                                            var noAction = item.NoAction < 0 ? "" : GlobalFunctions.ComputeTimeFrame(item.NoAction);
+                                            var seen = item.Seen.ComputeTimeFrame();
+                                            var accepted = item.Accepted.ComputeTimeFrame();
+                                            var arrived = item.Arrived.ComputeTimeFrame();
+                                            var redirected = item.Redirected.ComputeTimeFrame();
+                                            var noAction = item.NoAction < 0 ? "" : item.NoAction.ComputeTimeFrame();
                                             <tr>
                                                 <th><small class="custom-warning">@code</small></th>
                                                 <th><small class="text-gray">@dateReferred</small></th>

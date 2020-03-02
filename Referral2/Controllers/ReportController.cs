@@ -415,7 +415,7 @@ namespace Referral2.Controllers
                 form.TimeReferred.ToString("MMMM d, yyyy h:mm tt",CultureInfo.InvariantCulture),
                 form.TimeTransferred == default? "" : form.TimeTransferred.ToString("MMMM d, yyyy h:mm tt", CultureInfo.InvariantCulture),
                 GlobalFunctions.GetFullName(form.Patient),
-                GlobalFunctions.ComputeAge(form.Patient.DateOfBirth),
+                form.Patient.DateOfBirth.ComputeAge(),
                 form.Patient.Sex,
                 form.Patient.CivilStatus,
                 GlobalFunctions.GetAddress(form.Patient),
@@ -551,7 +551,7 @@ namespace Referral2.Controllers
                 </tbody>
             </table>",
             GlobalFunctions.GetFullName(form.PatientWoman),
-            GlobalFunctions.ComputeAge(form.PatientWoman.DateOfBirth),
+            form.PatientWoman.DateOfBirth.ComputeAge(),
             GlobalFunctions.GetAddress(form.PatientWoman),
             form.WomanReason,
             form.WomanMajorFindings,

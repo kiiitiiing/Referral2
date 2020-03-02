@@ -6,6 +6,7 @@
     <title>@ViewData["Title"] - Referral2</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     @*<link rel="stylesheet" href="~/css/site.css" />*@
+    <link rel="icon" href="~/assets/dist/img/dohfavicon.png" />
     <link rel="stylesheet" href="~/assets/dist/css/adminlte.min.css" />
     <link rel="stylesheet" href="~/assets/dist/css/wizardstep.css" />
     <link rel="stylesheet" href="~/assets/dist/css/CustomCSS.css" />
@@ -36,6 +37,8 @@
     <script src="~/assets/plugins/moment/moment.min.js"></script>
     <script src="~/assets/dist/js/bootstrap-datetimepicker.js"></script>
     <script type="text/javascript" src="~/assets/plugins/toastr/toastr.min.js"></script>
+    <script type="text/javascript" src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
 
 
 </head>
@@ -48,33 +51,53 @@
     <header>
         @if (User.Identity.IsAuthenticated)
         {
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container">
+            var name = User.FindFirstValue(ClaimTypes.GivenName) + " " + User.FindFirstValue(ClaimTypes.Surname);
+            name = User.FindFirstValue(ClaimTypes.Role) == "doctor" ? "Dr. " + name : name;
+            var department = string.IsNullOrEmpty(User.FindFirstValue("DepartmentName")) ? "" : " / " + User.FindFirstValue("DepartmentName");
+            var bannerName = name.NameToUpper() + department;
+            var facilityName = User.FindFirstValue("FacilityName");
+            <div class="header" style="background-color:#2F4054;padding:10px;">
+                <div class="container">
+                    <div class="fa-pull-left">
+                        <span class="title-info">Welcome,</span> <span class="title-desc"> @bannerName </span>
+                    </div>
 
-                <div class="navbar-collapse collapse flex-sm-row-reverse">
-
-                    <partial name="_LoginPartial" />
-                    @if (User.FindFirstValue(ClaimTypes.Role).Equals("doctor"))
-                    {
-                        <partial name="~/Views/Shared/Navbar/_DoctorNavbarPartial.cshtml" />
-                    }
-                    else if (User.FindFirstValue(ClaimTypes.Role).Equals("admin"))
-                    {
-                        <partial name="~/Views/Shared/Navbar/_AdminNavbarPartial.cshtml" />
-                    }
-                    else if (User.FindFirstValue(ClaimTypes.Role).Equals("support"))
-                    {
-                        <partial name="~/Views/Shared/Navbar/_SupportNavbarPartial.cshtml" />
-                    }
-                    else if (User.FindFirstValue(ClaimTypes.Role).Equals("mcc"))
-                    {
-                        <partial name="~/Views/Shared/Navbar/_MccNavbarPartial.cshtml" />
-                    }
+                    <div class="fa-pull-right">
+                        <span class="title-desc">@facilityName</span>
+                    </div>
+                    <div class="clearfix"></div>
                 </div>
             </div>
-        </nav>
+            <div class="header" style="background-color:#59ab91;padding:15px;">
+                <div class="container">
+                    <img src="~/assets/dist/img/ReferralBanner.png" class="img-responsive" />
+                </div>
+            </div>
+            <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white box-shadow mb-3 custom-nav">
+                <div class="container">
+
+                    <div class="navbar-collapse collapse flex-sm-row-reverse">
+                        @if (User.FindFirstValue(ClaimTypes.Role).Equals("doctor"))
+                        {
+                            <partial name="~/Views/Shared/Navbar/_DoctorNavbarPartial.cshtml" />
+                        }
+                        else if (User.FindFirstValue(ClaimTypes.Role).Equals("admin"))
+                        {
+                            <partial name="~/Views/Shared/Navbar/_AdminNavbarPartial.cshtml" />
+                        }
+                        else if (User.FindFirstValue(ClaimTypes.Role).Equals("support"))
+                        {
+                            <partial name="~/Views/Shared/Navbar/_SupportNavbarPartial.cshtml" />
+                        }
+                        else if (User.FindFirstValue(ClaimTypes.Role).Equals("mcc"))
+                        {
+                            <partial name="~/Views/Shared/Navbar/_MccNavbarPartial.cshtml" />
+                        }
+                    </div>
+                </div>
+            </nav>
         }
-        </header>
+    </header>
     <!-- MODALS -->
     <div class="modal fade" id="login-status-modal" tabindex="-1" role="dialog" aria-labelledby="addContactLabel" aria-hidden="true">
         <div class="modal-dialog modal-sm" role="document">
@@ -229,10 +252,13 @@
             </div>
         </div>
     </div>
-
+    @{
+        var login = User.Identity.IsAuthenticated ? "" : "login-page";
+    }
     <!-- MODAL END -->
-    <div class="container set-height">
-        <partial name="_CookieConsentPartial" />
+    <div class="container set-height @login">
+        <!--<partial name="_CookieConsentPartial" />-->
+
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
@@ -276,15 +302,13 @@
         else if (sessionStorage.getItem('onReload') == 'removedFacility') {
             sessionStorage.setItem('onReload', '');
             ChangePasswordSuccess("success", "Facility removed successfully!");
-        } 
+        }
         else if (sessionStorage.getItem('onReload') == 'updatedIssues') {
             sessionStorage.setItem('onReload', '');
             ChangePasswordSuccess("success", "Issue updated successfully!");
         }
     </script>
 
-    <script type="text/javascript" src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-    <script type="text/javascript" src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
     @RenderSection("Scripts", required: false)
 
 </body>

@@ -74,7 +74,7 @@ namespace Referral2.Controllers
         public async Task<IActionResult> Chat()
         {
             var chats = await _context.Feedback
-                .Where(x => x.Code.Equals("it-support-chat") && x.Sender.FacilityId.Equals(UserFacility))
+                .Where(x => x.Code.Equals("it-group-chat") && x.Sender.FacilityId.Equals(UserFacility))
                 .Select(x=> new SupportChatViewModel 
                 {
                     SupportId = (int)x.SenderId,
@@ -82,7 +82,7 @@ namespace Referral2.Controllers
                     SupportName = GlobalFunctions.GetFullName(x.Sender),
                     Message = x.Message,
                     MessageDate = (DateTime)x.CreatedAt
-                }).AsNoTracking().ToListAsync();
+                }).ToListAsync();
 
             return View(chats);
         }
@@ -105,7 +105,7 @@ namespace Referral2.Controllers
                 await _context.SaveChangesAsync();
             };
 
-            return View();
+            return RedirectToAction("Chat");
         }
         // GET: DAILY REFERRALS
         public async Task<IActionResult> DailyReferrals(string daterange, int? page, bool export)
@@ -148,14 +148,14 @@ namespace Referral2.Controllers
                 .OrderBy(x => x.Lastname)
                 .Select(i => new DailyReferralSupport
                 {
-                    DoctorName = i.Firstname + " " + i.Middlename + " " + i.Lastname,
+                    DoctorName = i.Firstname +" "+ (i.Middlename ?? "") + " " + i.Lastname,
                     OutAccepted = activities.Where(x => x.ReferringMd.Equals(i.Id) && x.Status.Equals(_status.Value.ACCEPTED)).Count(),
                     OutRedirected = tract.Where(x => x.ReferringMd.Equals(i.Id) && x.Status.Equals(_status.Value.REJECTED)).Count(),
                     OutSeen = trackings.Where(x => x.ReferringMd.Equals(i.Id) && x.DateSeen == default).Count(),
-                    OutTotal = trackings.Where(x => x.ReferringMd.Equals(i.Id)).Select(x=>x.Code).Distinct().Count(),
+                    OutTotal = trackings.Where(x => x.ReferringMd.Equals(i.Id)).Select(x => x.Code).Distinct().Count(),
                     InAccepted = tract.Where(x => x.ReferredTo.Equals(UserFacility) && x.ActionMd.Equals(i.Id) && x.Status.Equals(_status.Value.ACCEPTED)).Count(),
                     InRedirected = tract.Where(x => x.ReferredTo.Equals(UserFacility) && x.ActionMd.Equals(i.Id) && x.Status.Equals(_status.Value.REJECTED)).Count(),
-                    InSeen = seens.Where(x=>x.UserMd.Equals(i.Id)).GroupBy(x=>x.TrackingId).Select(x=>x.Key).Count(),
+                    InSeen = seens.Where(x => x.UserMd.Equals(i.Id)).GroupBy(x => x.TrackingId).Select(x => x.Key).Count(),
                 });
 
             if(export)
@@ -244,10 +244,10 @@ namespace Referral2.Controllers
 
             var dailyUsers = _context.User
                 .Where(x => x.FacilityId.Equals(UserFacility) && x.Level.Equals(_roles.Value.DOCTOR))
-                .OrderBy(x=>x.Lastname)
+                .OrderBy(x => x.Lastname)
                 .Select(i => new DailyUsersViewModel
                 {
-                    MDName = GlobalFunctions.GetFullLastName(i),
+                    MDName = i.Lastname + ", " + i.Firstname + " " + (i.Middlename ?? ""),
                     OnDuty = i.LastLogin != default ? logins.Where(x => x.UserId == i.Id && x.Login1 >= StartDate && x.Login1 <= EndDate).First().Status : "",
                     LoggedIn = i.LastLogin != default ? logins.Where(x => x.UserId == i.Id && x.Login1 >= StartDate && x.Login1 <= EndDate).First().Login1 != default : false,
                     LoginTime = logins.Where(x => x.UserId == i.Id && x.Login1 >= StartDate && x.Login1 <= EndDate).First().Login1,
@@ -377,20 +377,23 @@ namespace Referral2.Controllers
             return View(model);
         }
         // GET: INCOMING REPORT 
-        public async Task<IActionResult> IncomingReport()
+        public async Task<IActionResult> IncomingReport(int? page)
         {
-            var incoming = await _context.Tracking
+            var incoming = _context.Tracking
                 .Where(x => x.ReferredTo.Equals(UserFacility))
+                .Where(x => x.Status == _status.Value.SEEN || x.Status == _status.Value.REFERRED)
                 .Select(x => new IncomingReferralViewModel
                 {
-                    PatientName = GlobalFunctions.GetFullName(x.Patient),
+                    PatientName = x.Patient.FirstName+" "+x.Patient.MiddleName+" "+x.Patient.LastName,
                     ReferringFacility = x.ReferredFromNavigation.Name,
                     Department = x.Department.Description,
                     DateReferred = x.DateReferred,
                     Status = x.Status
-                }).AsNoTracking().ToListAsync();
+                });
 
-            return View(incoming);
+            int size = 20;
+
+            return View(await PaginatedList<IncomingReferralViewModel>.CreateAsync(incoming.OrderByDescending(x=>x.DateReferred), page ?? 1, size));
         }
         // GET: MANANGE USERS
         public async Task<IActionResult> ManageUsers(int? page, string search)
@@ -406,15 +409,14 @@ namespace Referral2.Controllers
                     DepartmentName = y.Department.Description,
                     Username = y.Username,
                     Status = y.Status,
-                    LastLogin = y.LastLogin.Equals(default) ? "Never Login" : y.LastLogin.ToString("MMM dd, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture)
+                    LastLogin = y.LastLogin.Equals(default) ? "Never Login" : y.LastLogin.GetDate("MMM dd, yyyy hh:mm tt")
                 });
-
 
             if(!string.IsNullOrEmpty(search))
             {
                 doctors = doctors.Where(x => x.DoctorName.Contains(search));
             }
-            int size = 10;
+            int size = 15;
 
             return View(await PaginatedList<SupportManageViewModel>.CreateAsync(doctors.OrderByDescending(x=>x.DoctorName), page ?? 1, size));
         }
@@ -428,7 +430,7 @@ namespace Referral2.Controllers
             var totalDoctors = _context.User
                 .Where(x => x.Level.Equals(_roles.Value.DOCTOR) && x.FacilityId.Equals(UserFacility)).Count();
             var onlineDoctors = _context.User
-                .Where(x => x.Login.Equals("login") && x.FacilityId.Equals(UserFacility)).Count();
+                .Where(x => x.LoginStatus.Equals("login") && x.FacilityId.Equals(UserFacility) && x.Level == _roles.Value.DOCTOR && x.LastLogin.Date == DateTime.Now.Date).Count();
             var referredPatients = _context.Tracking
                 .Where(x => x.ReferredTo.Equals(UserFacility)).Count();
             var dashboard = new SupportDashboadViewModel(
@@ -444,12 +446,13 @@ namespace Referral2.Controllers
         {
             var departments = _context.Department;
             var currentMd = await _context.User.FindAsync(id);
-            if(currentMd != null)
+            if(currentMd != null && currentMd.DepartmentId != null)
             {
                 ViewBag.Status = new SelectList(ListContainer.UserStatus, "Key", "Value", currentMd.Status);
                 ViewBag.Departments = new SelectList(departments, "Id", "Description", currentMd.DepartmentId);
                 currentMd.Password = "";
             }
+            ViewBag.Departments = new SelectList(departments, "Id", "Description");
 
             var doctor = returnDoctorInfo(currentMd);
 

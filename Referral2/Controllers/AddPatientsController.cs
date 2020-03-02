@@ -142,7 +142,7 @@ namespace Referral2.Controllers
             {
                 Id = patient.Id,
                 Name = GlobalFunctions.GetFullName(patient),
-                Age = GlobalFunctions.ComputeAge(patient.DateOfBirth),
+                Age = patient.DateOfBirth.ComputeAge(),
                 Sex = patient.Sex,
                 CivilStatus = patient.CivilStatus,
                 Address = GlobalFunctions.GetAddress(patient),
@@ -191,7 +191,7 @@ namespace Referral2.Controllers
             {
                 Id = currentPatient.Id,
                 Name = GlobalFunctions.GetFullName(currentPatient),
-                Age = GlobalFunctions.ComputeAge(currentPatient.DateOfBirth),
+                Age = currentPatient.DateOfBirth.ComputeAge(),
                 Sex = currentPatient.Sex,
                 CivilStatus = currentPatient.CivilStatus,
                 Address = GlobalFunctions.GetAddress(currentPatient),
@@ -514,7 +514,7 @@ namespace Referral2.Controllers
             {
                 Id = patient.Id,
                 Name = GlobalFunctions.GetFullName(patient),
-                Age = GlobalFunctions.ComputeAge(patient.DateOfBirth),
+                Age = patient.DateOfBirth.ComputeAge(),
                 Sex = patient.Sex,
                 CivilStatus = patient.CivilStatus,
                 Address = GlobalFunctions.GetAddress(patient),
