@@ -48,12 +48,9 @@ namespace Referral2.Controllers
         public DateTime EndDate { get; set; }
 
         //GET: List Patients
-        public async Task<IActionResult> ListPatients(string currentFilter, string name, int? muncityId, int? barangayId, int? pageNumber)
+        public async Task<IActionResult> ListPatients( string name, int? muncityId, int? barangayId, int? page)
         {
-            if (name != null)
-                pageNumber = 1;
-            else
-                name = currentFilter;
+            ViewBag.CurrentFilter = name;
 
             var muncities = _context.Muncity.Where(x => x.ProvinceId.Equals(UserProvince));
 
@@ -66,7 +63,6 @@ namespace Referral2.Controllers
                 ViewBag.Barangays = new SelectList(barangays, "Id", "Description", barangayId);
             }
                 
-            ViewBag.CurrentFilter = name;
 
 
             var patients = _context.Patient
@@ -88,10 +84,10 @@ namespace Referral2.Controllers
             x.BarangayId.Equals(barangayId));
 
 
-            int pageSize = 5;
+            int size = 15;
 
 
-            return View(await PaginatedList<PatientsViewModel>.CreateAsync(patients.OrderBy(x=>x.PatientName), pageNumber ?? 1, pageSize));
+            return View(await PaginatedList<PatientsViewModel>.CreateAsync(patients.OrderBy(x=>x.PatientName), page ?? 1, size));
         }
 
 
@@ -498,6 +494,7 @@ namespace Referral2.Controllers
             ViewBag.Total = referred.Count();
             ViewBag.Facilities = new SelectList(facilities, "Id", "Name");
             ViewBag.ListStatus = new SelectList(ListContainer.ListStatus, "Key", "Value");
+
 
             if (!string.IsNullOrEmpty(search))
             {

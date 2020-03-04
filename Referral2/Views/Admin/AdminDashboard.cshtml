@@ -93,17 +93,39 @@
         </div>
     </div>
 
+<audio id="soundFx">
+    <source src="~/assets/sounds/sound1.ogg" />
+</audio>
 
 <script>
     DashboardAPI('@User.FindFirstValue(ClaimTypes.Role)');
     //$('#notif-modal').modal('show');
 
+    
+
+    var title = "New Referral"
+    var patient = "Jane Doe";
+    var actionMd = "Dr. Keith Joseph";
+    var status = "";
+    var facility = "Talisay District Hospital";
+
+    var delay = 5000;
+    $(function () {
+        Lobibox.notify('success', {
+            delay: false,
+            img: 'assets/hospitallogos/DOHLOGO.png',
+            title: title,
+            msg: patient + ' was referred by ' + actionMd + ' of ' + facility
+        });
+    });
+
+    /*
         toastr.options = {
           "closeButton": false,
           "debug": false,
           "newestOnTop": false,
           "progressBar": false,
-          "positionClass": "toast-top-right",
+          "positionClass": "toast-bottom-right",
           "preventDuplicates": false,
           "onclick": null,
           "showDuration": "300",
@@ -114,6 +136,6 @@
           "hideEasing": "linear",
           "showMethod": "fadeIn",
           "hideMethod": "fadeOut"
-        }
-        Command: toastr["success"]("Are you the six fingered man?")
+    }
+    Command: toastr["success"](patient + " was referred by " + actionMd + " of " + facility, title)*/
 </script>

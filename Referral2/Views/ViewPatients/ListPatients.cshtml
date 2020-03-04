@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Patient List";
+    var muncity = ViewBag.Muncities.SelectedValue == null ? "" : ViewBag.Muncities.SelectedValue.ToString();
+    var barangay = ViewBag.Barangays == null ? "" : ViewBag.Barangays.SelectedValue.ToString();
 }
 
 
@@ -58,10 +60,9 @@
                 <div class="card card-outline">
                     <!-- DAILY USERS HEADER -->
                     <div class="card-header with-border">
-                        <h3>
+                        <h4>
                             Patient List
-                        </h3>
-                        <small class="text-success">@DateTime.Now.ToString("MMMM dd, yyyy")</small>
+                        </h4>
                     </div>
                     <!-- DAILY USERS BODY -->
                     <div class="card-body">
@@ -69,7 +70,7 @@
                         @if (Model.Count() > 0)
                         {
                             <div class="table-responsive">
-                                <table class="table table-striped table-hover table-bordered">
+                                <table class="table table-striped table-hover custom-table" width="100%">
                                     <!-- TABLE HEADER -->
                                     <thead>
                                         <tr class="bg-gradient-gray">
@@ -87,23 +88,23 @@
                                             var dateOfBirth = item.DateofBirth.ToString("MMMM dd, yyyy");
                                         <tr>
                                             <!-- NAME -->
-                                            <td>
-                                                <a href="#" data-toggle="ajax-modal" data-target="#update-modal" data-url="@Url.Action("Update", "AddPatients", new { id = item.PatientId })">
+                                            <td width="28%">
+                                                <a class="text-bold" href="#" data-toggle="ajax-modal" data-target="#update-modal" data-url="@Url.Action("Update", "AddPatients", new { id = item.PatientId })">
                                                     @item.PatientName
                                                 </a>
                                             </td>
-                                            <td>@item.PatientSex</td><!-- GENDER -->
-                                            <td>
+                                            <td width="13%">@item.PatientSex</td><!-- GENDER -->
+                                            <td width="17%">
                                                 <!-- AGE/DOB -->
-                                                @item.PatientAge<br />
+                                                @item.PatientAge years old<br />
                                                 <small class="text-muted">@dateOfBirth</small>
                                             </td>
-                                            <td>
+                                            <td width="23%">
                                                 <!-- BARANGAY -->
                                                 @item.Barangay<br />
-                                                <small class="text-muted">@item.Muncity</small>
+                                                <small class="text-success">@item.Muncity</small>
                                             </td>
-                                            <td>
+                                            <td width="19%">
                                                 @if (item.PatientSex.Equals("Female") && (item.PatientAge > 14 && item.PatientAge < 50))
                                                 {
                                                     <!-- REFER -->
@@ -145,6 +146,22 @@
                                 </span>
                             </div>
                         }
+                    </div>
+                    <div class="card-footer">
+                        @await Html.PartialAsync("~/Views/Shared/PartialViews/_PageList.cshtml", new PageListModel
+                       {
+                           Action = "ListPatients",
+                           HasNextPage = Model.HasNextPage,
+                           HasPreviousPage = Model.HasPreviousPage,
+                           PageIndex = Model._pageIndex,
+                           TotalPages = Model._totalPages,
+                           Parameters = new Dictionary<string, string>
+                           {
+                               {"name", ViewBag.CurrentFilter },
+                               { "muncityId", muncity},
+                               { "barangayId", barangay}
+                           }
+                       })
                     </div>
                 </div>
             </div>

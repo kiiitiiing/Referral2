@@ -16,6 +16,15 @@ a.dropdown-item{
     line-height: 20px !important;
 }
 
+.custom-table{
+    vertical-align: middle !important;
+    font-size: 14px !important;
+}
+
+.custom-table td {
+    vertical-align: middle !important;
+}
+
 .custom-nav {
     display: -webkit-flex;
     -webkit-flex-direction: row;

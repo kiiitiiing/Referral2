@@ -58,7 +58,7 @@ namespace Referral2.Controllers
             ViewBag.StartDate = StartDate;
             ViewBag.EndDate = EndDate;
 
-            int size = 5;
+            int size = 20;
 
             var activities = _context.Activity
                 .Where(x => x.DateReferred >= StartDate && x.DateReferred <= EndDate);
@@ -67,9 +67,11 @@ namespace Referral2.Controllers
                 .Select(t => new IncomingReportViewModel
                 {
                     ReferredTo = (int)t.ReferredTo,
+                    ReferredFrom = (int)t.ReferredFrom,
                     Department = (int)t.DepartmentId,
                     Code = t.Code,
-                    Facility = t.ReferredToNavigation.Name,
+                    Facility = t.ReferredFromNavigation.Name,
+                    DateReferred = t.DateReferred,
                     DateAdmitted = activities.First(x=>x.Code.Equals(t.Code) && x.Status.Equals(_status.Value.ADMITTED)).DateReferred,
                     DateArrived = activities.First(x => x.Code.Equals(t.Code) && x.Status.Equals(_status.Value.ARRIVED)).DateReferred,
                     DateDischarged = activities.First(x => x.Code.Equals(t.Code) && x.Status.Equals(_status.Value.DISCHARGED)).DateReferred,
@@ -77,7 +79,8 @@ namespace Referral2.Controllers
                     DateTransferred = activities.First(x => x.Code.Equals(t.Code) && x.Status.Equals(_status.Value.TRANSFERRED)).DateReferred
                 });
 
-            var facilities = _context.Facility;
+            var facilities = _context.Facility
+                .Where(x => x.Id != UserFacility);
             var departments = await AvailableDepartments(UserFacility);
             ViewBag.Facilities = new SelectList(facilities, "Id", "Name");
             ViewBag.Departments = new SelectList(departments, "DepartmentId", "DepartmentName");
@@ -86,18 +89,18 @@ namespace Referral2.Controllers
 
             if (facility != null)
             {
-                tracking = tracking.Where(x => x.ReferredTo.Equals(facility));
+                tracking = tracking.Where(x => x.ReferredFrom.Equals(facility));
                 ViewBag.Facilities = new SelectList(facilities, "Id", "Name", facility);
                 ViewBag.Total = tracking.Count();
             }
             if(department != null)
             {
                 tracking = tracking.Where(x => x.Department.Equals(department));
-                ViewBag.Departments = new SelectList(departments, "Id", "Description", department);
+                ViewBag.Departments = new SelectList(departments, "DepartmentId", "DepartmentName", department);
                 ViewBag.Total = tracking.Count();
             }
 
-            return View(await PaginatedList<IncomingReportViewModel>.CreateAsync(tracking.OrderBy(x=>x.Facility), page ?? 1, size));
+            return View(await PaginatedList<IncomingReportViewModel>.CreateAsync(tracking.OrderByDescending(x=>x.DateReferred), page ?? 1, size));
         }
         // GET OUTGOING REPORT
         public async Task<IActionResult> OutgoingReport(string daterange, int? page, int? facility, int? department)
@@ -116,13 +119,14 @@ namespace Referral2.Controllers
             ViewBag.StartDate = StartDate;
             ViewBag.EndDate = EndDate;
 
-            int size = 5;
+            int size = 20;
 
             var outgoing = _context.Tracking
                 .Where(x => x.ReferredFrom == UserFacility && x.DateReferred >= StartDate && x.DateReferred <= EndDate)
                 .Select(t => new OutgoingReportViewModel
                 {
                     Department = (int)t.DepartmentId,
+                    ReferredTo = (int)t.ReferredTo,
                     ReferredFrom = (int)t.ReferredFrom,
                     Code = t.Code,
                     DateReferred = t.DateReferred,
@@ -133,7 +137,8 @@ namespace Referral2.Controllers
                     NoAction = t.DateSeen == default ? 0 : t.DateReferred.Subtract(DateTime.Now).TotalMinutes
                 });
 
-            var facilities = _context.Facility;
+            var facilities = _context.Facility
+                .Where(x=>x.Id != UserFacility);
             var departments = await AvailableDepartments(UserFacility);
             ViewBag.Facilities = new SelectList(facilities, "Id", "Name");
             ViewBag.Departments = new SelectList(departments, "DepartmentId", "DepartmentName");
@@ -142,14 +147,14 @@ namespace Referral2.Controllers
 
             if (facility != null)
             {
-                outgoing = outgoing.Where(x => x.ReferredFrom.Equals(facility));
+                outgoing = outgoing.Where(x => x.ReferredTo.Equals(facility));
                 ViewBag.Facilities = new SelectList(facilities, "Id", "Name", facility);
                 ViewBag.Total = outgoing.Count();
             }
             if (department != null)
             {
                 outgoing = outgoing.Where(x => x.Department.Equals(department));
-                ViewBag.Departments = new SelectList(departments, "Id", "Description", department);
+                ViewBag.Departments = new SelectList(departments, "DepartmentId", "DepartmentName", department);
                 ViewBag.Total = outgoing.Count();
             }
 

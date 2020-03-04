@@ -5,6 +5,8 @@
     var startDate = ViewBag.StartDate;
     var endDate = ViewBag.EndDate;
     var dateRange = startDate.ToString("dd/MM/yyyy") + " - " + endDate.ToString("dd/MM/yyyy");
+    var facility = ViewBag.Facilities.SelectedValue == null ? "" : ViewBag.Facilities.SelectedValue.ToString();
+    var department = ViewBag.Departments.SelectedValue == null ? "" : ViewBag.Departments.SelectedValue.ToString();
 }
 
 <div class="content">
@@ -100,13 +102,13 @@
                                             var transferred = item.DateTransferred == default ? "" : item.DateTransferred.ToString("MM/dd/yy HH:mm");
                                             var cancelled = item.DateCancelled == default ? "" : item.DateCancelled.ToString("MM/dd/yy HH:mm");
                                             <tr>
-                                                <th><small class="">@code</small></th>
-                                                <th><small class="text-success" title="@item.Facility">@referredFrom</small></th>
-                                                <th><small class="text-success">@arrived</small></th>
-                                                <th><small class="text-success">@admitted</small></th>
-                                                <th><small class="text-success">@discharged</small></th>
-                                                <th><small class="text-success">@transferred</small></th>
-                                                <th><small class="text-success">@cancelled</small></th>
+                                                <td>@code</td>
+                                                <td class="text-success" title="@item.Facility">@referredFrom</td>
+                                                <td><small class="text-success">@arrived</small></td>
+                                                <td><small class="text-success">@admitted</small></td>
+                                                <td><small class="text-success">@discharged</small></td>
+                                                <td><small class="text-success">@transferred</small></td>
+                                                <td><small class="text-success">@cancelled</small></td>
                                             </tr>
                                         }
                                     </tbody>
@@ -125,17 +127,20 @@
                     </div>
                     <div class="card-footer">
                         @await Html.PartialAsync("~/Views/Shared/PartialViews/_PageList.cshtml", new PageListModel
-                        {
-                            Action = "IncomingReport",
-                            HasNextPage = Model.HasNextPage,
-                            HasPreviousPage = Model.HasPreviousPage,
-                            PageIndex = Model._pageIndex,
-                            TotalPages = Model._totalPages,
-                            Parameters = new Dictionary<string, string>
-                            {
-                                { "page", Model._pageIndex.ToString() }
-                            }
-                        })
+                       {
+                           Action = "IncomingReport",
+                           HasNextPage = Model.HasNextPage,
+                           HasPreviousPage = Model.HasPreviousPage,
+                           PageIndex = Model._pageIndex,
+                           TotalPages = Model._totalPages,
+                           Parameters = new Dictionary<string, string>
+                                {
+                                    { "page", Model._pageIndex.ToString() },
+                                    { "daterange", dateRange },
+                                    { "facility", facility},
+                                    {"department", department}
+                                }
+                       })
                     </div>
                 </div>
             </div>

@@ -6,6 +6,8 @@
     var startDate = ViewBag.StartDate;
     var endDate = ViewBag.EndDate;
     var dateRange = startDate + " - " + endDate;
+    var dep = ViewBag.Departments.SelectedValue == null ? "" : ViewBag.Departments.SelectedValue.ToString();
+    var status = ViewBag.IncomingStatus.SelectedValue == null ? "" : ViewBag.IncomingStatus.SelectedValue.ToString();
 }
 
 <div class="content">
@@ -82,7 +84,7 @@
                                     var dateAction = item.DateAction.GetDate("MMM dd, yyyy hh:mm tt");
                                     var currentUserFacility = int.Parse(User.FindFirstValue("Facility"));
                                     var currentUserDepartment = string.IsNullOrEmpty(User.FindFirstValue("Department"))? 0 : int.Parse(User.FindFirstValue("Department"));
-
+                                    
                                     switch (item.Status)
                                     {
                                         case "rejected":
@@ -538,8 +540,8 @@
                                {"page",Model._pageIndex.ToString() },
                                {"search", ViewBag.CurrentSearch },
                                { "dateRange",dateRange },
-                               { "department",ViewBag.SelectedDepartment},
-                               { "status", ViewBag.SelectedStatus }
+                               { "department", dep},
+                               { "status", status}
                            }
                        })
                     </div>

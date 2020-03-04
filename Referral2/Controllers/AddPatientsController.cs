@@ -177,9 +177,8 @@ namespace Referral2.Controllers
                 var activity = SetNormalActivity(tracking);
                 _context.Add(tracking);
                 _context.Add(activity);
-                _context.Add(patient);
                 await _context.SaveChangesAsync();
-                return RedirectToAction("ListPatients", "ViewPatients");
+                return RedirectToAction("Referred", "ViewPatients");
             }
             else
             {
@@ -586,6 +585,8 @@ namespace Referral2.Controllers
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now                
             };
+            _context.Add(patient);
+            _context.SaveChanges();
             return patient;
         }
 
@@ -635,7 +636,7 @@ namespace Referral2.Controllers
                 Remarks = patientForm.Reason,
                 Type = "normal",
                 Status = _status.Value.REFERRED,
-                //FormId = patientForm.Id,
+                FormId = patientForm.Id,
                 WalkIn = "no",
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now
