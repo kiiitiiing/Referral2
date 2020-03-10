@@ -51,7 +51,10 @@ namespace Referral2.Services
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
                 return (false, user);
 
-            user = await _context.User.SingleOrDefaultAsync(x => x.Username.Equals(username));
+            user = await _context.User
+                .Include(x=>x.Facility)
+                .Include(x=>x.Department)
+                .SingleOrDefaultAsync(x => x.Username.Equals(username));
 
             if (user == null)
                 return (false, user);

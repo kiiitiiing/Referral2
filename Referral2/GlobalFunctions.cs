@@ -140,7 +140,7 @@ namespace Referral2
             return barangay + muncity + province;
         }
 
-        public static string GetFullName(Patient patient)
+        public static string GetFullName(this Patient patient)
         {
             if (patient != null)
                 return patient.FirstName.CheckName() + " " + patient.MiddleName.CheckName() + " " + patient.LastName.CheckName();
@@ -155,14 +155,14 @@ namespace Referral2
             else
                 return "";
         }
-        public static string GetFullLastName(Patient patient)
+        public static string GetFullLastName(this Patient patient)
         {
             if (patient != null)
                 return patient.LastName.CheckName() + ", " + patient.FirstName.CheckName() + " " + patient.MiddleName.CheckName();
             else
                 return "";
         }
-        public static string GetFullName(User user)
+        public static string GetFullName(this User user)
         {
             if (user != null)
                 return user.Firstname.CheckName() + " " + user.Middlename.CheckName() + " " + user.Lastname.CheckName();

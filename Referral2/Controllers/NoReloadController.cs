@@ -128,16 +128,14 @@ namespace Referral2.Controllers
                 DepartmentName = x.Description
             });
 
-            var test = _context.User.Where(x => x.FacilityId.Equals(facilityId) && x.Level.Equals(_roles.Value.DOCTOR))
-                                             .DistinctBy(d => d.DepartmentId);
-
             var faciliyDepartment = _context.User.Where(x => x.FacilityId.Equals(facilityId) && x.Level.Equals(_roles.Value.DOCTOR) && x.DepartmentId != null)
-                                            .DistinctBy(d => d.DepartmentId)
-                                            .Select(x => new SelectDepartment
-                                            {
-                                                DepartmentId = (int)x.DepartmentId,
-                                                DepartmentName = x.Department.Description
-                                            });
+                .Include(x=>x.Department)
+                .DistinctBy(d => d.DepartmentId)
+                .Select(x => new SelectDepartment
+                {
+                    DepartmentId = (int)x.DepartmentId,
+                    DepartmentName = x.Department.Description
+                });
 
             SelectAddressDepartment selectAddress = new SelectAddressDepartment(address, faciliyDepartment);
 
@@ -192,11 +190,11 @@ namespace Referral2.Controllers
         public List<SelectUser> FilterUser(int facilityId, int departmentId)
         {
             var getUser = _context.User.Where(x => x.FacilityId.Equals(facilityId) && x.DepartmentId.Equals(departmentId) && x.Level.Equals(_roles.Value.DOCTOR))
-                                        .Select(y => new SelectUser
-                                        {
-                                            MdId = y.Id,
-                                            DoctorName = ("Dr. " + y.Firstname + " " + y.Middlename.CheckName() + " " + y.Lastname).NameToUpper() + " - " + y.Contact.CheckName()
-                                        }); ;
+                .Select(y => new SelectUser
+                {
+                    MdId = y.Id,
+                    DoctorName = ("Dr. " + y.Firstname + " " + y.Middlename.CheckName() + " " + y.Lastname).NameToUpper() + " - " + y.Contact.CheckName()
+                }); ;
 
             return getUser.ToList();
         }
@@ -204,11 +202,11 @@ namespace Referral2.Controllers
         public List<SelectUser> FilterUsersWalkin(int? departmentId)
         {
             var getUser = _context.User.Where(x => x.FacilityId.Equals(UserFacility) && x.DepartmentId.Equals(departmentId) && x.Level.Equals(_roles.Value.DOCTOR))
-                                        .Select(y => new SelectUser
-                                        {
-                                            MdId = y.Id,
-                                            DoctorName = string.IsNullOrEmpty(y.Contact) ? "Dr. " + y.Firstname + " " + y.Middlename + " " + y.Lastname + " - N/A" : "Dr. " + y.Firstname + " " + y.Middlename + " " + y.Lastname + " - " + y.Contact
-                                        });
+                .Select(y => new SelectUser
+                {
+                    MdId = y.Id,
+                    DoctorName = string.IsNullOrEmpty(y.Contact) ? "Dr. " + y.Firstname + " " + y.Middlename + " " + y.Lastname + " - N/A" : "Dr. " + y.Firstname + " " + y.Middlename + " " + y.Lastname + " - " + y.Contact
+                });
 
             return getUser.ToList();
         }

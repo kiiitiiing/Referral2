@@ -350,16 +350,19 @@ namespace Referral2.Controllers
             #region Initialize variables
             ViewBag.CurrentSearch = search;
 
-            StartDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-            EndDate = StartDate.AddMonths(1).AddDays(-1);
-
             if (!string.IsNullOrEmpty(dateRange))
             {
                 StartDate = DateTime.Parse(dateRange.Substring(0, dateRange.IndexOf(" ") + 1).Trim());
                 EndDate = DateTime.Parse(dateRange.Substring(dateRange.LastIndexOf(" ")).Trim());
             }
+            else
+            {
+                StartDate = new DateTime(DateTime.Now.Year, 1, 1);
+                EndDate = DateTime.Now;
+            }
 
             var faciliyDepartment = _context.User
+                .Include(x=>x.Department)
                 .Where(x => x.FacilityId.Equals(UserFacility) && x.Level.Equals(_roles.Value.DOCTOR) && x.DepartmentId != null)
                 .DistinctBy(x=>x.DepartmentId)
                 .Select(x => new SelectDepartment
@@ -385,12 +388,12 @@ namespace Referral2.Controllers
                     Pregnant = t.Type.Equals("pregnant"),
                     TrackingId = t.Id,
                     Code = t.Code,
-                    PatientName = t.Patient.FirstName+" "+(t.Patient.MiddleName??"")+" "+t.Patient.LastName,
+                    PatientName = t.Patient.GetFullName().NameToUpper(),
                     PatientSex = t.Patient.Sex,
                     PatientAge = t.Patient.DateOfBirth.ComputeAge(),
                     Status = t.Status,
-                    ReferringMd = "Dr. "+ t.ReferringMdNavigation.Firstname+" " +t.ReferringMdNavigation.Middlename+" "+t.ReferringMdNavigation.Lastname,
-                    ActionMd = activities.OrderByDescending(x => x.DateReferred).Where(x => x.Status == t.Status && x.Code == t.Code).First().ActionMdNavigation.GetMDFullName(),
+                    ReferringMd = t.ReferringMdNavigation.GetMDFullName().NameToUpper(),
+                    ActionMd = activities.OrderByDescending(x => x.DateReferred).Where(x => x.Status == t.Status && x.Code == t.Code).First().ActionMdNavigation.GetMDFullName().NameToUpper(),
                     SeenCount = t.Seen.Count(),//Seen
                     CallCount = _context.Activity.Where(x => x.Code.Equals(t.Code) && x.Status.Equals(_status.Value.CALLING)).Count(),
                     FeedbackCount = _context.Feedback.Where(x => x.Code.Equals(t.Code)).Count(),//feedback

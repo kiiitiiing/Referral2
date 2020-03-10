@@ -64,6 +64,7 @@ namespace Referral2.Controllers
         public IActionResult ViewReco(string code)
         {
             var feedbacks = _context.Feedback
+                .Include(x=>x.Sender).ThenInclude(x=>x.Facility)
                 .Where(x => x.Code.Equals(code)).ToList();
 
             var chats = new ChatsModel

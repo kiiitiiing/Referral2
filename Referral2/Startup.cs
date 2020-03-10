@@ -34,8 +34,8 @@ namespace Referral2
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
             services.AddDbContext<ReferralDbContext>(options =>
-                options.UseLazyLoadingProxies()
-                        .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.DetachedLazyLoadingWarning))
+                options/*.UseLazyLoadingProxies()
+                        .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.DetachedLazyLoadingWarning))*/
                         .UseSqlServer(Configuration.GetConnectionString("ReferralConnection")));
 
             services.AddCors();
