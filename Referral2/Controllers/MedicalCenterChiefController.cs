@@ -946,6 +946,21 @@ namespace Referral2.Controllers
             return View(onlineUsers);
         }
 
+        public async Task<IActionResult> OnlineMcc()
+        {
+            var OnlineMccFacility = await _context.Facility
+                .Select(x => new OnlineMccModel
+                {
+                    FacilityId = x.Id,
+                    FacilityName = x.Name,
+                    Online = x.User.Where(c => c.FacilityId == x.Id && c.Level == _roles.Value.MCC && c.LoginStatus.Contains("login") && c.LastLogin.Date == DateTime.Now.Date).FirstOrDefault().Equals(null)
+                })
+                .OrderBy(x=>x.FacilityName)
+                .ToListAsync();
+
+            return PartialView(OnlineMccFacility);
+        }
+
         #region HELPERS
 
         public void SetDates(string dateRange)

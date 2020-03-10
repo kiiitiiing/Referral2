@@ -10,6 +10,7 @@ namespace Referral2.Models.ViewModels
     {
         public string Code { get; set; }
         public int MdId { get; set; }
+        public string Facility { get; set; }
         public string MdName { get; set; }
         [Required]
         public string Message { get; set; }

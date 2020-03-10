@@ -80,6 +80,13 @@ $(function () {
             placeholderElement.empty();
             placeholderElement.html(data);
             placeholderElement.find('.modal').modal('show');
+
+            var formId = placeholderElement.find('.modal').attr('id');
+
+            if (formId == 'reco-modal') {
+                console.log('reco loaded');
+                $('div.direct-chat-messages').animate({ scrollTop: $('#last-item').position().top }, 0);
+            }
         });
     });
 
@@ -107,6 +114,7 @@ $(function () {
             if (formId == 'reco-modal') {
                 console.log('chat sent');
                 $('#chat').val('');
+                $('div.direct-chat-messages').animate({ scrollTop: $('#last-item').position().top }, 0);
             }
             else if (validation == '') {
                 placeholderElement.find('.modal').modal('hide');
@@ -303,6 +311,15 @@ function GetDashboardValues(level) {
     var urlss = "/NoReload/DashboardValues?level=" + level;
     return $.ajax({
         url: urlss, 
+        type: 'get',
+        async: true
+    });
+}
+
+function GetAvailableDepartments(id) {
+    var url = "/NoReload/AvailableDepartments?facilityId=" + id;
+    return $.ajax({
+        url: url,
         type: 'get',
         async: true
     });

@@ -59,7 +59,7 @@ namespace Referral2
             {
                 options.LoginPath = "/Account/Login";
                 options.LogoutPath = "/Account/Logout";
-                options.AccessDeniedPath = "/Account/AccessDenied";
+                options.AccessDeniedPath = "/Account/NotFound";
                 options.ExpireTimeSpan = TimeSpan.FromHours(3);
             });
 

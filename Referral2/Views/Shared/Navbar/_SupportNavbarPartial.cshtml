@@ -1,4 +1,4 @@
-﻿<ul class="navbar-nav flex-grow-1">
+﻿<ul class="navbar-nav">
     <!-- DASHBOARD -->
     <li class="nav-item d-none d-sm-inline-block">
         <a class="nav-link" asp-area="" asp-controller="Support" asp-action="SupportDashboard">
@@ -32,14 +32,14 @@
         <ul class="dropdown-menu">
             <!-- DAILY USERS -->
             <li>
-                <a class="dropdown-item nav-link" data-target="modal" asp-area="" asp-controller="Support" asp-action="DailyUsers">
+                <a class="dropdown-item" data-target="modal" asp-area="" asp-controller="Support" asp-action="DailyUsers">
                     <i class="fa fa-users"></i>
                     &nbsp;Daily Users
                 </a>
             </li>
             <!-- DAILY REFERRALS -->
             <li>
-                <a class="dropdown-item nav-link" data-target="modal" asp-area="" asp-controller="Support" asp-action="DailyReferrals">
+                <a class="dropdown-item" data-target="modal" asp-area="" asp-controller="Support" asp-action="DailyReferrals">
                     <i class="fa fa-wheelchair"></i>
                     &nbsp;Daily Referrals
                 </a>
@@ -48,7 +48,7 @@
             <li class="dropdown-divider"></li>
             <!-- INCOMING REFERRAL -->
             <li>
-                <a class="dropdown-item nav-link" data-target="modal" asp-area="" asp-controller="Support" asp-action="IncomingReport">
+                <a class="dropdown-item" data-target="modal" asp-area="" asp-controller="Support" asp-action="IncomingReport">
                     <i class="fa fa-ambulance"></i>
                     &nbsp;Incoming Referrals
                     <span class="badge badge-bg">
@@ -58,7 +58,7 @@
             </li>
             <!-- IT SUPPORT: GROUP CHAT -->
             <li>
-                <a class="dropdown-item nav-link" data-target="modal" asp-area="" asp-controller="Support" asp-action="Chat">
+                <a class="dropdown-item" data-target="modal" asp-area="" asp-controller="Support" asp-action="Chat">
                     <i class="fa fa-comments"></i>
                     &nbsp;IT Support Group Chat
                 </a>
@@ -74,7 +74,7 @@
         <ul class="dropdown-menu">
             <!-- CHANGE PASSWORD -->
             <li>
-                <a class="dropdown-item nav-link" data-toggle="ajax-modal" data-target="#change-password-modal" data-url="@Url.Action("ChangePassword","Users")">
+                <a class="dropdown-item" data-toggle="ajax-modal" data-target="#change-password-modal" data-url="@Url.Action("ChangePassword","Users")">
                     <i class="fa fa-key"></i>
                     &nbsp;Change Password
                 </a>
@@ -83,7 +83,7 @@
             <li class="dropdown-divider"></li>
             <!-- LOGOUT -->
             <li>
-                <a class="dropdown-item nav-link" data-target="modal" asp-area="" asp-controller="Account" asp-action="Logout">
+                <a class="dropdown-item" data-target="modal" asp-area="" asp-controller="Account" asp-action="Logout">
                     <i class="fa fa-sign-out-alt"></i>
                     &nbsp;Logout
                 </a>
@@ -92,7 +92,7 @@
             @if (User.FindFirstValue("RealRole").Equals("admin"))
             {
                 <li>
-                    <a class="dropdown-item nav-link" data-target="modal" asp-area="" asp-controller="Account" asp-action="BackAsAdmin">
+                    <a class="dropdown-item" data-target="modal" asp-area="" asp-controller="Account" asp-action="BackAsAdmin">
                         <i class="fa fa-user-secret"></i>
                         &nbsp;Back as Admin
                     </a>

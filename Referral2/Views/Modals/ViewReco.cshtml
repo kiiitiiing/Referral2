@@ -1,43 +1,72 @@
 ﻿@model ChatsModel
 @{ 
     var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+    var userFacility = int.Parse(User.FindFirstValue("Facility"));
+    var direction = "";
 }
 
 <div class="modal fade" id="reco-modal">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content clearfix">
-            <div class="card card-success card-outline with-border direct-chat direct-chat-primary">
-                <div class="card-header with-border">
-                    <h3 class="card-title">
-                        <span class="feedback_code">@ViewBag.Code</span>
-                    </h3>
+            <div class="modal-body" style="margin: 0 !important; padding: 0 !important;">
+                <div class="card card-success card-outline with-border direct-chat direct-chat-primary" style="margin-bottom: 0 !important;">
+                    <div class="card-header with-border">
+                        <h3 class="card-title">
+                            <span class="feedback_code">@Model.Code</span>
+                        </h3>
 
-                    <div class="fa-pull-right">
-                        <button type="button" class="btn btn-box-tool" onclick="reloadMessage()">
-                            <i class="fa fa-refresh"></i>
-                        </button>
-                        <button type="button" data-dismiss="modal" class="btn" data-widget="remove">
-                            <i class="fa fa-times"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    @await Html.PartialAsync("~/Views/Modals/_Chats.cshtml", Model.Chats)
-                </div>
-                <div class="modal-footer ">
-                    <form asp-controller="Modals" asp-action="ViewReco" method="post" id="feedback-form">
-                        <input type="hidden" asp-for="Sender" value="@userId" autocomplete="off">
-                        <input class="code" type="hidden" asp-for="Code" id="code" autocomplete="off" value="@ViewBag.Code">
-                        <div class="input-group">
-                            <input type="text" asp-for="Message" id="chat" required placeholder="Type Message..." class="form-control message" autocomplete="off">
-                            <span class="input-group-btn">
-                                <button class="btn btn-success btn-flat" id="send-message" data-save="modal">Send</button>
-                            </span>
+                        <div class="fa-pull-right">
+                            <button type="button" class="btn btn-box-tool" onclick="reloadMessage()">
+                                <i class="fa fa-refresh"></i>
+                            </button>
+                            <button type="button" data-dismiss="modal" class="btn" data-widget="remove">
+                                <i class="fa fa-times"></i>
+                            </button>
                         </div>
-                    </form>
+                    </div>
+                    <div class="card-body">
+                        <div class="direct-chat-messages" id="@ViewBag.Code" style="font-size: 14px;">
+                            <div class="reco-body">
+                                @if (Model != null)
+                                {
+                                    var x = 0;
+                                    foreach (var item in Model.Chats)
+                                    {
+                                        x++;
+                                        var chatTime = item.CreatedAt.GetDate("dd MMM hh:mm tt");
+                                        direction = item.SenderId.Equals(userId) ? "right" : "left";
+                                        var reverse = direction == "right" ? "left" : "right";
+                                        var last = x == Model.Chats.Count() ? "last-item" : "";
+                                        <div class="direct-chat-msg @direction" id="chats">
+                                            <div class="direct-chat-info clearfix">
+                                                <span class="direct-chat-name fa-pull-@direction">@item.Sender.GetMDFullName().NameToUpper()</span>
+                                                <small class="direct-chat-timestamp fa-pull-@reverse">@chatTime</small>
+                                            </div>
+                                            <img class="direct-chat-img" title="@item.Sender.Facility.Name" src="~/assets/dist/img/MDMale.jpg" alt="Message User Image">
+                                            <div class="direct-chat-text" id="@last">
+                                                @item.Message
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer ">
+                        <form asp-controller="Modals" asp-action="ViewReco" method="post" id="feedback-form">
+                            <input type="hidden" asp-for="Sender" value="@userId" autocomplete="off">
+                            <input class="code" type="hidden" asp-for="Code" id="code" autocomplete="off" value="@Model.Code">
+                            <div class="input-group ">
+                                <input type="text" asp-for="Message" id="chat" required placeholder="Type Message..." class="form-control message">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-success btn-flat" id="send-message" data-save="modal">Send</button>
+                                </span>
+                            </div>
+                        </form>
+                        <div class="clearfix"></div>
+                    </div>
                     <div class="clearfix"></div>
                 </div>
-                <div class="clearfix"></div>
             </div>
         </div>
     </div>
@@ -45,9 +74,17 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
-
         var send = $('#send-message');
+        if ('@ViewBag.IsValid' == 'False') {
+            $('#chat').addClass('is-invalid');
+        }
+        $('#chat').on('change', function () {
+            $('#chat').removeClass('is-invalid');
+        });
 
+        
+        $('div.direct-chat-messages').animate({scrollTop:$('#last-item').position().top}, 0);
+        @*
         send.on('click', function () {
             var mdName = 'Dr. @User.FindFirstValue(ClaimTypes.GivenName) @User.FindFirstValue(ClaimTypes.Surname)';
             var chatTime = '@DateTime.Now.ToString("d, MMM h:mm tt", System.Globalization.CultureInfo.InvariantCulture)';
@@ -55,7 +92,7 @@
             var chatRight = $('<div class="direct-chat-msg right"></div>');
             var chatInfo = $('<div class="direct-chat-info clearfix"></div>');
             var spanMd = $('<span class="direct-chat-name fa-pull-right" id="md_name">' + mdName + '</span>');
-            var spanTime = $('<span class="direct-chat-timestamp fa-pull-left">' + chatTime + '</span>');
+            var spanTime = $('<small class="direct-chat-timestamp fa-pull-left">' + chatTime + '</small>');
             var pics = $('<img class="direct-chat-img" title="Talisay District Hospital" src="/assets/dist/img/MDMale.jpg" alt="Message User Image">');
             var divMessage = $('<div class="direct-chat-text" id="message_content">' + message + '</div>');
             chatInfo.append(spanMd);
@@ -65,7 +102,8 @@
             chatRight.append(divMessage);
             $('.reco-body').append(chatRight);
         });
-
+            *@
         
     })
+    function ChatDown() {}
 </script>

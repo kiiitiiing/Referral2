@@ -18,18 +18,21 @@
                     <div class="direct-chat-messages" style="height:400px" id="it-group-chat">
                         @if (Model != null)
                         {
+                            var x = 0;
                             foreach (var item in Model)
                             {
-                                var chatTime = item.MessageDate.ToString("dd MMM hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+                                x++;
+                                var chatTime = item.MessageDate.GetDate("dd MMM hh:mm tt");
                                 direction = item.SupportId.Equals(userId) ? "right" : "left";
                                 var reverse = direction == "right" ? "left" : "right";
-                                <div class="direct-chat-msg @direction">
+                                var last = x == Model.Count() ? "last-item" : "";
+                                <div class="direct-chat-msg @direction" id="chats">
                                     <div class="direct-chat-info clearfix">
                                         <span class="direct-chat-name fa-pull-@direction">@item.SupportName</span>
                                         <span class="direct-chat-timestamp fa-pull-@reverse">@chatTime</span>
                                     </div>
                                     <img class="direct-chat-img" title="@item.SupportFacilityName" src="~/assets/dist/img/MDMale.jpg" alt="Message User Image">
-                                    <div class="direct-chat-text">
+                                    <div class="direct-chat-text" id="@last">
                                         @item.Message
                                     </div>
                                 </div>
@@ -56,4 +59,11 @@
             <partial name="~/Views/Shared/PartialViews/_LinksPartial.cshtml" />
         </div>
     </div>
+
+<script type="text/javascript">
+    var chaat = document.getElementById('#chats');
+    $('html,body').animate({ scrollTop: 9999 }, 0);
+    $('div.direct-chat-messages').animate({scrollTop:$('#last-item').position().top}, 0);
+    //$('div.direct-chat-messages').scrollTo($('#last-item').position().top, {duration:0})
+</script>
     

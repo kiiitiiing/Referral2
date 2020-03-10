@@ -12,7 +12,7 @@ namespace Referral2.Models.ViewModels
         public int Sender { get; set; }
         [Required]
         public string Message { get; set; }
-        public List<FeedbackViewModel> Chats { get; set; }
+        public List<Feedback> Chats { get; set; }
 
     }
 }

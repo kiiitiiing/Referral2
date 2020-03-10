@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
+
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Referral2.Models.ViewModels.Users
 {
@@ -15,11 +13,13 @@ namespace Referral2.Models.ViewModels.Users
         [Required(ErrorMessage = "New Password is required")]
         [DataType(DataType.Password)]
         [Display(Name = "new password")]
+        [MinLength(6, ErrorMessage = "Password minimum length must be 6 characters.")]
         public string NewPassword { get; set; }
         [Required]
         [Compare("NewPassword")]
         [DataType(DataType.Password)]
         [Display(Name = "confirm password")]
+        [MinLength(6, ErrorMessage = "Password minimum length must be 6 characters.")]
         public string ConfirmPassword { get; set; }
     }
 }

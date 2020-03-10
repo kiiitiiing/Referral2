@@ -27,6 +27,7 @@ namespace Referral2.Models
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 
+
         [ForeignKey(nameof(ActionMd))]
         [InverseProperty(nameof(User.ActivityActionMdNavigation))]
         public virtual User ActionMdNavigation { get; set; }

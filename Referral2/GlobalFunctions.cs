@@ -170,7 +170,7 @@ namespace Referral2
                 return "";
         }
 
-        public static string GetMDFullName(User doctor)
+        public static string GetMDFullName(this User doctor)
         {
             if (doctor != null)
                 FullName = "Dr. " + doctor.Firstname.CheckName() + " " + doctor.Middlename.CheckName() + " " + doctor.Lastname.CheckName();

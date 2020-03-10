@@ -1,19 +1,19 @@
-﻿@model List<FeedbackViewModel>
+﻿@model List<Feedback>
 
-    <div class="direct-chat-messages" id="@ViewBag.Code">
+    <div class="direct-chat-messages" id="@ViewBag.Code" style="font-size: 14px;">
         <div class="reco-body">
             @foreach (var item in Model)
             {
-                if (item.MdId.Equals(int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier))))
+                if (item.SenderId.Equals(int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier))))
                 {
                     <div class="direct-chat-msg right">
                         <div class="direct-chat-info clearfix">
-                            <span class="direct-chat-name fa-pull-right" id="md_name">@item.MdName</span>
-                            <span class="direct-chat-timestamp fa-pull-left" id="chat_time">@item.TimeSent.ToString("d, MMM h:mm tt",System.Globalization.CultureInfo.InvariantCulture)</span>
+                            <span class="direct-chat-name fa-pull-right" id="md_name">@item.Sender.GetMDFullName().NameToUpper()</span>
+                            <small class="direct-chat-timestamp fa-pull-left" id="chat_time">@item.CreatedAt.GetDate("d, MMM h:mm tt")</small>
                         </div>
                         <!-- /.direct-chat-info -->
-                        <img class="direct-chat-img" title="Talisay District Hospital" src="~/assets/dist/img/MDMale.jpg" alt="Message User Image"><!-- /.direct-chat-img -->
-                        <div class="direct-chat-text" id="message_content">
+                        <img class="direct-chat-img" title="@item.Sender.Facility.Name" src="~/assets/dist/img/MDMale.jpg" alt="Message User Image"><!-- /.direct-chat-img -->
+                        <div class="direct-chat-text" id="message_content" title="@item.CreatedAt.GetDate("d, MMM h:mm tt")">
                             @item.Message
                         </div>
                         <!-- /.direct-chat-text -->
@@ -23,12 +23,12 @@
                 {
                     <div class="direct-chat-msg left">
                         <div class="direct-chat-info clearfix">
-                            <span class="direct-chat-name pull-left">@item.MdName</span>
-                            <span class="direct-chat-timestamp pull-right">@item.TimeSent.ToString("d, MMM h:mm tt", System.Globalization.CultureInfo.InvariantCulture)</span>
+                            <span class="direct-chat-name pull-left">@item.Sender.GetMDFullName().NameToUpper()</span>
+                            <small class="direct-chat-timestamp pull-right">@item.CreatedAt.GetDate("d, MMM h:mm tt")</small>
                         </div>
                         <!-- /.direct-chat-info -->
-                        <img class="direct-chat-img" title="Vicente Sotto Memorial Medical Center" src="~/assets/dist/img/MDMale.jpg" alt="Message User Image"><!-- /.direct-chat-img -->
-                        <div class="direct-chat-text">
+                        <img class="direct-chat-img" title="@item.Sender.Facility.Name" src="~/assets/dist/img/MDMale.jpg" alt="Message User Image"><!-- /.direct-chat-img -->
+                        <div class="direct-chat-text" title="@item.CreatedAt.GetDate("d, MMM h:mm tt")">
                             @item.Message
                         </div>
                     </div>

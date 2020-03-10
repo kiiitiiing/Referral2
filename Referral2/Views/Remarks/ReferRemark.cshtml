@@ -1,6 +1,6 @@
 ﻿@model ReferViewModel
 
-<div class="modal fade" role="dialog" id="refer-modal">
+<div class="modal fade" role="dialog" id="refer-modal" style="font-size: 14px;">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <form asp-action="ReferRemark">
@@ -14,17 +14,22 @@
                         <input type="hidden" asp-for="Code" />
                     </div>
                     <div class="">
-                        <textarea asp-for="Remarks" class="form-control" rows="5"></textarea>
+                        <textarea asp-for="Remarks" class="form-control" rows="5" required></textarea>
                         <span asp-validation-for="Remarks" class="text-danger"></span>
                     </div>
                     <div class="">
                         <span>Facility:</span>
-                        <select asp-for="FacilityId" asp-items="ViewBag.Facility" class="form-control" required></select>
+                        <select asp-for="FacilityId" asp-items="ViewBag.Facility" class="form-control select2 faciliyFilter" required>
+                            <option value="">Select Facility</option>
+                        </select>
                         <span asp-validation-for="FacilityId" class="text-danger"></span>
                     </div>
                     <div class="">
                         <span>Department:</span>
-                        <select asp-for="DepartmentId" asp-items="ViewBag.Department" class="form-control" required></select>
+                        <select asp-for="DepartmentId" asp-items="ViewBag.Department" class="form-control departmentFilter" required>
+                            <option value="">Select Department
+                            </option>
+                        </select>
                         <span asp-validation-for="DepartmentId" class="text-danger"></span>
                     </div>
                 </div>
@@ -38,3 +43,28 @@
 </div>
 
 
+<script type="text/javascript">
+    
+    $('.select2').select2({
+        theme: 'bootstrap4'
+    });
+    
+    var facilityId = 0;
+    $('.faciliyFilter').on('change', function () {
+        facilityId = $('.faciliyFilter').val();
+        $.when(GetAvailableDepartments(facilityId)).done(function (output) {
+            $('.departmentFilter').empty()
+                .append($('<option>', {
+                    value: "",
+                    text: 'Select Department'
+                }));
+
+            jQuery.each(output, function (i, element) {
+                $('.departmentFilter').append($('<option>', {
+                    value: element.departmentId,
+                    text: element.departmentName
+                }))
+            });
+        })
+    })
+</script>

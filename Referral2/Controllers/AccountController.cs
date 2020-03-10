@@ -212,6 +212,11 @@ namespace Referral2.Controllers
             return View();
         }
 
+        public IActionResult NotFound()
+        {
+            return View();
+        }
+
         public IActionResult Cancel(string returnUrl)
         {
             if(isUrlValid(returnUrl))

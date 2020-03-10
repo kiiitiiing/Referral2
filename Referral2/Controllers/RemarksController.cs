@@ -17,6 +17,7 @@ using Referral2.Resources;
 using Microsoft.Extensions.Options;
 using Referral2.Models.ViewModels.Remarks;
 using Microsoft.EntityFrameworkCore;
+using MoreLinq.Extensions;
 
 namespace Referral2.Controllers
 {
@@ -341,12 +342,11 @@ namespace Referral2.Controllers
         [HttpGet]
         public IActionResult ReferRemark(string code)
         {
-            ViewBag.Facility = new SelectList(_context.Facility,"Id","Name");
-            ViewBag.Department = new SelectList(_context.Department, "Id", "Description");
+            ViewBag.Facility = new SelectList(_context.Facility.Where(x=>x.Id != UserFacility),"Id","Name");
             return PartialView();
         }
         [HttpPost]
-        public async Task<IActionResult> ReferRemark([Bind] ReferViewModel model, string code)
+        public async Task<IActionResult> ReferRemark([Bind] ReferViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -360,8 +360,8 @@ namespace Referral2.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Accepted", "ViewPatients");
             }
-            ViewBag.Facility = new SelectList(_context.Facility, "Id", "Name", model.FacilityId);
-            ViewBag.Department = new SelectList(_context.Department, "Id", "Description", model.DepartmentId);
+            ViewBag.Facility = new SelectList(_context.Facility.Where(x=>x.Id != UserFacility), "Id", "Name", model.FacilityId);
+            ViewBag.Department = new SelectList(AvailableDepartments(UserFacility), "Id", "Description", model.DepartmentId);
             return PartialView(model);
         }
         #endregion
@@ -448,7 +448,18 @@ namespace Referral2.Controllers
         #endregion
 
         #region Helpers
-
+        private List<SelectDepartment> AvailableDepartments(int facilityId)
+        {
+            var availableDepartments = _context.User
+                .Where(x => x.FacilityId.Equals(facilityId) && x.Level.Equals(_roles.Value.DOCTOR) && x.DepartmentId != null)
+                .DistinctBy(d => d.DepartmentId)
+                .Select(x => new SelectDepartment
+                {
+                    DepartmentId = (int)x.DepartmentId,
+                    DepartmentName = x.Department.Description
+                });
+            return availableDepartments.ToList();
+        }
 
         private Tracking TravelTracking(TravelViewModel model)
         {
@@ -474,11 +485,11 @@ namespace Referral2.Controllers
             newTracking.Code = tracking.Code;   
             newTracking.PatientId = tracking.PatientId;
             newTracking.Transportation = null;
-            newTracking.ReferredFrom = 
+            newTracking.ReferredFrom = UserFacility;
             newTracking.ReferredTo = model.FacilityId;
             newTracking.DepartmentId = model.DepartmentId;
             newTracking.ReferringMd = UserId;;
-            newTracking.ActionMd = null;
+            newTracking.ActionMd = UserId;
             newTracking.DateReferred = DateTime.Now;
             newTracking.DateAccepted = default;
             newTracking.DateArrived = default;
@@ -537,6 +548,7 @@ namespace Referral2.Controllers
         public Tracking ReferTracking(ReferViewModel model, string status)
         {
             var currentTracking = _context.Tracking.FirstOrDefault(x => x.Code.Equals(model.Code));
+            currentTracking.DateTransferred = DateTime.Now;
             currentTracking.Remarks = model.Remarks;
             currentTracking.ActionMd = UserId;;
             currentTracking.Status = status;

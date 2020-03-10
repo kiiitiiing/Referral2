@@ -16,12 +16,12 @@
                     </div>
                     <div class="">
                         <span>Select Date/Time:</span>
-                        <input asp-for="DateDischarged" type="text" id="datetimepicker" value="@DateTime.Now.ToString("yyyy-MM-dd HH:mm")" class="form-control" />
+                        <input asp-for="DateDischarged" type="text" id="datetimepicker" value="@DateTime.Now.ToString("yyyy-MM-dd HH:mm")" class="form-control" required />
                         <span asp-validation-for="DateDischarged" class="text-danger"></span>
                     </div>
                     <div class="">
                         <span>Enter Remarks:</span>
-                        <textarea asp-for="Remarks" class="form-control" rows="5"></textarea>
+                        <textarea asp-for="Remarks" class="form-control" rows="5" required></textarea>
                         <span asp-validation-for="Remarks" class="text-danger"></span>
                     </div>
                 </div>

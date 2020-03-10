@@ -1,0 +1,28 @@
+﻿@model List<OnlineMccModel>
+
+<div class="card card-success" style="font-size: 14px;">
+    <div class="card-header">
+        <h4 class="card-title">Online Facilities</h4>
+    </div>
+
+    <div class="card-body" style="overflow: auto; height: 400px; scroll">
+        <div class="list-group">
+            @foreach (var item in Model)
+            {
+                var length = 20;
+                var facility = item.FacilityName.Length > length ? new string(item.FacilityName.Take(length).ToArray()) + "..." : item.FacilityName;
+                var text = item.Online ? "danger" : "success";
+                <a class="list-group-item clearfix" title="@item.FacilityName" href="#">
+                    @facility.NameToUpper()
+                    <span class="fa-pull-right">
+                        <i class="fa fa-circle text-@text"></i>
+                    </span>
+                </a>
+            }
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    console.log('wtf??');
+</script>

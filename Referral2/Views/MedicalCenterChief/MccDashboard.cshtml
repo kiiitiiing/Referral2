@@ -58,13 +58,8 @@
                 </div>
             </div>
         </div>
-    </div>
-    <!-- LINKS -->
-    <div class="col-md-3">
-        <partial name="~/Views/Shared/PartialViews/_SupportLinksPartial.cshtml" />
-    </div>
-    <!-- MONTHLY ACTIVITY -->
-    <div class="col-md-9">
+
+        <!-- MONTHLY ACTIVITY -->
         <div class="card">
             <div class="card-header">
                 <h3>Monthly Activity</h3>
@@ -76,10 +71,35 @@
             </div>
         </div>
     </div>
+    <!-- LINKS -->
+    <div class="col-md-3" id="wat">
+        <partial name="~/Views/Shared/PartialViews/_OtherLinksPartial.cshtml" />
+        <div id="OnlineMcc" style="font-size: 14px;">
+        </div>
+    </div>
 </div>
 
 
 <script src="~/assets/plugins/chart.js/Chart.js"></script>
-<script>
+<script type="text/javascript">
     DashboardAPI('@User.FindFirstValue(ClaimTypes.Role)');
+
+    function test() {
+        alert('test');
+    }
+
+    var url = '@Url.Action("OnlineMcc","MedicalCenterChief")';
+
+
+    $.ajax({
+        url: url,
+        type: 'get',
+        async: true,
+        error: function (xhr) {
+            console.debug(xhr);
+        },
+        success: function (data) {
+            $('#OnlineMcc').html(data);
+        }
+    });
 </script>

@@ -77,10 +77,12 @@
                     <img src="~/assets/dist/img/ReferralBanner.png" class="img-responsive" />
                 </div>
             </div>
-            <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white box-shadow mb-3 custom-nav">
+            <nav class="navbar navbar-expand-md navbar-light navbar-white custom-nav">
                 <div class="container">
-
-                    <div class="navbar-collapse collapse flex-sm-row-reverse">
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse order-3" id="navbarCollapse">
                         @if (User.FindFirstValue(ClaimTypes.Role).Equals("doctor"))
                         {
                             <partial name="~/Views/Shared/Navbar/_DoctorNavbarPartial.cshtml" />

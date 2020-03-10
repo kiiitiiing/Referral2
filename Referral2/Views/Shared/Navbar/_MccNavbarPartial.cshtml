@@ -1,4 +1,4 @@
-﻿<ul class="navbar-nav flex-grow-1">
+﻿<ul class="navbar-nav">
     <!-- DASHBOARD -->
     <li class="nav-item d-none d-sm-inline-block">
         <a class="nav-link" asp-area="" asp-controller="MedicalCenterChief" asp-action="MccDashboard">
@@ -15,28 +15,28 @@
         <ul class="dropdown-menu">
             <!-- ONLINE DOCTORS-->
             <li>
-                <a class="dropdown-item nav-link" asp-area="" asp-controller="MedicalCenterChief" asp-action="OnlineUsersDepartment">
+                <a class="dropdown-item" asp-area="" asp-controller="MedicalCenterChief" asp-action="OnlineUsersDepartment">
                     <i class="fa fa-users"></i>
                     &nbsp;Online Department
                 </a>
             </li>
             <!-- INCOMING REFERRALS -->
             <li>
-                <a class="dropdown-item nav-link" asp-area="" asp-controller="MedicalCenterChief" asp-action="MccIncoming">
+                <a class="dropdown-item" asp-area="" asp-controller="MedicalCenterChief" asp-action="MccIncoming">
                     <i class="fa fa-chart-line"></i>
                     &nbsp;Incoming Referral
                 </a>
             </li>
             <!-- REFERRAL TIMEFRAME -->
             <li>
-                <a class="dropdown-item nav-link" asp-area="" asp-controller="MedicalCenterChief" asp-action="TimeFrame">
+                <a class="dropdown-item" asp-area="" asp-controller="MedicalCenterChief" asp-action="TimeFrame">
                     <i class="far fa-calendar"></i>
                     &nbsp;Referral Time Frame
                 </a>
             </li>
             <!-- CONSOLIDATED -->
             <li>
-                <a class="dropdown-item nav-link" asp-area="" asp-controller="MedicalCenterChief" asp-action="ConsolidatedMcc">
+                <a class="dropdown-item" asp-area="" asp-controller="MedicalCenterChief" asp-action="ConsolidatedMcc">
                     <i class="far fa-file-archive"></i>
                     &nbsp;Consolidated
                 </a>
@@ -66,14 +66,14 @@
         <ul class="dropdown-menu">
             <!-- CHANGE PASSWORD -->
             <li>
-                <a class="dropdown-item nav-link" data-toggle="ajax-modal" data-target="#change-password-modal" data-url="@Url.Action("ChangePassword","Users")">
+                <a class="dropdown-item" data-toggle="ajax-modal" data-target="#change-password-modal" data-url="@Url.Action("ChangePassword","Users")">
                     <i class="fa fa-key"></i>
                     &nbsp;Change Password
                 </a>
             </li>
             <!-- LOGOUT -->
             <li>
-                <a class="dropdown-item nav-link" data-target="modal" asp-area="" asp-controller="Account" asp-action="Logout">
+                <a class="dropdown-item" data-target="modal" asp-area="" asp-controller="Account" asp-action="Logout">
                     <i class="fa fa-sign-out-alt"></i>
                     &nbsp;Logout
                 </a>
@@ -82,7 +82,7 @@
             @if (User.FindFirstValue("RealRole").Equals("admin"))
             {
                 <li>
-                    <a class="dropdown-item nav-link" data-target="modal" asp-area="" asp-controller="Account" asp-action="BackAsAdmin">
+                    <a class="dropdown-item" data-target="modal" asp-area="" asp-controller="Account" asp-action="BackAsAdmin">
                         <i class="fa fa-user-secret"></i>
                         &nbsp;Back as Admin
                     </a>

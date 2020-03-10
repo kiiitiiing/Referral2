@@ -1,4 +1,7 @@
-
+.img-responsive{
+    width: auto;
+    height: auto;
+}
 
 .container-auth-bg {
     background-image: url('../img/backdrop.png'),radial-gradient(#CCC,#DDD) !important;
@@ -10,6 +13,10 @@
 
 .dropdown-menu{
     font-size: 14px !important;
+}
+
+.navbar{
+    margin-bottom: 20px !important;
 }
 
 a.dropdown-item{
@@ -118,7 +125,7 @@ table thead th{
 }
 
 .modal-body{
-    padding: 12px!important;
+    padding: 12px;
 }
 
 .bg-pregnant {

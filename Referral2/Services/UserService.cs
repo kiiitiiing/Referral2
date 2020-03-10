@@ -60,17 +60,24 @@ namespace Referral2.Services
 
             else
             {
-                var result = _hashPassword.VerifyHashedPassword(user, user.Password, password);
-                if (result.Equals(PasswordVerificationResult.Success))
+                try
                 {
-                    user.LoginStatus = "login";
-                    user.LastLogin = DateTime.Now;
-                    user.UpdatedAt = DateTime.Now;
-                    _context.Update(user);
-                    return (true, user);
+                    var result = _hashPassword.VerifyHashedPassword(user, user.Password, password);
+                    if (result.Equals(PasswordVerificationResult.Success))
+                    {
+                        user.LoginStatus = "login";
+                        user.LastLogin = DateTime.Now;
+                        user.UpdatedAt = DateTime.Now;
+                        _context.Update(user);
+                        return (true, user);
+                    }
+                    else
+                        return (false, user);
                 }
-                else
+                catch
+                {
                     return (false, user);
+                }
             }
             
         }

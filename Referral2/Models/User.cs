@@ -77,6 +77,7 @@ namespace Referral2.Models
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 
+
         [ForeignKey(nameof(DepartmentId))]
         [InverseProperty("User")]
         public virtual Department Department { get; set; }

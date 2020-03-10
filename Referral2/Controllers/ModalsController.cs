@@ -64,20 +64,12 @@ namespace Referral2.Controllers
         public IActionResult ViewReco(string code)
         {
             var feedbacks = _context.Feedback
-                .Where(x => x.Code.Equals(code))
-                .Select(x => new FeedbackViewModel
-                {
-                    Code = x.Code,
-                    MdId = (int)x.SenderId,
-                    MdName = GlobalFunctions.GetMDFullName(x.Sender),
-                    Message = x.Message,
-                    TimeSent = (DateTime)x.CreatedAt
-                }).ToList();
-            ViewBag.Code = code;
+                .Where(x => x.Code.Equals(code)).ToList();
 
             var chats = new ChatsModel
             {
-                Chats = feedbacks
+                Chats = feedbacks,
+                Code = code
             };
 
             return PartialView("~/Views/Modals/ViewReco.cshtml", chats);
@@ -85,9 +77,8 @@ namespace Referral2.Controllers
 
         // POST Feedback
         [HttpPost]
-        public void ViewReco([Bind] ChatsModel model)
+        public async Task<IActionResult> ViewReco([Bind] ChatsModel model)
         {
-            var feedbacks = _context.Feedback.Where(x => x.Code == model.Code).AsEnumerable();
             if (ModelState.IsValid)
             {
                 var feedback = new Feedback
@@ -100,8 +91,16 @@ namespace Referral2.Controllers
                     UpdatedAt = DateTime.Now
                 };
                   _context.Add(feedback);
-                  _context.SaveChanges();
+                  await _context.SaveChangesAsync();
+                ViewBag.IsValid = true;
             }
+            var chatsModel = new ChatsModel()
+            {
+                Chats = _context.Feedback.Where(x => x.Code == model.Code).ToList(),
+                Code = model.Code
+            };
+            ViewBag.IsValid = false;
+            return PartialView(chatsModel);
         }
 
 

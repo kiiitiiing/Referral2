@@ -59,6 +59,16 @@
                         seenReject = true;
                     switch (Model.Status)
                     {
+                        case "transferred":
+                            {
+                                referred = "active";
+                                seen = "disabled";
+                                accepted = "disabled";
+                                arrived = "disabled";
+                                admitted = "disabled";
+                                discharged = "disabled";
+                                break;
+                            }
                         case "referred":
                             {
                                 referred = "active";
@@ -205,6 +215,61 @@
                                                 <tr class="@trClass" style="@trStyle">
                                                     @switch (item2.Status)
                                                     {
+                                                        case "transferred":
+                                                            {
+                                                                <td class="table-date">
+                                                                    <span class="text-muted">@item2.DateAction</span>
+                                                                </td>
+                                                                @if (!Model.Walkin)
+                                                                {
+                                                                    <td>
+                                                                        <span class="patient-color">@item2.PatientName</span>
+                                                                        was referred by
+                                                                        <span class="md-color">@item2.ReferringMd</span>
+                                                                        of
+                                                                        <span class="hospital-color">@item2.FacilityFrom</span>
+                                                                        to
+                                                                        <span class="hospital-color">@item2.FacilityTo</span>
+                                                                    </td>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <td>
+                                                                        <strong>Walk-In Patient: </strong>
+                                                                        <span class="patient-color">@item2.PatientName</span>
+                                                                    </td>
+                                                                }
+                                                                break;
+                                                            }
+                                                    
+
+                                                        case "redirected":
+                                                            {
+                                                                <td class="table-date">
+                                                                    <span class="text-muted">@item2.DateAction</span>
+                                                                </td>
+                                                                @if (!Model.Walkin)
+                                                                {
+                                                                    <td>
+                                                                        <span class="patient-color">@item2.PatientName</span>
+                                                                        was referred by
+                                                                        <span class="md-color">@item2.ReferringMd</span>
+                                                                        of
+                                                                        <span class="hospital-color">@item2.FacilityFrom</span>
+                                                                        to
+                                                                        <span class="hospital-color">@item2.FacilityTo</span>
+                                                                    </td>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <td>
+                                                                        <strong>Walk-In Patient: </strong>
+                                                                        <span class="patient-color">@item2.PatientName</span>
+                                                                    </td>
+                                                                }
+                                                                break;
+                                                            }
+                                                    
                                                         case "rejected":
                                                             {
                                                                 <td class="table-date">
@@ -214,7 +279,7 @@
                                                                     <span class="md-color">@item2.ActionMd</span>
                                                                     of
                                                                     <span class="hospital-color">@item2.FacilityTo</span>
-                                                                    recommend to redirect
+                                                                    recommended to redirect
                                                                     <span class="patient-color">@item2.PatientName</span>
                                                                     to other facility.<br />
                                                                     <span class="text-warning">Remarks: @item2.Remarks</span>
@@ -440,7 +505,7 @@
                 else
                 {
                     <div class="alert alert-warning">
-                        <span class="text-lg">
+                        <span>
                             <i class="fa fa-exclamation-triangle"></i>
                             &nbsp;Referral code couldn't be found!
                         </span>

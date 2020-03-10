@@ -15,6 +15,7 @@ namespace Referral2.Data
         public ReferralDbContext(DbContextOptions<ReferralDbContext> options)
             : base(options)
         {
+            Database.SetCommandTimeout(50);
         }
 
         public virtual DbSet<Activity> Activity { get; set; }

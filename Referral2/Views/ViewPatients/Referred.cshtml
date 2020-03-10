@@ -270,6 +270,34 @@
                                         <tr class="@trClass" style="@trStyle">
                                             @switch (item2.Status)
                                             {
+                                                case "transferred":
+                                                    {
+
+                                                        <td class="table-date">
+                                                            <span class="text-muted">@item2.DateAction</span>
+                                                        </td>
+                                                        @if (!item.Walkin)
+                                                        {
+                                                            <td>
+                                                                <span class="patient-color">@item2.PatientName</span>
+                                                                was referred by
+                                                                <span class="md-color">@item2.ReferringMd</span>
+                                                                of
+                                                                <span class="hospital-color">@item2.FacilityFrom</span>
+                                                                to
+                                                                <span class="hospital-color">@item2.FacilityTo</span>
+                                                            </td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td>
+                                                                <strong>Walk-In Patient: </strong>
+                                                                <span class="patient-color">@item2.PatientName</span>
+                                                            </td>
+                                                        }
+
+                                                        break;
+                                                    }
                                                 case "rejected":
                                                     {
                                                         <td class="table-date">

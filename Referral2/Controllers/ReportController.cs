@@ -61,9 +61,9 @@ namespace Referral2.Controllers
             int size = 20;
 
             var activities = _context.Activity
-                .Where(x => x.DateReferred >= StartDate && x.DateReferred <= EndDate);
+                .Where(x => x.DateReferred>= StartDate && x.DateReferred <= EndDate);
             var tracking = _context.Tracking
-                .Where(x => x.ReferredTo == UserFacility && x.DateReferred >= StartDate && x.DateReferred <= EndDate)
+                .Where(x => x.ReferredTo == UserFacility && x.DateReferred>= StartDate && x.DateReferred <= EndDate)
                 .Select(t => new IncomingReportViewModel
                 {
                     ReferredTo = (int)t.ReferredTo,
@@ -122,7 +122,7 @@ namespace Referral2.Controllers
             int size = 20;
 
             var outgoing = _context.Tracking
-                .Where(x => x.ReferredFrom == UserFacility && x.DateReferred >= StartDate && x.DateReferred <= EndDate)
+                .Where(x => x.ReferredFrom == UserFacility && x.DateReferred>= StartDate && x.DateReferred <= EndDate)
                 .Select(t => new OutgoingReportViewModel
                 {
                     Department = (int)t.DepartmentId,
@@ -190,7 +190,7 @@ namespace Referral2.Controllers
             var objectSettings = new ObjectSettings
             {
                 PagesCount = true,
-                HtmlContent = NormalPdf(form),
+                HtmlContent = /*DTR(),*/ NormalPdf(form),
                 WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "css", "site.css") }
             };
 
@@ -225,6 +225,425 @@ namespace Referral2.Controllers
                 Objects = { objectSettings }
             };
             return _converter.Convert(pdf);
+        }
+
+        public string DTR()
+        {
+            var pdf = new StringBuilder();
+
+            pdf.Append(@"
+<html>
+    <head></head>
+    <body>
+    <div class='row'>
+  <div class='col-md-3'>
+    <table>
+    <tr>
+      <td colspan='8'>
+        <small>Civil Service Form No. 48 <span class='fa-pull-right'>Printed: 2020-03-05</span></small>
+      </td>
+    </tr>
+    <tr>
+      <td colspan = '8' class='text-center'>
+          DAILY TIME RECORD
+      </td>
+    </tr>
+    <tr>
+      <td colspan = '8' class='text-center text-bold'>
+          <u>DAMANDAMAN, KEITH JOSEPH</u>
+      </td>
+    </tr>
+    <tr>
+      <td colspan = '8'>
+        <small> For the month of: Mar 03 to Apr 15, 2020  ID No: 0978</small> 
+      </td>
+    </tr>
+    <tr>
+      <td colspan = '8'>
+        <small> Official Hours for (days A.M.P.M.arrival and departure)</small> 
+      </td>
+    </tr>
+    <tr>
+      <td colspan = '2' class='text-center'>
+        &nbsp;
+      </td>
+      <td colspan = '2' class='text-center'>
+        <small>AM</small>
+      </td>
+      <td colspan = '2' class='text-center'>
+        <small>PM</small>
+      </td>
+      <td colspan = '2' class='text-center'>
+        <small>MINUTES</small>
+      </td>
+    </tr>
+    <tr>
+      <td colspan = '2' class='text-center'>
+        <small>DAY</small>
+      </td>
+      <td>
+        <small>ARRIVAL</small>
+      </td>
+      <td>
+        <small>DEPARTURE</small>
+      </td>
+      <td>
+        <small>ARRIVAL</small>
+      </td>
+      <td>
+        <small>DEPARTURE</small>
+      </td>
+      <td>
+        <small>LATE</small>
+      </td>
+      <td>
+        <small>UT</small>
+      </td>
+    </tr>
+    <!-- DAYS -->
+    <tr>
+      <td>
+        03
+      </td>
+      <td>
+        Tue
+      </td>
+      <td>
+        07:46:34
+      </td>
+      <td>
+        12:27:25
+      </td>
+      <td>
+        12:27:30
+      </td>
+      <td>
+        19:07:37
+      </td>
+      <td>
+        &nbsp;
+      </td>
+      <td>
+        &nbsp;
+      </td>
+    </tr>
+    <!-- DAYS -->
+    <tr>
+      <td>
+        04
+      </td>
+      <td>
+        Wed
+      </td>
+      <td>
+        07:44:46
+      </td>
+      <td>
+        12:47:33
+      </td>
+      <td>
+        12:47:38
+      </td>
+      <td>
+        17:45:44
+      </td>
+      <td>
+        &nbsp;
+      </td>
+      <td>
+        &nbsp;
+      </td>
+    </tr>
+    <!-- DAYS -->
+    <tr>
+      <td>
+        05
+      </td>
+      <td>
+        Thu
+      </td>
+      <td>
+        07:54:58
+      </td>
+      <td>
+        12:07:28 
+      </td>
+      <td>
+        12:07:32 
+      </td>
+      <td>
+        &nbsp;
+      </td>
+      <td>
+        &nbsp;
+      </td>
+      <td>
+        &nbsp;
+      </td>
+    </tr>
+    <!-- DAYS -->
+    <tr>
+      <td>
+        06
+      </td>
+      <td>
+        Fri
+      </td>
+      <td colspan = '4' class='text-center text-bold'>
+        <u><i>ABSENT</i></u>
+      </td>
+      <td>
+        480
+      </td>
+      <td>
+        &nbsp;
+      </td>
+    </tr>
+    <!-- DAYS -->
+    <tr>
+      <td>
+        07
+      </td>
+      <td>
+        Sat
+      </td>
+      <td colspan = '4' class='text-center text-bold'>
+        <u><i>DAY OFF</i></u>
+      </td>
+      <td>
+        &nbsp;
+      </td>
+      <td>
+        &nbsp;
+      </td>
+    </tr>
+    <!-- DAYS -->
+    <tr>
+      <td>
+        08
+      </td>
+      <td>
+        Sun
+      </td>
+      <td colspan = '4' class='text-center text-bold'>
+        <u><i>DAY OFF</i></u>
+      </td>
+      <td>
+        &nbsp;
+      </td>
+      <td>
+        &nbsp;
+      </td>
+    </tr>
+  </table>
+  </div>
+  <div class='col-md-3'>
+    
+    <table>
+      <tr>
+        <td colspan='8'>
+          <small>Civil Service Form No. 48 <span class='fa-pull-right'>Printed: 2020-03-05</span></small>
+        </td>
+      </tr>
+      <tr>
+        <td colspan = '8' class='text-center'>
+            DAILY TIME RECORD
+        </td>
+      </tr>
+      <tr>
+        <td colspan = '8' class='text-center text-bold'>
+            <u>DAMANDAMAN, KEITH JOSEPH</u>
+        </td>
+      </tr>
+      <tr>
+        <td colspan = '8'>
+          <small> For the month of: Mar 03 to Apr 15, 2020  ID No: 0978</small> 
+        </td>
+      </tr>
+      <tr>
+        <td colspan = '8'>
+          <small> Official Hours for (days A.M.P.M.arrival and departure)</small> 
+        </td>
+      </tr>
+      <tr>
+        <td colspan = '2' class='text-center'>
+          &nbsp;
+        </td>
+        <td colspan = '2' class='text-center'>
+          <small>AM</small>
+        </td>
+        <td colspan = '2' class='text-center'>
+          <small>PM</small>
+        </td>
+        <td colspan = '2' class='text-center'>
+          <small>MINUTES</small>
+        </td>
+      </tr>
+      <tr>
+        <td colspan = '2' class='text-center'>
+          <small>DAY</small>
+        </td>
+        <td>
+          <small>ARRIVAL</small>
+        </td>
+        <td>
+          <small>DEPARTURE</small>
+        </td>
+        <td>
+          <small>ARRIVAL</small>
+        </td>
+        <td>
+          <small>DEPARTURE</small>
+        </td>
+        <td>
+          <small>LATE</small>
+        </td>
+        <td>
+          <small>UT</small>
+        </td>
+      </tr>
+      <!-- DAYS -->
+      <tr>
+        <td>
+          03
+        </td>
+        <td>
+          Tue
+        </td>
+        <td>
+          07:46:34
+        </td>
+        <td>
+          12:27:25
+        </td>
+        <td>
+          12:27:30
+        </td>
+        <td>
+          19:07:37
+        </td>
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          &nbsp;
+        </td>
+      </tr>
+      <!-- DAYS -->
+      <tr>
+        <td>
+          04
+        </td>
+        <td>
+          Wed
+        </td>
+        <td>
+          07:44:46
+        </td>
+        <td>
+          12:47:33
+        </td>
+        <td>
+          12:47:38
+        </td>
+        <td>
+          17:45:44
+        </td>
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          &nbsp;
+        </td>
+      </tr>
+      <!-- DAYS -->
+      <tr>
+        <td>
+          05
+        </td>
+        <td>
+          Thu
+        </td>
+        <td>
+          07:54:58
+        </td>
+        <td>
+          12:07:28 
+        </td>
+        <td>
+          12:07:32 
+        </td>
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          &nbsp;
+        </td>
+      </tr>
+      <!-- DAYS -->
+      <tr>
+        <td>
+          06
+        </td>
+        <td>
+          Fri
+        </td>
+        <td colspan = '4' class='text-center text-bold'>
+          <u><i>ABSENT</i></u>
+        </td>
+        <td>
+          480
+        </td>
+        <td>
+          &nbsp;
+        </td>
+      </tr>
+      <!-- DAYS -->
+      <tr>
+        <td>
+          07
+        </td>
+        <td>
+          Sat
+        </td>
+        <td colspan = '4' class='text-center text-bold'>
+          <u><i>DAY OFF</i></u>
+        </td>
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          &nbsp;
+        </td>
+      </tr>
+      <!-- DAYS -->
+      <tr>
+        <td>
+          08
+        </td>
+        <td>
+          Sun
+        </td>
+        <td colspan = '4' class='text-center text-bold'>
+          <u><i>DAY OFF</i></u>
+        </td>
+        <td>
+          &nbsp;
+        </td>
+        <td>
+          &nbsp;
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
+    </body>
+</html>
+");
+            return pdf.ToString();
         }
 
         public string NormalPdf(PatientForm form)

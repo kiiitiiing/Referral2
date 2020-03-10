@@ -66,7 +66,7 @@ namespace Referral2.Controllers
         public List<SelectDepartment> AvailableDepartments(int facilityId)
         {
             var availableDepartments = _context.User
-                .Where(x => x.FacilityId.Equals(facilityId) && x.Level.Equals(_roles.Value.DOCTOR))
+                .Where(x => x.FacilityId.Equals(facilityId) && x.Level.Equals(_roles.Value.DOCTOR) && x.DepartmentId != null)
                 .DistinctBy(d => d.DepartmentId)
                 .Select(x => new SelectDepartment
                 {
@@ -116,7 +116,7 @@ namespace Referral2.Controllers
             var facility = _context.Facility.Find(facilityId);
             if (facility == null)
                 return null;
-            string facilityAddress = facility.Address.Equals("none") ? "" : facility.Address + ", ";
+            string facilityAddress = facility.Address == null ? "" : facility.Address + ", ";
             string barangay = facility.Barangay == null ? "" : facility.Barangay.Description + ", ";
             string muncity = facility.Muncity == null ? "" : facility.Muncity.Description + ", ";
             string province = facility.Province == null ? "" : facility.Province.Description;
@@ -128,7 +128,10 @@ namespace Referral2.Controllers
                 DepartmentName = x.Description
             });
 
-            var faciliyDepartment = _context.User.Where(x => x.FacilityId.Equals(facilityId) && x.Level.Equals(_roles.Value.DOCTOR))
+            var test = _context.User.Where(x => x.FacilityId.Equals(facilityId) && x.Level.Equals(_roles.Value.DOCTOR))
+                                             .DistinctBy(d => d.DepartmentId);
+
+            var faciliyDepartment = _context.User.Where(x => x.FacilityId.Equals(facilityId) && x.Level.Equals(_roles.Value.DOCTOR) && x.DepartmentId != null)
                                             .DistinctBy(d => d.DepartmentId)
                                             .Select(x => new SelectDepartment
                                             {
@@ -192,8 +195,8 @@ namespace Referral2.Controllers
                                         .Select(y => new SelectUser
                                         {
                                             MdId = y.Id,
-                                            DoctorName = string.IsNullOrEmpty(y.Contact) ? "Dr. " + y.Firstname + " " + y.Middlename + " " + y.Lastname + " - N/A" : "Dr. " + y.Firstname + " " + y.Middlename + " " + y.Lastname + " - " + y.Contact
-                                        });
+                                            DoctorName = ("Dr. " + y.Firstname + " " + y.Middlename.CheckName() + " " + y.Lastname).NameToUpper() + " - " + y.Contact.CheckName()
+                                        }); ;
 
             return getUser.ToList();
         }
