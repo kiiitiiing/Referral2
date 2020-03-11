@@ -33,7 +33,13 @@ namespace Referral2.Controllers
             if (code == null)
                 return NotFound();
 
-            var patientForm = _context.PatientForm.Single(x => x.Code.Equals(code));
+            var patientForm = _context.PatientForm
+                .Include(x=>x.Patient)
+                .Include(x=>x.ReferredToNavigation)
+                .Include(x=>x.ReferringFacility)
+                .Include(x=>x.Department)
+                .Include(x=>x.ReferredToNavigation)
+                .Single(x => x.Code.Equals(code));
 
             if (patientForm == null)
                 return NotFound();
@@ -63,11 +69,19 @@ namespace Referral2.Controllers
         }
         public async Task<IActionResult> PregnantForm(string code)
         {
-            var form = await _context.PregnantForm.SingleAsync(x => x.Code.Equals(code));
+            var form = await _context.PregnantForm
+                .Include(x=>x.PatientBaby)
+                .Include(x=>x.PatientWoman)
+                .Include(x=>x.Department)
+                .Include(x=>x.ReferredToNavigation)
+                .Include(x=>x.ReferredByNavigation)
+                .Include(x=>x.ReferringFacilityNavigation)
+                .SingleAsync(x => x.Code.Equals(code));
             Baby baby = null;
 
             if (form.PatientBabyId != null)
-                baby = await _context.Baby.SingleOrDefaultAsync(x => x.BabyId.Equals(form.PatientBabyId));
+                baby = await _context
+                    .Baby.SingleOrDefaultAsync(x => x.BabyId.Equals(form.PatientBabyId));
 
             var pregnantForm = new PregnantViewModel(form, baby);
 
@@ -100,14 +114,26 @@ namespace Referral2.Controllers
 
         public async Task<IActionResult> PrintableNormalForm(string code)
         {
-            var form = await _context.PatientForm.SingleOrDefaultAsync(x => x.Code.Equals(code));
+            var form = await _context.PatientForm
+                .Include(x => x.Patient)
+                .Include(x => x.ReferredToNavigation)
+                .Include(x => x.ReferringFacility)
+                .Include(x => x.Department)
+                .Include(x => x.ReferredToNavigation)
+                .SingleOrDefaultAsync(x => x.Code.Equals(code));
 
             return PartialView(form);
         }
 
         public async Task<IActionResult> PrintablePregnantForm(string code)
         {
-            var form = _context.PregnantForm.FirstOrDefault(x => x.Code.Equals(code));
+            var form = _context.PregnantForm
+                .Include(x => x.PatientBaby)
+                .Include(x => x.PatientWoman)
+                .Include(x => x.Department)
+                .Include(x => x.ReferredToNavigation)
+                .Include(x => x.ReferredByNavigation)
+                .Include(x => x.ReferringFacilityNavigation).FirstOrDefault(x => x.Code.Equals(code));
 
             Baby baby = null;
 

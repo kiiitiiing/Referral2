@@ -172,27 +172,37 @@ namespace Referral2.Services
 
         Task<(bool, User)> IUserService.SwitchUserAsync(int id, string password)
         {
-            var user = _context.User.Find(id);
+            var user = _context.User
+                .Include(x => x.Facility)
+                .Include(x => x.Department)
+                .FirstOrDefault(x=>x.Id == id);
             if (user == null)
             {
                 return Task.FromResult((false, user));
             }
 
-            var result = _hashPassword.VerifyHashedPassword(user, user.Password, password);
-
-
-            if (result.Equals(PasswordVerificationResult.Success))
+            try
             {
-                user.LoginStatus = "login";
-                user.LastLogin = DateTime.Now;
-                user.UpdatedAt = DateTime.Now;
-                user.Status = "active";
-                _context.Update(user);
-                return Task.FromResult((true, user));
-            }
+                var result = _hashPassword.VerifyHashedPassword(user, user.Password, password);
 
-            else
+
+                if (result.Equals(PasswordVerificationResult.Success))
+                {
+                    user.LoginStatus = "login";
+                    user.LastLogin = DateTime.Now;
+                    user.UpdatedAt = DateTime.Now;
+                    user.Status = "active";
+                    _context.Update(user);
+                    return Task.FromResult((true, user));
+                }
+
+                else
+                    return Task.FromResult((false, user));
+            }
+            catch
+            {
                 return Task.FromResult((false, user));
+            }
         }
     }
 }

@@ -205,7 +205,12 @@
             <p class="text-center">All Rights Reserved 2020 | Version 2.1</p>
         </footer>
     }
-    <script type="text/javascript">
+    <script>
+
+        $('#patient-form-modal').on('hidden.bs.modal', function () {
+            console.log('weee');
+        });
+
         if (sessionStorage.getItem('onReload') == 'passWordChanged') {
             sessionStorage.setItem('onReload', '');
             ChangePasswordSuccess("success", "Change Password Success!");
@@ -241,6 +246,9 @@
         else if (sessionStorage.getItem('onReload') == 'updatedIssues') {
             sessionStorage.setItem('onReload', '');
             ChangePasswordSuccess("success", "Issue updated successfully!");
+        }
+        function Test() {
+            console.log('yeo')
         }
     </script>
 

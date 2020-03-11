@@ -162,14 +162,28 @@ namespace Referral2.Controllers
         }
         public async Task<IActionResult> NormalFormPdf(string code)
         {
-            var patientForm = await _context.PatientForm.SingleOrDefaultAsync(x => x.Code.Equals(code));
+            var patientForm = await _context.PatientForm
+                .Include(x => x.Patient)
+                .Include(x => x.ReferredToNavigation)
+                .Include(x => x.ReferringFacility)
+                .Include(x => x.Department)
+                .Include(x => x.ReferredToNavigation)
+                .Include(x => x.ReferringMdNavigation)
+                .SingleOrDefaultAsync(x => x.Code.Equals(code));
             var file = SetPDF(patientForm);
             return File(file, "application/pdf");
         }
-
+            
         public async Task<IActionResult> PregnantFromPdf(string code)
         {
-            var pregnantForm = await _context.PregnantForm.SingleOrDefaultAsync(x => x.Code.Equals(code));
+            var pregnantForm = await _context.PregnantForm
+                .Include(x => x.PatientBaby)
+                .Include(x => x.PatientWoman)
+                .Include(x => x.Department)
+                .Include(x => x.ReferredToNavigation)
+                .Include(x => x.ReferredByNavigation)
+                .Include(x=>x.ReferringFacilityNavigation)
+                .SingleOrDefaultAsync(x => x.Code.Equals(code));
             var file = SetPDF(pregnantForm);
             return File(file, "application/pdf");
         }

@@ -25,7 +25,7 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="direct-chat-messages" id="@ViewBag.Code" style="font-size: 14px;">
+                        <div class="direct-chat-messages" id="@Model.Code" style="font-size: 14px;">
                             <div class="reco-body">
                                 @if (Model != null)
                                 {
@@ -74,6 +74,11 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
+
+        $('#reco-modal').on('hidden.bs.modal', function () {
+            UpdateRecoCount('@Model.Code');
+        });
+
         var send = $('#send-message');
         if ('@ViewBag.IsValid' == 'False') {
             $('#chat').addClass('is-invalid');

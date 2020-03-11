@@ -562,7 +562,7 @@
                         &nbsp;ReCo
                         @if (recoCount > 0)
                         {
-                            <small class="badge bg-blue">@recoCount</small>
+                            <small class="badge bg-blue" id="reco_@item.Code">@recoCount</small>
                         }
                     </button>
                     <button type="button" class="btn btn-xs btn-danger" data-toggle="ajax-modal" data-target="#issues-modal" data-url="@Url.Action("Issues","Remarks", new { id = item.TrackingId })">

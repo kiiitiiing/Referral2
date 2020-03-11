@@ -9,7 +9,7 @@ namespace Referral2.Models
     {
         [Key]
         public int Id { get; set; }
-        public int? TrackingId { get; set; }
+        public int TrackingId { get; set; }
         [Required]
         [Column("Issue")]
         [StringLength(255)]

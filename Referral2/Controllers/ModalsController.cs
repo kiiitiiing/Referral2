@@ -97,7 +97,8 @@ namespace Referral2.Controllers
             }
             var chatsModel = new ChatsModel()
             {
-                Chats = _context.Feedback.Where(x => x.Code == model.Code).ToList(),
+                Chats = _context.Feedback
+                .Include(x => x.Sender).ThenInclude(x => x.Facility).Where(x => x.Code == model.Code).ToList(),
                 Code = model.Code
             };
             ViewBag.IsValid = false;

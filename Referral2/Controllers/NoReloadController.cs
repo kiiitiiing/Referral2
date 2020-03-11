@@ -211,6 +211,13 @@ namespace Referral2.Controllers
             return getUser.ToList();
         }
 
+        public async Task<int> RecoCount(string code)
+        {
+            var recoCtr = await _context.Feedback.Where(x => x.Code == code).CountAsync();
+
+            return recoCtr;
+        }
+
         public DashboardViewModel DashboardValues(string level)
         {
             List<int> accepted = new List<int>();

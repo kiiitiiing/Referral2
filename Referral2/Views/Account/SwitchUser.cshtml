@@ -1,5 +1,5 @@
 ﻿@model SwitchUserModel
-<div class="modal fade" id="switch-user-modal" tabindex="-1" role="dialog" aria-labelledby="addContactLabel" aria-hidden="true">
+<div class="modal fade" id="switch-user-modal" role="dialog" aria-labelledby="addContactLabel" aria-hidden="true">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -9,7 +9,7 @@
                 <div class="modal-body" style="padding-bottom:5px">
                     <div class="form-group">
                         <label style="padding: 0px;">User</label>
-                        <select class="form-control" asp-items="ViewBag.Users" asp-for="Id" required>
+                        <select class="form-control select2" asp-items="ViewBag.Users" asp-for="Id" required>
                         </select>
                     </div>
                     <div class="form-group">
@@ -33,4 +33,12 @@
     form.removeData('validator');
     form.removeData('unobtrusiveValidation');
     $.validator.unobtrusive.parse(form);
+
+    $(document).ready(function () {
+        console.log('wtf?');
+
+        $('.select2').select2({
+            theme: 'bootstrap4'
+        });
+    });
 </script>

@@ -68,7 +68,7 @@ $(function () {
 
     //---------------------- ADDRESS CHANGE -------------------------
 
-
+   
 
     //---------------------- MODALS ---------------------------------
 
@@ -111,6 +111,9 @@ $(function () {
             var newBody = $('.modal-body', data);
             placeholderElement.find('.modal-body').replaceWith(newBody);
             var validation = $('span.text-danger').text();
+            $('.select2').select2({
+                theme: 'bootstrap4'
+            });
             if (formId == 'reco-modal') {
                 console.log('chat sent');
                 $('#chat').val('');
@@ -367,6 +370,18 @@ function GetSupportReport() {
         url: url,
         type: 'get',
         async: true
+    });
+}
+
+function UpdateRecoCount(code) {
+    var url = "/NoReload/RecoCount?code=" + code;
+    $.ajax({
+        url: url,
+        type: 'get',
+        async: true,
+        success: function (output) {
+            $('#reco_' + code).html(output);
+        }
     });
 }
 

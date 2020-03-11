@@ -130,7 +130,9 @@ namespace Referral2.Controllers
 
         public IActionResult Issues(int? id)
         {
-            var issues = _context.Issue.Where(x => x.TrackingId == id);
+            var issues = _context.Issue
+                .Include(x=>x.Tracking)
+                .Where(x => x.TrackingId == id);
             var issueModel = new IssuesModel
             {
                 TrackingId = (int)id,
@@ -148,8 +150,10 @@ namespace Referral2.Controllers
                 {
                     if (item.Id != 0)
                     {
-                        item.UpdatedAt = DateTime.Now;
-                        _context.Update(item);
+                        var currIssue = _context.Issue.Find(item.Id);
+                        currIssue.Issue1 = item.Issue1;
+                        currIssue.UpdatedAt = DateTime.Now;
+                        _context.Update(currIssue);
                     }
                     else
                     {
@@ -159,7 +163,14 @@ namespace Referral2.Controllers
                     }
                 }
                 await _context.SaveChangesAsync();
-                return PartialView("~/Views/Remarks/Issues.cshtml", model);
+                var issues = new IssuesModel()
+                {
+                    Issues = _context.Issue
+                    .Include(x => x.Tracking)
+                    .Where(x => x.TrackingId == model.TrackingId).ToList(),
+                    TrackingId = model.TrackingId
+                };
+                return PartialView("~/Views/Remarks/Issues.cshtml", issues);
             }
             else
                 ModelState.AddModelError("Issues", "Please fill up input.");

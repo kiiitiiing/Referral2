@@ -15,6 +15,7 @@ using Referral2.Helpers;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 
 namespace Referral2.Controllers
 {
@@ -64,11 +65,11 @@ namespace Referral2.Controllers
         public async Task<IActionResult> SwitchUser([Bind] SwitchUserModel model)
         {
             var users = _context.User
-                .Where(x => x.FacilityId.Equals(UserFacility))
+                .Where(x => x.FacilityId.Equals(UserFacility) && x.Level == _roles.Value.DOCTOR)
                 .Select(x => new ChangeLoginViewModel
                 {
                     Id = x.Id,
-                    UserLastname = x.Lastname + ", " + x.Firstname
+                    UserLastname = (x.Lastname + ", " + x.Firstname).NameToUpper()
                 });
             if (ModelState.IsValid)
             {
@@ -262,7 +263,10 @@ namespace Referral2.Controllers
 
         private async Task LoginAsAsync(int facilityId, string level)
         {
-            var user = await _context.User.FindAsync(UserId);
+            var user = await _context.User
+                .Include(x => x.Department)
+                .Include(x => x.Facility)
+                .FirstOrDefaultAsync(x => x.Id == UserId);
             var properties = new AuthenticationProperties
             {
                 AllowRefresh = false,
