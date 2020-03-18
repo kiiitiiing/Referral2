@@ -128,13 +128,15 @@ namespace Referral2.Controllers
                 DepartmentName = x.Description
             });
 
-            var faciliyDepartment = _context.User.Where(x => x.FacilityId.Equals(facilityId) && x.Level.Equals(_roles.Value.DOCTOR) && x.DepartmentId != null)
-                .Include(x=>x.Department)
-                .DistinctBy(d => d.DepartmentId)
+            var faciliyDepartment = _context.User
+                .Include(x => x.Department)
+                .Where(x => x.FacilityId.Equals(UserFacility) && x.Level.Equals(_roles.Value.DOCTOR) && x.DepartmentId != null)
+                .Select(y => y.Department)
+                .Distinct()
                 .Select(x => new SelectDepartment
                 {
-                    DepartmentId = (int)x.DepartmentId,
-                    DepartmentName = x.Department.Description
+                    DepartmentId = (int)x.Id,
+                    DepartmentName = x.Description
                 });
 
             SelectAddressDepartment selectAddress = new SelectAddressDepartment(address, faciliyDepartment);

@@ -237,12 +237,17 @@ namespace Referral2.Controllers
         [HttpGet]
         public IActionResult ArrivedRemark(string code)
         {
-            return PartialView();
+            var Arrived = new RemarksViewModel
+            {
+                Code = code,
+            };
+            return PartialView(Arrived);
         }
 
         [HttpPost]
         public async Task<IActionResult> ArrivedRemark([Bind] RemarksViewModel model, string code)
         {
+            System.Diagnostics.Debug.WriteLine("@Code : " + code);
             if (ModelState.IsValid)
             {
                 var tracking = ArrivedTracking(model, _status.Value.ARRIVED);
@@ -283,7 +288,11 @@ namespace Referral2.Controllers
         [HttpGet]
         public IActionResult AdmittedRemark(string code)
         {
-            return PartialView();
+            var Admitted = new AdmittedViewModel
+            {
+                Code = code,
+            };
+            return PartialView(Admitted);
         }
 
         [HttpPost]
@@ -407,7 +416,11 @@ namespace Referral2.Controllers
         [HttpGet]
         public IActionResult DischargedRemark(string code)
         {
-            return PartialView();
+            var Discharge = new DischargeRemarkViewModel
+            {
+                Code = code,
+            };
+            return PartialView(Discharge);
         }
 
         [HttpPost]

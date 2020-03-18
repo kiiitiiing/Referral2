@@ -1,69 +1,202 @@
 ﻿@model IEnumerable<SupportChatViewModel>
-
+@using Referral2.Helpers;
+@using Referral2.Models.MobileModels;
+@inject IJsonHelper Json;
+@using Newtonsoft.Json;
 @{
     ViewData["Title"] = "Referral System";
     var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
     var userFacility = int.Parse(User.FindFirstValue("Facility"));
-    var direction = "";
+    var _userFacility = User.FindFirstValue("Facility");
+    var UserName = User.FindFirstValue(ClaimTypes.Surname) + " " + User.FindFirstValue(ClaimTypes.GivenName);
+    string[] userName = User.FindFirstValue(ClaimTypes.GivenName).Split();
+
+    var UserInformation = new UserModel
+    {
+        UserID = userId,
+        Level = User.FindFirstValue(ClaimTypes.Role),
+        Facility = _userFacility,
+        Firstname = userName[0],
+        Middlename = userName.Length < 2 ? " " : userName[1],
+        Lastname = User.FindFirstValue(ClaimTypes.Surname)
+    };
 }
-    <div class="row">
-        <div class="col-md-9">
-            <div class="card card-success card-outline direct-chat direct-chat-primary">
-                <div class="card-header with-border">
-                    <h3 class="box-title">
-                        <span class="feedback_code">IT Support: Group Chat</span>
-                    </h3>
-                </div>
-                <div class="card-body">
-                    <div class="direct-chat-messages" style="height:400px" id="it-group-chat">
-                        @if (Model != null)
-                        {
-                            var x = 0;
-                            foreach (var item in Model)
-                            {
-                                x++;
-                                var chatTime = item.MessageDate.GetDate("dd MMM hh:mm tt");
-                                direction = item.SupportId.Equals(userId) ? "right" : "left";
-                                var reverse = direction == "right" ? "left" : "right";
-                                var last = x == Model.Count() ? "last-item" : "";
-                                <div class="direct-chat-msg @direction" id="chats">
-                                    <div class="direct-chat-info clearfix">
-                                        <span class="direct-chat-name fa-pull-@direction">@item.SupportName</span>
-                                        <span class="direct-chat-timestamp fa-pull-@reverse">@chatTime</span>
-                                    </div>
-                                    <img class="direct-chat-img" title="@item.SupportFacilityName" src="~/assets/dist/img/MDMale.jpg" alt="Message User Image">
-                                    <div class="direct-chat-text" id="@last">
-                                        @item.Message
-                                    </div>
-                                </div>
-                            }
-                        }
-                    </div>
-                </div>
-                <div class="card-footer">
-                    <form asp-action="Chat" method="post" id="feedbackForm">
-                        <div class="input-group">
-                            <input type="hidden" name="MdId" value="@userId" />
-                            <input type="hidden" name="Code" value="it-group-chat" />
-                            <input type="text" name="Message" id="message" required="" placeholder="Type Message ..." class="form-control" autocomplete="off">
-                            <span class="input-group-btn">
-                                <button type="submit" class="btn btn-success">Send</button>
-                            </span>
-                        </div>
-                    </form>
-                </div>
-                <!-- /.box-footer-->
+
+<script>
+    var output;
+    var listofusers = [];
+    Initialize("@Constants.Server_Link");
+
+    $(document).ready(function () {
+
+        $("#btn1").click(function () {
+            var getmessage = $("#message").val();
+            $("#message").val("");
+            EnvelopeMessageToMainServer(getmessage);
+        });
+
+        $("#btn1").ready(function () {
+            var getuser = @Html.Raw(JsonConvert.SerializeObject(UserInformation));
+            setTimeout(function () { SubmitUserInformation(getuser); }, 300);
+        });
+    });
+
+    function EnvelopeMessageToMainServer(getmessage) {
+        var url = "@Url.Action("GetMessage", "Support")";
+        var getuser = @Html.Raw(JsonConvert.SerializeObject(UserInformation));
+        var getlistusers = JSON.stringify(listofusers);
+
+        var datamessage = {
+            message: getmessage,
+            name: getuser.Lastname + " " + getuser.Firstname + " " + getuser.Middlename,
+            level: getuser.Level,
+            group: getlistusers
+        };
+
+        $.ajax({
+            type: "POST",
+            url: url,
+
+            data: datamessage,
+            success: function (data) {
+                doSend(JSON.stringify(data));
+
+            },
+            error: function (data) {
+                console.log("error : " + JSON.stringify(data));
+            },
+        });
+    }
+
+    function SubmitUserInformation(getuser) {
+        var url = "@Url.Action("GetUser", "Support")";
+        $.ajaxSetup({ async: false });
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: {
+                user: JSON.stringify(getuser),
+            },
+            success: function (data) {
+                doSend(JSON.stringify(data));
+            },
+        });
+    }
+
+    function SendListToServer(getlist) {
+        var url = "@Url.Action("GetList", "Support")";
+        var datamessage = {list : getlist};
+        $.ajaxSetup({ async: false });
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: datamessage,
+            success: function (data) {
+                listofusers = data;
+            },
+        });
+    }
+
+    function AppendBubbleChat(direction, message, user) {
+        var getclearfix =
+            "<div class='direct-chat-msg " + direction + "' > "
+            + "<div class='direct-chat-info' clearfix>"
+            + "<span class='direct-chat-name pull-" + direction + "'>" + user + "</span>"
+            + "<span class='direct-chat-timestamp pull-" + direction + "'>@DateTime.Now</span>"
+            + "</div>"
+            + "<img class='direct-chat-img' src='/assets/dist/img/MDMale.jpg'>"
+            + "<div class='direct-chat-text' id='MessageChatBox'>"
+            + "<p>" + message + "</p>"
+            + "</div>"
+            + "</div>";
+
+        return getclearfix;
+    }
+
+    function writeToScreen(data) {
+        var getclientmessage = JSON.parse(data);
+        var getmessage = getclientmessage.ClientMessage.Message;
+        var direction = (getclientmessage.ClientMessage.SenderId == "@Html.Raw(userId)") ? "right" : "left";
+
+        $("#BubbleDiv").append(AppendBubbleChat(direction, getmessage, getclientmessage.ClientMessage.Sender));
+    }
+
+    function init() {
+        output = document.getElementById("MessageChatBox");
+    }
+
+    function Initialize(wsUri) {
+        websocket = new WebSocket(wsUri);
+        websocket.onopen = function (evt) { onOpen(evt) };
+        websocket.onclose = function (evt) { onClose(evt) };
+        websocket.onmessage = function (evt) { onMessage(evt) };
+        websocket.onerror = function (evt) { onError(evt) };
+    }
+
+    function onOpen(evt) {
+    }
+
+    function onClose(evt) {
+    }
+
+    function onMessage(evt) {
+        var parsedata = JSON.parse(evt.data);
+        console.log("IGO");
+        switch (parsedata.InformationType) {
+
+            case "clients":
+                SendListToServer(JSON.stringify(parsedata.ListUserInformation))
+                break;
+            case "message_it":
+                // TASK: @*TO SEND DATA TO MAIN DATABASE*@
+                console.log("message_it")
+                writeToScreen(evt.data);
+                break;
+            default:
+                console.log("default");
+                break;
+        }
+    }
+
+
+    function onError(evt) {
+    }
+
+    function doSend(message) {
+        websocket.send(message);
+    }
+
+    window.addEventListener("load", init, false);
+
+</script>
+
+<div class="row" id="MainDiv">
+    <div class="col-md-9">
+        <div class="card card-success card-outline direct-chat direct-chat-primary">
+            <div class="card-header with-border">
+                <h3 class="box-title">
+                    <span class="feedback_code">IT Support: Group Chat</span>
+                </h3>
             </div>
-        </div>
-        <div class="col-md-3">
-            <partial name="~/Views/Shared/PartialViews/_LinksPartial.cshtml" />
+
+            <div class="direct-chat-messages box-body" style="height:400px" id="BubbleDiv">
+
+            </div>
+
+            <div class="card-footer">
+                <div class="input-group">
+                    <input type="hidden" name="MdId" value="@userId" />
+                    <input type="hidden" name="Code" value="it-support-chat" />
+                    <input type="text" name="message" id="message" required="" placeholder="Type Message ..." class="form-control" autocomplete="off">
+                    <span class="input-group-btn">
+                        <button class="btn btn-success" id="btn1"> Send</button>
+                    </span>
+                </div>
+            </div>
+            <!-- /.box-footer-->
         </div>
     </div>
-
-<script type="text/javascript">
-    var chaat = document.getElementById('#chats');
-    $('html,body').animate({ scrollTop: 9999 }, 0);
-    $('div.direct-chat-messages').animate({scrollTop:$('#last-item').position().top}, 0);
-    //$('div.direct-chat-messages').scrollTo($('#last-item').position().top, {duration:0})
-</script>
-    
+    <div class="col-md-3">
+        <partial name="~/Views/Shared/PartialViews/_LinksPartial.cshtml" />
+    </div>
+</div>

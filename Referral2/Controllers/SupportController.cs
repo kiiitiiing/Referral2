@@ -18,6 +18,8 @@ using System.Diagnostics;
 using System.IO;
 using OfficeOpenXml;
 using System.Globalization;
+using Referral2.Models.MobileModels;
+using Newtonsoft.Json;
 
 namespace Referral2.Controllers
 {
@@ -484,6 +486,64 @@ namespace Referral2.Controllers
             ViewBag.Departments = new SelectList(departments, "Id", "Description", doctor.DepartmentId);
             return PartialView("~/Views/Support/UpdateUser.cshtml",model);
         }
+
+        #region Support Chat Components
+        [HttpPost]
+        public IActionResult GetList(string list)
+        {
+            return Json(JsonConvert.DeserializeObject<List<UserModel>>(list));
+        }
+
+        [HttpPost]
+        public IActionResult GetMessage(string message, string name, string level, string group)
+        {
+            List<string> useraddress = new List<string>();
+            var GetUsers = JsonConvert.DeserializeObject<List<UserModel>>(group);
+            var Request = new RequestModel
+            {
+                InformationType = Constants.MESSAGE_TAG_GC_IT,
+                ListUserInformation = GetUsers,
+                ClientMessage = new MessageModel
+                {
+                    Sender = name,
+                    Message = message,
+                    Receivers = char.ToUpper(level[0]) + level.Substring(1),
+                    Sender_Endpoint = "",
+                },
+            };
+            foreach (var client in GetUsers)
+            {
+                useraddress.Add(client.IPAddress);
+            }
+
+            Request.ClientMessage.Receiver_Endpoints = useraddress;
+
+            return Json(Request);
+        }
+
+        [HttpPost]
+        public IActionResult GetUser(string user)
+        {
+            var DeserializeUserInformation = JsonConvert.DeserializeObject<UserModel>(user);
+
+            var getfacility = _context.Facility
+                .Where(facilityId => facilityId.Id == Convert.ToInt32(DeserializeUserInformation.Facility))
+                .Select(facility => facility.Name)
+                .FirstOrDefault();
+
+            DeserializeUserInformation.Facility = getfacility;
+
+            var Request = new RequestModel
+            {
+                InformationType = Constants.INFORMATION_TAG,
+                UserInformation = DeserializeUserInformation,
+            };
+
+            return Json(Request);
+        }
+
+
+        #endregion
         #region HELPERS
 
         private async Task<User> SetDoctorViewModel(UpdateDoctorViewModel model)
