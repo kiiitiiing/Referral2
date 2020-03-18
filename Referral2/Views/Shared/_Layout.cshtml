@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Referral2</title>
+    <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     @*<link rel="stylesheet" href="~/css/site.css" />*@
     <link rel="icon" href="~/assets/dist/img/dohfavicon.png" />
@@ -105,7 +105,7 @@
         }
     </header>
     <!-- MODALS -->
-    <div class="modal fade" id="login-status-modal" tabindex="-1" role="dialog" aria-labelledby="addContactLabel" aria-hidden="true">
+    <div class="modal fade" id="login-status-modal">
         <div class="modal-dialog modal-sm" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -117,16 +117,22 @@
                     </fieldset>
                 </div>
                 <div class="modal-body">
-                    <button id="btn-on-duty" type="button" class="btn btn-success col-sm-5" style="width: 50% !important;">
-                        <i class="fa-5x fa fa-user-md"></i>
-                        <br>
-                        ON DUTY
-                    </button>
-                    <button id="btn-off-duty" type="button" class="btn btn-default col-sm-5" style="width: 50% !important;">
-                        <i class="fa-5x fa fa-user-md"></i>
-                        <br>
-                        OFF DUTY
-                    </button>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <button id="btn-on-duty" type="button" class="btn btn-success" style="width: 100% !important;">
+                                <i class="fa-5x fa fa-user-md"></i>
+                                <br>
+                                ON DUTY
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button id="btn-off-duty" type="button" class="btn btn-default" style="width: 100% !important;">
+                                <i class="fa-5x fa fa-user-md"></i>
+                                <br>
+                                OFF DUTY
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

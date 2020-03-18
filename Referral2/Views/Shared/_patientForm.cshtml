@@ -1,11 +1,11 @@
 ﻿@model PatientForm
 @{
-    var dateReferred = Model.TimeReferred == default ? "" : Model.TimeReferred.ToString("MMMM dd, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
-    var dateTransferred = Model.TimeTransferred == default ? "" : Model.TimeTransferred.ToString("MMMM dd, yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+    var dateReferred = Model.TimeReferred == default ? "" : Model.TimeReferred.GetDate("MMMM dd, yyyy hh:mm tt");
+    var dateTransferred = Model.TimeTransferred == default ? "" : Model.TimeTransferred.GetDate("MMMM dd, yyyy hh:mm tt");
     var referringMd = Model.ReferringMdNavigation;
-    var referringMdName = referringMd == null ? "" : GlobalFunctions.GetMDFullName(referringMd);
+    var referringMdName = referringMd == null ? "" : referringMd.GetMDFullName().NameToUpper();
     var referringMdContact = referringMd == null ? "" : referringMd.Contact;
-    var actionMd = Model.ReferredMdNavigation == null ? "" : GlobalFunctions.GetMDFullName(Model.ReferredMdNavigation) + " - " + Model.ReferredMdNavigation.Contact;
+    var actionMd = Model.ReferredMdNavigation == null ? "" : Model.ReferredMdNavigation.GetMDFullName().NameToUpper() + " - " + Model.ReferredMdNavigation.Contact;
 }
 
 <div class="title-form">
@@ -24,14 +24,14 @@
                 <td colspan="6">Facility Contact #: <span>@Model.ReferringFacility.Contact</span></td>
             </tr>
             <tr>
-                <td colspan="6">Address: <span>@GlobalFunctions.GetAddress(Model.ReferringFacility)</span></td>
+                <td colspan="6">Address: <span>@Model.ReferringFacility.GetAddress()</span></td>
             </tr>
             <tr>
                 <td colspan="3">Referred to: <span>@Model.ReferredToNavigation.Name</span></td>
                 <td colspan="3">Department: <span>@Model.Department.Description</span></td>
             </tr>
             <tr>
-                <td colspan="6">Address: <span>@GlobalFunctions.GetAddress(Model.ReferredToNavigation)</span></td>
+                <td colspan="6">Address: <span>@Model.ReferredToNavigation.GetAddress()</span></td>
             </tr>
             <tr>
                 <td colspan="3">
@@ -51,13 +51,13 @@
                 <td colspan="3">
                     Name of Patient:
                     <span>
-                        @GlobalFunctions.GetFullName(Model.Patient)
+                        @Model.Patient.GetFullName().NameToUpper()
                     </span>
                 </td>
                 <td>
                     Age:
                     <span>
-                        @GlobalFunctions.ComputeAge(Model.Patient.DateOfBirth)
+                        @Model.Patient.DateOfBirth.ComputeAge()
                     </span>
                 </td>
                 <td>
@@ -77,7 +77,7 @@
                 <td colspan="6">
                     Address:
                     <span>
-                        @GlobalFunctions.GetAddress(Model.Patient)
+                        @Model.Patient.GetAddress()
                     </span>
                 </td>
             </tr>

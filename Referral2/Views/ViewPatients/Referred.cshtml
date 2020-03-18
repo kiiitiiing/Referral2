@@ -171,8 +171,9 @@
                 var headerclass = item.Pregnant ? "bg-pregnant" : "card-custom-bg";
                 var seenCount = item.SeenCount;
                 var callerCount = item.CallerCount;
-                var recoCount = item.ReCoCount;
+                var issueCtr = item.IssueCount != 0 ? item.IssueCount.ToString() : "";
                 var referredBy = item.Walkin ? "WALK IN" : item.ReferredBy.ToUpper();
+                var recoCtr = item.ReCoCount != 0 ? item.ReCoCount.ToString() : "";
                 int ctr = 0;
                 seen = "disabled";
                 accepted = "disabled";
@@ -560,18 +561,12 @@
                     <button type="button" class="btn btn-info btn-xs" data-toggle="ajax-modal" data-target="#reco-modal" data-url="@Url.Action("ViewReco","Modals", new { code = item.Code })">
                         <i class="fa fa-comments"></i>
                         &nbsp;ReCo
-                        @if (recoCount > 0)
-                        {
-                            <small class="badge bg-blue" id="reco_@item.Code">@recoCount</small>
-                        }
+                        <small class="badge bg-blue" id="reco_@item.Code">@recoCtr</small>
                     </button>
                     <button type="button" class="btn btn-xs btn-danger" data-toggle="ajax-modal" data-target="#issues-modal" data-url="@Url.Action("Issues","Remarks", new { id = item.TrackingId })">
                         <i class="fa fa-exclamation-triangle"></i>
                         &nbsp;Issue and Concern
-                        @if (item.IssueCount > 0)
-                        {
-                            <small class="badge bg-gradient-red">@item.IssueCount</small>
-                        }
+                        <small class="badge bg-gradient-red" id="issue_@item.TrackingId">@issueCtr</small>
                     </button>
                     @if (!item.Status.Equals("cancelled") && !item.Status.Equals("discharged"))
                     {

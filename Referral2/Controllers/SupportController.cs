@@ -110,13 +110,17 @@ namespace Referral2.Controllers
         // GET: DAILY REFERRALS
         public async Task<IActionResult> DailyReferrals(string daterange, int? page, bool export)
         {
-            StartDate = DateTime.Now;
-            EndDate = DateTime.Now;
             if(!string.IsNullOrEmpty(daterange))
             {
                 StartDate = DateTime.Parse(daterange.Substring(0, daterange.IndexOf(" ") + 1).Trim());
                 EndDate = DateTime.Parse(daterange.Substring(daterange.LastIndexOf(" ")).Trim());
             }
+            else
+            {
+                StartDate = DateTime.Now;
+                EndDate = DateTime.Now;
+            }
+            EndDate = EndDate.AddDays(1).AddSeconds(-1);
             ViewBag.StartDate = StartDate;
             ViewBag.EndDate = EndDate;
             int size = 20;
@@ -230,13 +234,15 @@ namespace Referral2.Controllers
         // GET: DAILY USERS
         public async Task<IActionResult> DailyUsers(string date, int? page, bool export)
         {
-            StartDate = DateTime.Now.Date;
-            EndDate = StartDate.AddDays(1).AddSeconds(-1);
             if (date != null)
             {
                 StartDate = DateTime.Parse(date);
-                EndDate = StartDate.AddDays(1).AddSeconds(-1);
             }
+            else
+            {
+                StartDate = DateTime.Now.Date;
+            }
+            EndDate = StartDate.AddDays(1).AddSeconds(-1);
             ViewBag.Date = StartDate;
 
             var logins = _context.Login
@@ -400,6 +406,7 @@ namespace Referral2.Controllers
         {
             ViewBag.SearchString = search;
             var doctors = _context.User
+                .Include(x=>x.Department)
                 .Where(x => x.FacilityId.Equals(UserFacility) && x.Level.Equals(_roles.Value.DOCTOR))
                 .Select(y => new SupportManageViewModel
                 {

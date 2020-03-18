@@ -143,7 +143,7 @@ namespace Referral2.Controllers
             if (!string.IsNullOrEmpty(dateRange))
             {
                 StartDate = DateTime.Parse(dateRange.Substring(0, dateRange.IndexOf(" ") + 1).Trim());
-                EndDate = DateTime.Parse(dateRange.Substring(dateRange.LastIndexOf(" ")).Trim());
+                EndDate = DateTime.Parse(dateRange.Substring(dateRange.LastIndexOf(" ")).Trim()).AddDays(1).AddSeconds(-1);
             }
             else
             {
@@ -213,7 +213,7 @@ namespace Referral2.Controllers
                     .Select(i => new ListItem
                     {
                         NoItem = i.Count(),
-                        ItemName = i.Key == null ? "" : GlobalFunctions.GetMDFullName(doctors.SingleOrDefault(x => x.Id == i.Key))
+                        ItemName = i.Key == null ? "" : doctors.SingleOrDefault(x => x.Id == i.Key).GetMDFullName().NameToUpper()
                     })
                     .ToListAsync();
 
@@ -326,7 +326,7 @@ namespace Referral2.Controllers
                     .Select(i => new ListItem
                     {
                         NoItem = i.Count(),
-                        ItemName = i.Key == null ? "" : GlobalFunctions.GetMDFullName(doctors.SingleOrDefault(x => x.Id == i.Key))
+                        ItemName = i.Key == null ? "" : doctors.SingleOrDefault(x => x.Id == i.Key).GetMDFullName().NameToUpper()
                     })
                     .ToListAsync();
 
@@ -762,13 +762,16 @@ namespace Referral2.Controllers
         // DAILY REFERRAL
         public async Task<IActionResult> DailyReferral(int? page, string dateRange, bool export)
         {
-            StartDate = DateTime.Now;
-            EndDate = DateTime.Now;
 
             if (!string.IsNullOrEmpty(dateRange))
             {
                 StartDate = DateTime.Parse(dateRange.Substring(0, dateRange.IndexOf(" ") + 1).Trim());
-                EndDate = DateTime.Parse(dateRange.Substring(dateRange.LastIndexOf(" ")).Trim());
+                EndDate = DateTime.Parse(dateRange.Substring(dateRange.LastIndexOf(" ")).Trim()).AddDays(1).AddSeconds(-1);
+            }
+            else
+            {
+                StartDate = DateTime.Now;
+                EndDate = DateTime.Now.AddDays(1).AddSeconds(-1);
             }
             ViewBag.StartDate = StartDate;
             ViewBag.EndDate = EndDate;
@@ -1014,13 +1017,13 @@ namespace Referral2.Controllers
             if (!string.IsNullOrEmpty(daterange))
             {
                 StartDate = DateTime.Parse(daterange.Substring(0, daterange.IndexOf(" ") + 1).Trim());
-                EndDate = DateTime.Parse(daterange.Substring(daterange.LastIndexOf(" ")).Trim());
+                EndDate = DateTime.Parse(daterange.Substring(daterange.LastIndexOf(" ")).Trim()).AddDays(1).AddSeconds(-1);
             }
             else
             {
                 var dateNow = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
                 StartDate = new DateTime(dateNow.Year, 1, 1);
-                EndDate = new DateTime(dateNow.Year, 12, 31);
+                EndDate = new DateTime(dateNow.Year, 12, 31).AddDays(1).AddSeconds(-1);
             }
             ViewBag.StartDate = StartDate;
             ViewBag.EndDate = EndDate;
@@ -1083,12 +1086,12 @@ namespace Referral2.Controllers
             if(!string.IsNullOrEmpty(date))
             {
                 StartDate = DateTime.Parse(date);
-                EndDate = StartDate.AddDays(1).AddSeconds(1);
+                EndDate = StartDate.AddDays(1).AddSeconds(-1);
             }
             else
             {
                 StartDate = DateTime.Now.Date;
-                EndDate = StartDate.AddDays(1).AddSeconds(1);
+                EndDate = StartDate.AddDays(1).AddSeconds(-1);
             }
 
             ViewBag.Date = StartDate.ToString("dd/MM/yyyy");
@@ -1141,12 +1144,12 @@ namespace Referral2.Controllers
             if (!string.IsNullOrEmpty(dateRange))
             {
                 StartDate = DateTime.Parse(dateRange.Substring(0, dateRange.IndexOf(" ") + 1).Trim());
-                EndDate = DateTime.Parse(dateRange.Substring(dateRange.LastIndexOf(" ")).Trim());
+                EndDate = DateTime.Parse(dateRange.Substring(dateRange.LastIndexOf(" ")).Trim()).AddDays(1).AddSeconds(-1);
             }
             else
             {
                 StartDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-                EndDate = StartDate.AddMonths(1).AddDays(-1);
+                EndDate = StartDate.AddMonths(1).AddSeconds(-1);
             }
             ViewBag.StartDate = StartDate;
             ViewBag.EndDate = EndDate;
@@ -1304,7 +1307,7 @@ namespace Referral2.Controllers
         public async Task<IActionResult> ViewedOnly(int? page, int? facility, string startDate, string endDate, string type)
         {
             StartDate = DateTime.Parse(startDate);
-            EndDate = DateTime.Parse(endDate);
+            EndDate = DateTime.Parse(endDate).AddDays(1).AddSeconds(-1);
             #region Query
             var activities = _context.Activity.Where(x => x.DateReferred >= StartDate && x.DateReferred <= EndDate);
             var feedbacks = _context.Feedback.Where(x => x.CreatedAt >= StartDate && x.CreatedAt <= EndDate);
@@ -1318,9 +1321,9 @@ namespace Referral2.Controllers
                     PatientName = t.Patient.FirstName + " " + t.Patient.MiddleName + " " + t.Patient.LastName,
                     PatientSex = t.Patient.Sex,
                     PatientAge = t.Patient.DateOfBirth.ComputeAge(),
-                    PatientAddress = GlobalFunctions.GetAddress(t.Patient),
-                    ReferredBy = GlobalFunctions.GetMDFullName(t.ReferringMdNavigation),
-                    ReferredTo = GlobalFunctions.GetMDFullName(t.ActionMdNavigation),
+                    PatientAddress = t.Patient.Barangay.Description+", "+t.Patient.Muncity.Description+", "+t.Patient.Province.Description,
+                    ReferredBy =  t.ReferringMdNavigation.GetMDFullName().NameToUpper(),
+                    ReferredTo = t.ActionMdNavigation.GetMDFullName().NameToUpper(),
                     ReferredToId = t.ReferredTo,
                     ReferredFromId = t.ReferredFrom,
                     TrackingId = t.Id,

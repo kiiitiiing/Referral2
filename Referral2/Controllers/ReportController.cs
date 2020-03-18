@@ -55,6 +55,7 @@ namespace Referral2.Controllers
                 StartDate = DateTime.Parse(daterange.Substring(0, daterange.IndexOf(" ") + 1).Trim());
                 EndDate = DateTime.Parse(daterange.Substring(daterange.LastIndexOf(" ")).Trim());
             }
+            EndDate = EndDate.AddDays(1).AddSeconds(-1);
             ViewBag.StartDate = StartDate;
             ViewBag.EndDate = EndDate;
 
@@ -116,6 +117,7 @@ namespace Referral2.Controllers
                 StartDate = DateTime.Parse(daterange.Substring(0, daterange.IndexOf(" ") + 1).Trim());
                 EndDate = DateTime.Parse(daterange.Substring(daterange.LastIndexOf(" ")).Trim());
             }
+            EndDate = EndDate.AddDays(1).AddSeconds(-1);
             ViewBag.StartDate = StartDate;
             ViewBag.EndDate = EndDate;
 
@@ -1084,13 +1086,14 @@ namespace Referral2.Controllers
         private Task<IEnumerable<SelectDepartment>> AvailableDepartments(int facilityId)
         {
             var availableDepartments = _context.User
+                .Include(x=>x.Department)
                 .Where(x => x.FacilityId.Equals(facilityId) && x.Level.Equals(_roles.Value.DOCTOR) && x.DepartmentId != null)
-                .Select(x=>x.DepartmentId)
+                .Select(x=>x.Department)
                 .Distinct()
                 .Select(x => new SelectDepartment
                 {
-                    DepartmentId = (int)x,
-                    DepartmentName = _context.Department.SingleOrDefault(c=> c.Id == x).Description
+                    DepartmentId = (int)x.Id,
+                    DepartmentName = x.Description
                 });
             return Task.FromResult(availableDepartments.AsEnumerable());
         }

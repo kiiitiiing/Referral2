@@ -40,7 +40,7 @@
     $('.modal').on('hidden.bs.modal', function () {
         var seenCtr = $('#seen_@Model.Code').html();
         var add = 1;
-        if (seenCtr == '') {
+        if (seenCtr != '') {
             add = parseInt(seenCtr) + 1;
         }
         $('#seen_@Model.Code').html(add);

@@ -61,6 +61,10 @@
         form.removeData('unobtrusiveValidation');
         $.validator.unobtrusive.parse(form);
     });
+
+    $('#issues-modal').on('hidden.bs.modal', function () {
+        UpdateIssueCount('@Model.TrackingId');
+    });
     var x = 0;
     var track = $('#trackId').val();
     if ($('#lastval').val() > 0) {

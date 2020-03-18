@@ -47,6 +47,36 @@ namespace Referral2
             }
         }
 
+        public static string RemoveParenthesis(this string name)
+        {
+            var stack = new Stack<char>();
+
+            var par = false;
+
+            foreach(var letter in name)
+            {
+                stack.Push(letter);
+                if(letter == '(')
+                {
+                    par = true;
+                    stack.Pop();
+                }
+                if(par)
+                {
+                    if(letter == ')')
+                    {
+                        par = false;
+                        stack.Pop();
+                    }
+                    else
+                    {
+                        stack.Pop();
+                    }
+                }
+            }
+            var asa = string.Join<char>("", stack.Reverse());
+            return asa;
+        }
 
         public static string ComputeTimeFrame(this double minutes)
         {
@@ -121,17 +151,17 @@ namespace Referral2
         }
 
 
-        public static string GetAddress(Facility facility)
+        public static string GetAddress(this Facility facility)
         {
             string address = string.IsNullOrEmpty(facility.Address) ? "" : facility.Address + ", ";
-            string barangay = facility.Barangay == null ? "" : facility.Barangay.Description + ", ";
-            string muncity = facility.Muncity == null ? "" : facility.Muncity.Description + ", ";
+            string barangay = facility.BarangayId == null ? "" : facility.Barangay.Description + ", ";
+            string muncity = facility.MuncityId == null ? "" : facility.Muncity.Description + ", ";
             string province = facility.Province == null ? "" : facility.Province.Description;
 
             return address + barangay + muncity + province;
         }
 
-        public static string GetAddress(Patient patient)
+        public static string GetAddress( this Patient patient)
         {
             string barangay = patient.Barangay == null ? "" : patient.Barangay.Description + ", ";
             string muncity = patient.Muncity == null ? "" : patient.Muncity.Description + ", ";

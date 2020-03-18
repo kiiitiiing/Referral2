@@ -15,14 +15,13 @@ using Referral2.Models.ViewModels;
 
 namespace Referral2.Controllers
 {
-    public class ModalsController : HomeController
+    public class ModalsController : Controller
     {
         private readonly ReferralDbContext _context;
         private readonly IOptions<ReferralRoles> _roles;
         private readonly IOptions<ReferralStatus> _status;
 
         public ModalsController(ReferralDbContext context, IOptions<ReferralRoles> roles, IOptions<ReferralStatus> status)
-            :base(context,status)
         {
             _context = context;
             _roles = roles;

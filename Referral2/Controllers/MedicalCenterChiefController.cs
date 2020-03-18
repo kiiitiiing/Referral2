@@ -58,14 +58,17 @@ namespace Referral2.Controllers
 
         public async Task<IActionResult> ConsolidatedMcc(string dateRange , bool export, bool inexport, bool outexport)
         {
-            var dateNow = DateTime.Now;
-            StartDate = new DateTime(dateNow.Year, dateNow.Month, 1);
-            EndDate = StartDate.AddMonths(1).AddDays(-1);
             if (!string.IsNullOrEmpty(dateRange))
             {
                 StartDate = DateTime.Parse(dateRange.Substring(0, dateRange.IndexOf(" ") + 1).Trim());
                 EndDate = DateTime.Parse(dateRange.Substring(dateRange.LastIndexOf(" ")).Trim());
             }
+            else
+            {
+                var dateNow = DateTime.Now;
+                StartDate = new DateTime(dateNow.Year, dateNow.Month, 1);
+            }
+            EndDate = StartDate.AddMonths(1).AddDays(-1);
             ViewBag.StartDate = StartDate;
             ViewBag.EndDate = EndDate;
 
@@ -974,6 +977,7 @@ namespace Referral2.Controllers
                 StartDate = DateTime.Parse(dateRange.Substring(0, dateRange.IndexOf(" ") + 1).Trim());
                 EndDate = DateTime.Parse(dateRange.Substring(dateRange.LastIndexOf(" ")).Trim());
             }
+            EndDate = EndDate.AddDays(1).AddSeconds(-1);
         }
 
         public int UserId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));

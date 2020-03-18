@@ -58,7 +58,23 @@ namespace Referral2.Controllers
         public int NumberNotif()
         {
             var incoming = _context.Tracking
-                .Where(x => x.ReferredTo == UserFacility && x.UpdatedAt >= DateTime.Now.Date);
+               .Join(
+                  _context.Activity,
+                  t => t.Code,
+                  a => a.Code,
+                  (t, a) =>
+                     new
+                     {
+                         Code = t.Code,
+                         ReferredTo = t.ReferredTo,
+                         ReferredFrom = t.ReferredFrom, 
+                         DateAction = a.DateReferred
+                     }
+               )
+               .Where(x => x.ReferredTo == UserFacility && x.DateAction.Date == DateTime.Now.Date)
+               .OrderByDescending(x => x.DateAction)
+               .Select(x => x.Code)
+               .Distinct();
 
             return incoming.Count();
         }
@@ -113,7 +129,11 @@ namespace Referral2.Controllers
         [HttpGet]
         public SelectAddressDepartment FilterDepartment(int? facilityId)
         {
-            var facility = _context.Facility.Find(facilityId);
+            var facility = _context.Facility
+                .Include(x => x.Barangay)
+                .Include(x => x.Muncity)
+                .Include(x => x.Province)
+                .FirstOrDefault(x => x.Id == facilityId);
             if (facility == null)
                 return null;
             string facilityAddress = facility.Address == null ? "" : facility.Address + ", ";
@@ -128,13 +148,15 @@ namespace Referral2.Controllers
                 DepartmentName = x.Description
             });
 
-            var faciliyDepartment = _context.User.Where(x => x.FacilityId.Equals(facilityId) && x.Level.Equals(_roles.Value.DOCTOR) && x.DepartmentId != null)
-                .Include(x=>x.Department)
-                .DistinctBy(d => d.DepartmentId)
+            var faciliyDepartment = _context.User
+                .Include(x => x.Department)
+                .Where(x => x.FacilityId.Equals(facilityId) && x.Level.Equals(_roles.Value.DOCTOR) && x.DepartmentId != null)
+                .Select(x=>x.Department)
+                .Distinct()
                 .Select(x => new SelectDepartment
                 {
-                    DepartmentId = (int)x.DepartmentId,
-                    DepartmentName = x.Department.Description
+                    DepartmentId = (int)x.Id,
+                    DepartmentName = x.Description
                 });
 
             SelectAddressDepartment selectAddress = new SelectAddressDepartment(address, faciliyDepartment);
@@ -216,6 +238,20 @@ namespace Referral2.Controllers
             var recoCtr = await _context.Feedback.Where(x => x.Code == code).CountAsync();
 
             return recoCtr;
+        }
+
+        public async Task<int> SeenCount(int id)
+        {
+            var seenCtr = await _context.Seen.Where(x => x.TrackingId == id).CountAsync();
+
+            return seenCtr;
+        }
+
+        public async Task<int> IssueCount(int id)
+        {
+            var issueCtr = await _context.Issue.Where(x => x.TrackingId == id).CountAsync();
+
+            return issueCtr;
         }
 
         public DashboardViewModel DashboardValues(string level)

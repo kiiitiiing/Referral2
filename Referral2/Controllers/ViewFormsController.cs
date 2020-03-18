@@ -14,14 +14,13 @@ using Referral2.Models.ViewModels.Forms;
 
 namespace Referral2.Controllers
 {
-    public class ViewFormsController : HomeController
+    public class ViewFormsController : Controller
     {
         private readonly ReferralDbContext _context;
         private readonly IOptions<ReferralRoles> _roles;
         private readonly IOptions<ReferralStatus> _status;
 
         public ViewFormsController(ReferralDbContext context, IOptions<ReferralRoles> roles, IOptions<ReferralStatus> status)
-            : base(context,status)
         {
             _context = context;
             _roles = roles;
@@ -34,11 +33,18 @@ namespace Referral2.Controllers
                 return NotFound();
 
             var patientForm = _context.PatientForm
-                .Include(x=>x.Patient)
-                .Include(x=>x.ReferredToNavigation)
-                .Include(x=>x.ReferringFacility)
+                .Include(x => x.Patient).ThenInclude(x => x.Barangay)
+                .Include(x => x.Patient).ThenInclude(x => x.Muncity)
+                .Include(x=>x.Patient).ThenInclude(x=>x.Province)
+                .Include(x=>x.ReferredToNavigation).ThenInclude(x=>x.Barangay)
+                .Include(x => x.ReferredToNavigation).ThenInclude(x => x.Muncity)
+                .Include(x => x.ReferredToNavigation).ThenInclude(x => x.Province)
+                .Include(x=>x.ReferringFacility).ThenInclude(x=>x.Barangay)
+                .Include(x => x.ReferringFacility).ThenInclude(x => x.Muncity)
+                .Include(x => x.ReferringFacility).ThenInclude(x => x.Province)
                 .Include(x=>x.Department)
-                .Include(x=>x.ReferredToNavigation)
+                .Include(x=>x.ReferredMdNavigation)
+                .Include(x=>x.ReferringMdNavigation)
                 .Single(x => x.Code.Equals(code));
 
             if (patientForm == null)
@@ -115,11 +121,18 @@ namespace Referral2.Controllers
         public async Task<IActionResult> PrintableNormalForm(string code)
         {
             var form = await _context.PatientForm
-                .Include(x => x.Patient)
-                .Include(x => x.ReferredToNavigation)
-                .Include(x => x.ReferringFacility)
+                .Include(x => x.Patient).ThenInclude(x => x.Barangay)
+                .Include(x => x.Patient).ThenInclude(x => x.Muncity)
+                .Include(x => x.Patient).ThenInclude(x => x.Province)
+                .Include(x => x.ReferredToNavigation).ThenInclude(x => x.Barangay)
+                .Include(x => x.ReferredToNavigation).ThenInclude(x => x.Muncity)
+                .Include(x => x.ReferredToNavigation).ThenInclude(x => x.Province)
+                .Include(x => x.ReferringFacility).ThenInclude(x => x.Barangay)
+                .Include(x => x.ReferringFacility).ThenInclude(x => x.Muncity)
+                .Include(x => x.ReferringFacility).ThenInclude(x => x.Province)
                 .Include(x => x.Department)
-                .Include(x => x.ReferredToNavigation)
+                .Include(x => x.ReferredMdNavigation)
+                .Include(x => x.ReferringMdNavigation)
                 .SingleOrDefaultAsync(x => x.Code.Equals(code));
 
             return PartialView(form);
@@ -129,9 +142,13 @@ namespace Referral2.Controllers
         {
             var form = _context.PregnantForm
                 .Include(x => x.PatientBaby)
-                .Include(x => x.PatientWoman)
+                .Include(x => x.PatientWoman).ThenInclude(x=>x.Barangay)
+                .Include(x => x.PatientWoman).ThenInclude(x => x.Muncity)
+                .Include(x => x.PatientWoman).ThenInclude(x => x.Province)
                 .Include(x => x.Department)
-                .Include(x => x.ReferredToNavigation)
+                .Include(x => x.ReferredToNavigation).ThenInclude(x=>x.Barangay)
+                .Include(x => x.ReferredToNavigation).ThenInclude(x => x.Muncity)
+                .Include(x => x.ReferredToNavigation).ThenInclude(x => x.Province)
                 .Include(x => x.ReferredByNavigation)
                 .Include(x => x.ReferringFacilityNavigation).FirstOrDefault(x => x.Code.Equals(code));
 

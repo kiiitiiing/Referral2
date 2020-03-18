@@ -10,6 +10,7 @@ using System.Security.Claims;
 using Referral2.Models.ViewModels.Doctor;
 using Microsoft.Extensions.Options;
 using Referral2.Models.ViewModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace Referral2.Controllers
 {
@@ -136,16 +137,24 @@ namespace Referral2.Controllers
         //GET: ReferPartial
         public IActionResult Refer(int? id)
         {
-            var facility = _context.Facility.Single(x => x.Id.Equals(UserFacility));
-            var patient = _context.Patient.Find(id);
+            var facility = _context.Facility
+                .Include(x => x.Barangay)
+                .Include(x => x.Muncity)
+                .Include(x => x.Province)
+                .SingleOrDefault(x => x.Id == UserFacility);
+            var patient = _context.Patient
+                .Include(x => x.Barangay)
+                .Include(x => x.Muncity)
+                .Include(x => x.Province)
+                .SingleOrDefault(x => x.Id == id);
             var patientView = new PatientViewModel
             {
                 Id = patient.Id,
-                Name = GlobalFunctions.GetFullName(patient),
+                Name = patient.GetFullName(),
                 Age = patient.DateOfBirth.ComputeAge(),
                 Sex = patient.Sex,
                 CivilStatus = patient.CivilStatus,
-                Address = GlobalFunctions.GetAddress(patient),
+                Address = patient.GetAddress(),
                 PhicStatus = patient.PhicStatus,
                 PhicId = patient.PhicId
             };
@@ -156,7 +165,7 @@ namespace Referral2.Controllers
             ViewBag.ReferredTo = new SelectList(referTo, "Id", "Name");
             ViewBag.Patient = patientView;
             ViewBag.Facility = facility.Name;
-            ViewBag.FacilityAddress = GlobalFunctions.GetAddress(facility);
+            ViewBag.FacilityAddress = facility.GetAddress();
 
             return PartialView();
         }
@@ -214,14 +223,18 @@ namespace Referral2.Controllers
         //GET: Walkin patient
         public async Task<IActionResult> Walkin(int? id)
         {
-            var facility = _context.Facility.Find(UserFacility);
+            var facility = _context.Facility
+                .Include(x => x.Barangay)
+                .Include(x => x.Muncity)
+                .Include(x => x.Province)
+                .SingleOrDefault(x => x.Id == UserFacility);
             var faciliyDepartment = await AvailableDepartments(UserFacility);
             var cuurentPatient = await SetPatient(id);
             var facilities = _context.Facility
                 .Where(x => x.Id != UserFacility)
                 .Where(x => x.ProvinceId.Equals(UserProvince));
             ViewBag.Facility = facility.Name;
-            ViewBag.FacilityAddress = GlobalFunctions.GetAddress(facility);
+            ViewBag.FacilityAddress = facility.GetAddress();
             ViewBag.Patient = cuurentPatient;
             ViewBag.ReferringFacility = new SelectList(facilities, "Id", "Name");
             ViewBag.Departments = new SelectList(faciliyDepartment, "DepartmentId", "DepartmentName");
@@ -314,13 +327,17 @@ namespace Referral2.Controllers
         public async Task<IActionResult> PregnantWalkin(int? id)
         {
             var patient = await SetPatient(id);
-            var facility = _context.Facility.Find(UserFacility);
+            var facility = _context.Facility
+                .Include(x => x.Barangay)
+                .Include(x => x.Muncity)
+                .Include(x => x.Province)
+                .SingleOrDefault(x => x.Id == UserFacility);
             var facilityDepartment = await AvailableDepartments(UserFacility);
             var facilities = _context.Facility
                 .Where(x => x.Id != UserFacility && x.ProvinceId == UserProvince);
             ViewBag.Patient = patient;
             ViewBag.Facility = facility.Name;
-            ViewBag.FacilityAddress = GlobalFunctions.GetAddress(facility);
+            ViewBag.FacilityAddress = facility.GetAddress();
             ViewBag.Facilities = new SelectList(facilities, "Id", "Name");
             ViewBag.Departments = new SelectList(facilityDepartment, "DepartmentId", "DepartmentName");
             return PartialView();
@@ -507,7 +524,11 @@ namespace Referral2.Controllers
         }
         private Task<PatientViewModel> SetPatient(int? id)
         {
-            var patient = _context.Patient.Find(id);
+            var patient = _context.Patient
+                .Include(x => x.Barangay)
+                .Include(x => x.Muncity)
+                .Include(x => x.Province)
+                .SingleOrDefault(x => x.Id == id);
 
             var patientModel = new PatientViewModel
             {
@@ -531,12 +552,14 @@ namespace Referral2.Controllers
                      DepartmentName = x.Description
                  });
             var availableDepartments = _context.User
+                .Include(x => x.Department)
                 .Where(x => x.FacilityId.Equals(facilityId) && x.Level.Equals(_roles.Value.DOCTOR))
-                .GroupBy(d => d.DepartmentId)
+                .Select(x => x.Department)
+                .Distinct()
                 .Select(y => new SelectDepartment
                 {
-                    DepartmentId = departments.Single(x => x.DepartmentId.Equals(y.Key)).DepartmentId,
-                    DepartmentName = departments.Single(x => x.DepartmentId.Equals(y.Key)).DepartmentName
+                    DepartmentId = y.Id,
+                    DepartmentName = y.Description
                 });
             return Task.FromResult(availableDepartments);
         }

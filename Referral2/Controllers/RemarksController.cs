@@ -227,7 +227,7 @@ namespace Referral2.Controllers
                 _context.Add(activity);
                 await _context.SaveChangesAsync();
 
-                return RedirectToAction("Incoming", "ViewPatients");
+                return RedirectToAction("Accepted", "ViewPatients");
             }
             return PartialView(model);
         }

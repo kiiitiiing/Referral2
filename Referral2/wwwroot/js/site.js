@@ -85,7 +85,10 @@ $(function () {
 
             if (formId == 'reco-modal') {
                 console.log('reco loaded');
-                $('div.direct-chat-messages').animate({ scrollTop: $('#last-item').position().top }, 0);
+                var test = $('div.direct-chat-messages').find('#last-item');
+                if (test.length > 0) {
+                    $('div.direct-chat-messages').animate({ scrollTop: $('#last-item').position().top }, 0);
+                }
             }
         });
     });
@@ -117,7 +120,6 @@ $(function () {
             if (formId == 'reco-modal') {
                 console.log('chat sent');
                 $('#chat').val('');
-                $('div.direct-chat-messages').animate({ scrollTop: $('#last-item').position().top }, 0);
             }
             else if (validation == '') {
                 placeholderElement.find('.modal').modal('hide');
@@ -380,7 +382,36 @@ function UpdateRecoCount(code) {
         type: 'get',
         async: true,
         success: function (output) {
-            $('#reco_' + code).html(output);
+            $('#reco_' + code).html('').html(output);
+        }
+    });
+}
+
+function UpdateSeenCount(id) {
+    var url = "/NoReload/SeenCount?id=" + id;
+    $.ajax({
+        url: url,
+        type: 'get',
+        async: true,
+        success: function (output) {
+            if ($('#seen_' + id).html() == '') {
+                console.log('hmm');
+            }
+            else {
+                $('#seen_' + id).html(output);
+            }
+        }
+    });
+}
+
+function UpdateIssueCount(id) {
+    var url = "/NoReload/IssueCount?id=" + id;
+    $.ajax({
+        url: url,
+        type: 'get',
+        async: true,
+        success: function (output) {
+            $('#issue_' + id).html('').html(output);
         }
     });
 }
