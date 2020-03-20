@@ -1,5 +1,6 @@
 ﻿@model PaginatedList<IncomingViewModel>
-
+@using Referral2.Models.MobileModels;
+@using Newtonsoft.Json;
 @{
     ViewData["Title"] = "Incoming Patients";
     var accept = "accept-modal";
@@ -8,6 +9,33 @@
     var dateRange = startDate + " - " + endDate;
     var dep = ViewBag.Departments.SelectedValue == null ? "" : ViewBag.Departments.SelectedValue.ToString();
     var status = ViewBag.IncomingStatus.SelectedValue == null ? "" : ViewBag.IncomingStatus.SelectedValue.ToString();
+
+    var NotifyPatient = new NotificationModel();
+    var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+    var userFacility = int.Parse(User.FindFirstValue("Facility"));
+    var _userFacility = User.FindFirstValue("Facility");
+    var UserName = User.FindFirstValue(ClaimTypes.Surname) + " " + User.FindFirstValue(ClaimTypes.GivenName);
+    string[] userName = User.FindFirstValue(ClaimTypes.GivenName).Split();
+    var GetFirstPatient = Model.FirstOrDefault();
+    var UserInformation = new UserModel
+    {
+        UserID = userId,
+        Level = User.FindFirstValue(ClaimTypes.Role),
+        Facility = _userFacility,
+        Firstname = userName[0],
+        Middlename = userName.Length < 2 ? " " : userName[1],
+        Lastname = User.FindFirstValue(ClaimTypes.Surname)
+    };
+
+    if (GetFirstPatient.Status.Equals("accepted", StringComparison.OrdinalIgnoreCase))
+    {
+        NotifyPatient = new NotificationModel
+        {
+            PatientCode = GetFirstPatient.Code,
+            TrackStatus = GetFirstPatient.Status,
+            UpdatedAt = DateTime.Now
+        };
+    }
 }
 
 <div class="content">
@@ -683,8 +711,14 @@
     </div>
 </div>
 
-
+<script src="~/js/socket.js"></script>
 <script>
+    Initialize("@Constants.Server_Link");
+    setTimeout(function () { SubmitUserInformation(@Html.Raw(JsonConvert.SerializeObject(UserInformation))); }, 200);
+    setTimeout(function () { EnveloperPatientInformation(@Html.Raw(JsonConvert.SerializeObject(NotifyPatient))); }, 200);
+
+    var x = 0;
+    setTimeout(function () { console.log(x++); }, 1000);
     $(document).ready(function () {
         $('input[name="daterange"]').daterangepicker({
             format: 'YYYY/MM/DD',
@@ -697,5 +731,7 @@
     var stat = $('.statselect option:selected').html();
     $('#department').html(dep);
     $('#status').html(stat);
+
+
 
 </script>

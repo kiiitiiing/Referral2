@@ -1,11 +1,42 @@
 ﻿@model PatientForm
+@using Referral2.Models.MobileModels;
+@using Newtonsoft.Json;
 @{
     var dateReferred = Model.TimeReferred == default ? "" : Model.TimeReferred.GetDate("MMMM dd, yyyy hh:mm tt");
     var dateTransferred = Model.TimeTransferred == default ? "" : Model.TimeTransferred.GetDate("MMMM dd, yyyy hh:mm tt");
     var referringMd = Model.ReferringMdNavigation;
     var referringMdName = referringMd == null ? "" : referringMd.GetMDFullName().NameToUpper();
     var referringMdContact = referringMd == null ? "" : referringMd.Contact;
+<<<<<<< HEAD
     var actionMd = Model.ReferredMdNavigation == null ? "" : Model.ReferredMdNavigation.GetMDFullName().NameToUpper() + " - " + Model.ReferredMdNavigation.Contact;
+=======
+    var actionMd = Model.ReferredMdNavigation == null ? "" : GlobalFunctions.GetMDFullName(Model.ReferredMdNavigation) + " - " + Model.ReferredMdNavigation.Contact;
+
+    var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+    var userFacility = int.Parse(User.FindFirstValue("Facility"));
+    var _userFacility = User.FindFirstValue("Facility");
+    var UserName = User.FindFirstValue(ClaimTypes.Surname) + " " + User.FindFirstValue(ClaimTypes.GivenName);
+    string[] userName = User.FindFirstValue(ClaimTypes.GivenName).Split();
+
+    var UserInformation = new UserModel
+    {
+        UserID = userId,
+        Level = User.FindFirstValue(ClaimTypes.Role),
+        Facility = _userFacility,
+        Firstname = userName[0],
+        Middlename = userName.Length < 2 ? " " : userName[1],
+        Lastname = User.FindFirstValue(ClaimTypes.Surname)
+    };
+
+
+    // SEEN
+    var Notification = new NotificationModel
+    {
+        PatientCode = Model.Code,
+        TrackStatus = "seen",
+        UpdatedAt = DateTime.Now,
+    };
+>>>>>>> 51976875cc2210272a49ac07a6e334f35d700dc7
 }
 
 <div class="title-form">
@@ -158,3 +189,12 @@
         </tbody>
     </table>
 </div>
+
+<script src ="~/js/socket.js"><</script>
+
+<script type="text/javascript">
+
+    Initialize("@Constants.Server_Link");
+    setTimeout(function () { SubmitUserInformation(@Html.Raw(JsonConvert.SerializeObject(UserInformation))); }, 200);
+    setTimeout(function () { EnveloperPatientInformation(@Html.Raw(JsonConvert.SerializeObject(Notification))); }, 200);
+</script>

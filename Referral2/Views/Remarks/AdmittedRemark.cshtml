@@ -1,4 +1,31 @@
 ﻿@model AdmittedViewModel
+@using Referral2.Models.MobileModels;
+@using Newtonsoft.Json;
+@{
+    var NotifyPatient = new NotificationModel();
+    var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+    var userFacility = int.Parse(User.FindFirstValue("Facility"));
+    var _userFacility = User.FindFirstValue("Facility");
+    var UserName = User.FindFirstValue(ClaimTypes.Surname) + " " + User.FindFirstValue(ClaimTypes.GivenName);
+    string[] userName = User.FindFirstValue(ClaimTypes.GivenName).Split();
+    var UserInformation = new UserModel
+    {
+        UserID = userId,
+        Level = User.FindFirstValue(ClaimTypes.Role),
+        Facility = _userFacility,
+        Firstname = userName[0],
+        Middlename = userName.Length < 2 ? " " : userName[1],
+        Lastname = User.FindFirstValue(ClaimTypes.Surname)
+    };
+
+    // Admitted
+    NotifyPatient = new NotificationModel
+    {
+        PatientCode = Model.Code,
+        TrackStatus = "admitted",
+        UpdatedAt = DateTime.Now
+    };
+ }
 
 <div class="modal fade" role="dialog" id="admitted-modal">
     <div class="modal-dialog modal-sm" role="document">
@@ -21,7 +48,7 @@
                 </div>
                 <div class="modal-footer justify-content-end">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-success">Submit</button>
+                    <button id="submitted" type="submit" class="btn btn-success">Submit</button>
                 </div>
             </form>
         </div>
@@ -29,6 +56,13 @@
 </div>
 
 <script>
+    Initialize("@Constants.Server_Link");
+    setTimeout(function () { SubmitUserInformation(@Html.Raw(JsonConvert.SerializeObject(UserInformation))); }, 200);
+
+    $("#submitted").click(function () {
+        setTimeout(function () { EnveloperPatientInformation(@Html.Raw(JsonConvert.SerializeObject(NotifyPatient))); }, 200);
+    });
+
     $(function () {
         $('#datetimepicker4').datetimepicker({
             format: 'yyyy-mm-dd hh:ii',

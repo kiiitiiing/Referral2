@@ -15,6 +15,8 @@ using Referral2.Models.ViewModels.ViewPatients;
 using Microsoft.Extensions.Options;
 using Referral2.Models.ViewModels.Doctor;
 using MoreLinq.Extensions;
+using Newtonsoft.Json;
+using Referral2.Models.MobileModels;
 
 namespace Referral2.Controllers
 {
@@ -48,7 +50,7 @@ namespace Referral2.Controllers
         public DateTime EndDate { get; set; }
 
         //GET: List Patients
-        public async Task<IActionResult> ListPatients( string name, int? muncityId, int? barangayId, int? page)
+        public async Task<IActionResult> ListPatients(string name, int? muncityId, int? barangayId, int? page)
         {
             ViewBag.CurrentFilter = name;
 
@@ -62,7 +64,7 @@ namespace Referral2.Controllers
                 ViewBag.Muncities = new SelectList(muncities, "Id", "Description", muncityId);
                 ViewBag.Barangays = new SelectList(barangays, "Id", "Description", barangayId);
             }
-                
+
 
 
             var patients = _context.Patient
@@ -80,14 +82,14 @@ namespace Referral2.Controllers
                 CreatedAt = (DateTime)x.CreatedAt
             })
             .Where(x => x.PatientName.ToUpper().Contains(name) &&
-            x.MuncityId.Equals(muncityId) && 
+            x.MuncityId.Equals(muncityId) &&
             x.BarangayId.Equals(barangayId));
 
 
             int size = 15;
 
 
-            return View(await PaginatedList<PatientsViewModel>.CreateAsync(patients.OrderBy(x=>x.PatientName), page ?? 1, size));
+            return View(await PaginatedList<PatientsViewModel>.CreateAsync(patients.OrderBy(x => x.PatientName), page ?? 1, size));
         }
 
 
@@ -132,7 +134,7 @@ namespace Referral2.Controllers
 
             if (!string.IsNullOrEmpty(search))
             {
-                accepted = accepted.Where(s => s.PatientCode.Equals(search) || s.PatientName.Contains(search));    
+                accepted = accepted.Where(s => s.PatientCode.Equals(search) || s.PatientName.Contains(search));
                 ViewBag.Total = accepted.Count();
             }
             else
@@ -272,7 +274,7 @@ namespace Referral2.Controllers
                     PatientName = x.Patient.FirstName + " " + x.Patient.MiddleName + " " + x.Patient.LastName,
                     Code = x.Code,
                     DateArchive = x.DateReferred.AddDays(3),
-                    Reason = _context.Activity.Where(c=>c.Code == x.Code).FirstOrDefault().Remarks
+                    Reason = _context.Activity.Where(c => c.Code == x.Code).FirstOrDefault().Remarks
                 });
             #endregion
 
@@ -297,8 +299,54 @@ namespace Referral2.Controllers
             var activities = _context.Activity;
             var feedbacks = _context.Feedback;
             var facilities = _context.Facility.Where(x => x.Id != UserFacility);
+<<<<<<< HEAD
             List<ReferredViewModel> track = null;
             if(!string.IsNullOrEmpty(code))
+=======
+            var track = await _context.Tracking
+                .Where(x => x.Code.Equals(code))
+                .Select(t => new ReferredViewModel
+                {
+                    PatientId = t.PatientId,
+                    PatientName = t.Patient.FirstName + " " + t.Patient.MiddleName + " " + t.Patient.LastName,
+                    PatientSex = t.Patient.Sex,
+                    PatientAge = t.Patient.DateOfBirth.ComputeAge(),
+                    PatientAddress = GlobalFunctions.GetAddress(t.Patient),
+                    ReferredBy = GlobalFunctions.GetMDFullName(t.ReferringMdNavigation),
+                    ReferredTo = GlobalFunctions.GetMDFullName(t.ActionMdNavigation),
+                    ReferredToId = t.ReferredTo,
+                    TrackingId = t.Id,
+                    SeenCount = t.Seen.Count(),
+                    CallerCount = activities.Where(x => x.Code.Equals(t.Code) && x.Status.Equals(_status.Value.CALLING)).Count(),
+                    IssueCount = _context.Issue.Where(x => x.TrackingId.Equals(t.Id)).Count(),
+                    ReCoCount = feedbacks.Where(x => x.Code.Equals(t.Code)).Count(),
+                    Travel = string.IsNullOrEmpty(t.Transportation),
+                    Code = t.Code,
+                    Status = t.Status,
+                    Pregnant = t.Type.Equals("pregnant"),
+                    Seen = t.DateSeen != default,
+                    Walkin = t.WalkIn.Equals("yes"),
+                    UpdatedAt = t.DateReferred,
+                    Activities = activities.Where(x => x.Code.Equals(t.Code) && x.Status != _status.Value.CALLING).OrderByDescending(x => x.CreatedAt)
+                        .Select(i => new ActivityLess
+                        {
+                            Status = i.Status,
+                            DateAction = i.DateReferred.ToString("MMM dd, yyyy hh:mm tt", CultureInfo.InvariantCulture),
+                            FacilityFrom = i.ReferredFromNavigation == null ? "" : i.ReferredFromNavigation.Name,
+                            FacilityFromContact = i.ReferredFromNavigation == null ? "" : i.ReferredFromNavigation.Contact,
+                            FacilityTo = t.ReferredToNavigation.Name,
+                            PatientName = i.Patient.FirstName + " " + i.Patient.MiddleName + " " + i.Patient.LastName,
+                            ActionMd = GlobalFunctions.GetMDFullName(i.ActionMdNavigation),
+                            ReferringMd = GlobalFunctions.GetMDFullName(i.ReferringMdNavigation),
+                            Remarks = i.Remarks
+                        })
+                })
+                .OrderByDescending(x => x.UpdatedAt)
+                .FirstOrDefaultAsync();
+
+
+            if (track != null)
+>>>>>>> 51976875cc2210272a49ac07a6e334f35d700dc7
             {
                 var tracking = await _context.Tracking
                    .Include(x=>x.ActionMdNavigation)
@@ -353,14 +401,17 @@ namespace Referral2.Controllers
                 return View(tracking);
             }
 
+<<<<<<< HEAD
             
+=======
+>>>>>>> 51976875cc2210272a49ac07a6e334f35d700dc7
 
             return View(track);
         }
 
 
         //GET: Incoming patients
-        public async Task<IActionResult> Incoming(string search, string dateRange, int? department, string status,int? page)
+        public async Task<IActionResult> Incoming(string search, string dateRange, int? department, string status, int? page)
         {
             #region Initialize variables
             ViewBag.CurrentSearch = search;
@@ -377,13 +428,21 @@ namespace Referral2.Controllers
             }
 
             var faciliyDepartment = _context.User
-                .Include(x=>x.Department)
+                .Include(x => x.Department)
                 .Where(x => x.FacilityId.Equals(UserFacility) && x.Level.Equals(_roles.Value.DOCTOR) && x.DepartmentId != null)
+<<<<<<< HEAD
                 .Select(x=>x.Department)
                 .Distinct()
                 .Select(x => new SelectDepartment
                 {
                     DepartmentId = x.Id,
+=======
+                .Select(y => y.Department)
+                .Distinct()
+                .Select(x => new SelectDepartment
+                {
+                    DepartmentId = (int)x.Id,
+>>>>>>> 51976875cc2210272a49ac07a6e334f35d700dc7
                     DepartmentName = x.Description
                 });
 
@@ -404,12 +463,12 @@ namespace Referral2.Controllers
                     Pregnant = t.Type.Equals("pregnant"),
                     TrackingId = t.Id,
                     Code = t.Code,
-                    PatientName = t.Patient.GetFullName().NameToUpper(),
+                    PatientName = t.Patient.LastName,
                     PatientSex = t.Patient.Sex,
                     PatientAge = t.Patient.DateOfBirth.ComputeAge(),
                     Status = t.Status,
-                    ReferringMd = t.ReferringMdNavigation.GetMDFullName().NameToUpper(),
-                    ActionMd = activities.OrderByDescending(x => x.DateReferred).Where(x => x.Status == t.Status && x.Code == t.Code).First().ActionMdNavigation.GetMDFullName().NameToUpper(),
+                    ReferringMd = t.ReferringMdNavigation.Lastname,
+                    //ActionMd = activities.OrderByDescending(x => x.DateReferred).Where(x => x.Status == t.Status && x.Code == t.Code).First().ActionMdNavigation.GetMDFullName(),
                     SeenCount = t.Seen.Count(),//Seen
                     CallCount = _context.Activity.Where(x => x.Code.Equals(t.Code) && x.Status.Equals(_status.Value.CALLING)).Count(),
                     FeedbackCount = _context.Feedback.Where(x => x.Code.Equals(t.Code)).Count(),//feedback
@@ -421,6 +480,7 @@ namespace Referral2.Controllers
                     Department = t.Department.Description,
                     DepartmentId = (int)t.DepartmentId
                 });
+
             #endregion
 
             if (department != null)
@@ -435,7 +495,7 @@ namespace Referral2.Controllers
                 incoming = incoming.Where(s => s.Code.Equals(search));
             }
 
-            if(!string.IsNullOrEmpty(status))
+            if (!string.IsNullOrEmpty(status))
             {
                 if (status.Equals(_status.Value.ACCEPTED))
                     incoming = incoming.Where(x => x.Status != _status.Value.REFERRED && x.Status != _status.Value.SEEN);
@@ -448,7 +508,7 @@ namespace Referral2.Controllers
             int size = 5;
 
             ViewBag.Total = incoming.Count();
-            return View(await PaginatedList<IncomingViewModel>.CreateAsync(incoming.OrderByDescending(x=>x.DateAction), page ?? 1, size));
+            return View(await PaginatedList<IncomingViewModel>.CreateAsync(incoming.OrderByDescending(x => x.DateAction), page ?? 1, size));
         }
         // GET: Referred
         public async Task<IActionResult> Referred(string search, string dateRange, int? facilityId, string status, int? page)
@@ -469,7 +529,7 @@ namespace Referral2.Controllers
             ViewBag.EndDate = EndDate;
             #endregion
             #region Query
-            var activities = _context.Activity.Where(x=>x.CreatedAt >= StartDate && x.CreatedAt <= EndDate);
+            var activities = _context.Activity.Where(x => x.CreatedAt >= StartDate && x.CreatedAt <= EndDate);
             var feedbacks = _context.Feedback.Where(x => x.CreatedAt >= StartDate && x.CreatedAt <= EndDate);
             var facilities = _context.Facility.Where(x => x.Id != UserFacility);
             var referred = _context.Tracking
@@ -480,7 +540,7 @@ namespace Referral2.Controllers
                 .Select(t => new ReferredViewModel
                 {
                     PatientId = t.PatientId,
-                    PatientName = t.Patient.FirstName+" "+ t.Patient.MiddleName+" "+ t.Patient.LastName,
+                    PatientName = t.Patient.FirstName + " " + t.Patient.MiddleName + " " + t.Patient.LastName,
                     PatientSex = t.Patient.Sex,
                     PatientAge = t.Patient.DateOfBirth.ComputeAge(),
                     PatientAddress = t.Patient.Barangay.Description+", "+t.Patient.Muncity.Description+", "+t.Patient.Province.Description,
@@ -490,7 +550,7 @@ namespace Referral2.Controllers
                     TrackingId = t.Id,
                     SeenCount = _context.Seen.Where(x => x.TrackingId.Equals(t.Id)).Count(),
                     CallerCount = activities.Where(x => x.Code.Equals(t.Code) && x.Status.Equals(_status.Value.CALLING)).Count(),
-                    IssueCount = _context.Issue.Where(x=>x.TrackingId.Equals(t.Id)).Count(),
+                    IssueCount = _context.Issue.Where(x => x.TrackingId.Equals(t.Id)).Count(),
                     ReCoCount = feedbacks.Where(x => x.Code.Equals(t.Code)).Count(),
                     Travel = string.IsNullOrEmpty(t.Transportation),
                     Code = t.Code,
@@ -532,7 +592,7 @@ namespace Referral2.Controllers
                 ViewBag.CurrentSearch = search;
             }
 
-            if(!string.IsNullOrEmpty(status))
+            if (!string.IsNullOrEmpty(status))
             {
                 referred = referred.Where(x => x.Status == status);
                 ViewBag.Total = referred.Count();
@@ -540,7 +600,7 @@ namespace Referral2.Controllers
                 ViewBag.SelectedStatus = status;
             }
 
-            if(facilityId != null)
+            if (facilityId != null)
             {
                 referred = referred.Where(x => x.ReferredToId == facilityId);
                 ViewBag.Total = referred.Count();
@@ -550,14 +610,139 @@ namespace Referral2.Controllers
 
             int size = 3;
 
-            return View(await PaginatedList< ReferredViewModel>.CreateAsync(referred.OrderByDescending(x=>x.UpdatedAt),page ?? 1, size));
+            return View(await PaginatedList<ReferredViewModel>.CreateAsync(referred.OrderByDescending(x => x.UpdatedAt), page ?? 1, size));
         }
+
+        #region View Patients Socket Components
+
+        [HttpPost]
+        public IActionResult GetUserInformation(string user)
+        {
+            var DeserializeUserInformation = JsonConvert.DeserializeObject<UserModel>(user);
+
+            var getfacility = _context.Facility
+                .Where(facilityId => facilityId.Id == Convert.ToInt32(DeserializeUserInformation.Facility))
+                .Select(facility => facility.Name)
+                .FirstOrDefault();
+
+            DeserializeUserInformation.Facility = getfacility;
+
+            var Request = new RequestModel
+            {
+                InformationType = Constants.INFORMATION_TAG,
+                UserInformation = DeserializeUserInformation,
+            };
+
+            return Json(Request);
+        }
+
+        [HttpPost]
+        public IActionResult GetPatientInformation(string patient)
+        {
+            RequestModel Request = new RequestModel();
+            if (!string.IsNullOrEmpty(patient))
+            {
+                var DeserializePatientInformation = JsonConvert.DeserializeObject<NotificationModel>(patient);
+                Console.WriteLine();
+
+                var GetPatientInfo = _context.Tracking
+                    .Join( // GET PATIENT ID
+                        _context.Patient,
+                        tracking => tracking.PatientId,
+                        patient => patient.Id,
+                        (tracking, patient) => new { tracking, patient })
+
+                    .Join( // GET NAME OF REFERRING MD
+                        _context.User,
+                        pr => pr.tracking.ReferringMd,
+                        referringuser => referringuser.Id,
+                        (referringmdId, referringuser) => new { referringmdId, referringuser })
+
+                    .Join( // GET NAME OF ACTION MD
+                        _context.User,
+                        pa => pa.referringmdId.tracking.ActionMd,
+                        actionmdUser => actionmdUser.Id,
+                        (actionmdId, actionmdUser) => new { actionmdId, actionmdUser })
+
+                    .Join( // GET FACILITY OF ACTION MD
+                        _context.Facility,
+                        pactionmd => pactionmd.actionmdUser.FacilityId,
+                        actionmdfacility => actionmdfacility.Id,
+                        (actionmdfacility, pactionmd) => new { actionmdfacility, pactionmd })
+
+                    .Join( // GET FACILITY OF REFERRING MD
+                        _context.Facility,
+                        preferringmd => preferringmd.actionmdfacility.actionmdId.referringuser.FacilityId,
+                        referringfacility => referringfacility.Id,
+                        (referring_facility, referring_md) => new { referring_facility, referring_md})
+
+                    .Where(patientcode => patientcode.referring_facility.actionmdfacility.actionmdId.referringmdId.tracking.Code == DeserializePatientInformation.PatientCode)
+                    .Select(notification => new NotificationModel
+                    {
+                        PatientCode = DeserializePatientInformation.PatientCode,
+                        PatientName = notification.referring_facility.actionmdfacility.actionmdId.referringmdId.patient.GetFullName(),
+                        TrackStatus = DeserializePatientInformation.TrackStatus,
+                        ReferringDoctor = notification.referring_facility.actionmdfacility.actionmdId.referringuser.GetMDFullName(),
+                        ReferringDoctorFacility = notification.referring_md.Name,
+                        ReferredDoctor = notification.referring_facility.actionmdfacility.actionmdUser.GetMDFullName(),
+                        ReferredDoctorFacility = notification.referring_facility.pactionmd.Name,
+                        UpdatedAt = DeserializePatientInformation.UpdatedAt,
+                    })
+                    .FirstOrDefault();
+
+                if (GetPatientInfo != null)
+                {
+                    Request = new RequestModel
+                    {
+                        InformationType = Constants.NOTIFICATION_TAG,
+                        PatientNotification = GetPatientInfo,
+                    };
+                    return Json(Request);
+                }
+                Console.WriteLine();
+            }
+            return Json(Request);
+        }
+
+        //public NotificationModel GetFinalStatus(NotificationModel patient, string status)
+        //{
+        //    var _patient = patient;
+        //    switch (status)
+        //    {
+        //        case "referred":
+        //            _patient.SeenStatus = 1; 
+        //                break;
+
+        //        case "seen":
+        //            _patient.AcceptedStatus = 1;
+        //            break;
+
+        //        case "accepted":
+        //            _patient.ArrivedStatus = 1;
+        //            break;
+
+        //        case "arrived":
+        //            _patient.AdmittedStatus = 1;
+        //            break;
+
+        //        case "admitted":
+        //            _patient.DischargedStatus = 1;
+        //            break;
+
+        //        case "discharged":
+        //            _patient.DischargedStatus = 2;
+        //            break;
+        //    }
+        //    return _patient;
+        //}
+
+        #endregion
 
         #region HELPERS
 
         public int UserId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
         public int UserFacility => int.Parse(User.FindFirstValue("Facility"));
-        public int? UserDepartment => string.IsNullOrEmpty(User.FindFirstValue("Department"))? null : (int?)int.Parse(User.FindFirstValue("Department"));
+        public int? UserDepartment => string.IsNullOrEmpty(User.FindFirstValue("Department")) ? null : (int?)int.Parse(User.FindFirstValue("Department"));
         public int UserProvince => int.Parse(User.FindFirstValue("Province"));
         public int UserMuncity => int.Parse(User.FindFirstValue("Muncity"));
         public int UserBarangay => int.Parse(User.FindFirstValue("Barangay"));
